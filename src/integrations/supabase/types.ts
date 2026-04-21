@@ -140,6 +140,7 @@ export type Database = {
           last_training_date: string | null
           longest_streak: number
           onboarded: boolean
+          playing_styles: string[]
           total_xp: number
           training_goal: string | null
           updated_at: string
@@ -160,6 +161,7 @@ export type Database = {
           last_training_date?: string | null
           longest_streak?: number
           onboarded?: boolean
+          playing_styles?: string[]
           total_xp?: number
           training_goal?: string | null
           updated_at?: string
@@ -180,6 +182,7 @@ export type Database = {
           last_training_date?: string | null
           longest_streak?: number
           onboarded?: boolean
+          playing_styles?: string[]
           total_xp?: number
           training_goal?: string | null
           updated_at?: string
