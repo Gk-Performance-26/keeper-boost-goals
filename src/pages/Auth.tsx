@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Shield } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import gkLogo from "@/assets/gk-logo.jpg";
 
 const schema = z.object({
   email: z.string().trim().email("Enter a valid email").max(255),
@@ -18,7 +19,7 @@ const schema = z.object({
 
 const Auth = () => {
   const { user, loading } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signup");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -69,14 +70,18 @@ const Auth = () => {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
       <div className="mb-6 flex flex-col items-center gap-3">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow">
-          <Shield className="h-8 w-8 text-primary-foreground" />
+        <div className="overflow-hidden rounded-2xl shadow-glow ring-1 ring-primary/30">
+          <img
+            src={gkLogo}
+            alt="GK Performance Hub logo"
+            className="h-32 w-32 object-cover"
+          />
         </div>
         <h1 className="font-display text-2xl text-center tracking-wide">
           GK <span className="text-gradient-primary">PERFORMANCE</span> HUB
         </h1>
-        <p className="text-center text-sm text-muted-foreground">
-          Daily training, real progress. Built for goalkeepers.
+        <p className="text-center text-sm text-muted-foreground italic">
+          Train like a pro. Save like a legend.
         </p>
       </div>
 
