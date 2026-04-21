@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Sparkles, Trophy } from "lucide-react";
 import { format, startOfDay } from "date-fns";
+import gkLogo from "@/assets/gk-logo.jpg";
 
 const Home = () => {
   const { user } = useAuth();
@@ -60,6 +61,15 @@ const Home = () => {
 
   return (
     <div className="space-y-6 px-5 pt-8">
+      {/* Brand */}
+      <div className="flex justify-center">
+        <img
+          src={gkLogo}
+          alt="GK Performance Hub"
+          className="h-28 w-28 rounded-2xl object-cover shadow-glow"
+        />
+      </div>
+
       {/* Header */}
       <header className="flex items-start justify-between">
         <div>
