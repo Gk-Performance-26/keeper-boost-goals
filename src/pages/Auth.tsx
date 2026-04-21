@@ -51,7 +51,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast({ title: "Welcome to KeeperUp 🧤", description: "Let's set up your profile." });
+        toast({ title: "Welcome to GK Performance Hub 🧤", description: "Let's set up your profile." });
         navigate("/onboarding");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -72,8 +72,8 @@ const Auth = () => {
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-primary shadow-glow">
           <Shield className="h-8 w-8 text-primary-foreground" />
         </div>
-        <h1 className="font-display text-3xl">
-          Keeper<span className="text-gradient-primary">Up</span>
+        <h1 className="font-display text-2xl text-center tracking-wide">
+          GK <span className="text-gradient-primary">PERFORMANCE</span> HUB
         </h1>
         <p className="text-center text-sm text-muted-foreground">
           Daily training, real progress. Built for goalkeepers.

@@ -31,6 +31,17 @@ export const DOMINANT_HANDS = [
   { value: "both", label: "Both" },
 ] as const;
 
+export const PLAYING_STYLES = [
+  { value: "libero", label: "GR líbero" },
+  { value: "aerial", label: "Forte no jogo aéreo" },
+  { value: "quick_exits", label: "GR rápido nas saídas" },
+  { value: "imposing", label: "Imponente" },
+  { value: "quick_reflexes", label: "Reflexos rápidos" },
+  { value: "strong_hands", label: "Mãos fortes" },
+] as const;
+
+export type PlayingStyle = (typeof PLAYING_STYLES)[number]["value"];
+
 export function generateFeedback(scores: Record<string, number>): string[] {
   const tips: string[] = [];
   Object.entries(scores).forEach(([slug, score]) => {
