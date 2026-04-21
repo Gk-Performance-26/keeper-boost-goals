@@ -4,12 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { Flame, LogOut, Settings, Sparkles, Trophy } from "lucide-react";
+import { Flame, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
+  const { data: isAdmin } = useIsAdmin();
 
   if (!profile) return null;
 
@@ -56,6 +58,13 @@ const Profile = () => {
             <Settings className="h-4 w-4" /> Edit profile
           </Button>
         </Link>
+        {isAdmin && (
+          <Link to="/admin">
+            <Button variant="outline" className="w-full justify-start">
+              <ShieldCheck className="h-4 w-4" /> Admin
+            </Button>
+          </Link>
+        )}
         <Button variant="outline" className="w-full justify-start text-destructive" onClick={signOut}>
           <LogOut className="h-4 w-4" /> Sign out
         </Button>
