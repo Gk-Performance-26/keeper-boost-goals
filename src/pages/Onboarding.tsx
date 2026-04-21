@@ -8,9 +8,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { AGE_GROUPS, DOMINANT_HANDS, EXPERIENCE_LEVELS, ExperienceLevel } from "@/lib/gamification";
-import { ChevronRight, Loader2, Shield } from "lucide-react";
+import {
+  AGE_GROUPS,
+  DOMINANT_HANDS,
+  EXPERIENCE_LEVELS,
+  ExperienceLevel,
+  PLAYING_STYLES,
+  PlayingStyle,
+} from "@/lib/gamification";
+import { Check, ChevronRight, Loader2, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const TOTAL_STEPS = 5;
 
 const Onboarding = () => {
   const { user } = useAuth();
@@ -24,11 +33,34 @@ const Onboarding = () => {
   const [hand, setHand] = useState<"left" | "right" | "both">(
     (profile?.dominant_hand as "left" | "right" | "both") || "right",
   );
+  const [styles, setStyles] = useState<PlayingStyle[]>(
+    ((profile as unknown as { playing_styles?: PlayingStyle[] })?.playing_styles ?? []) as PlayingStyle[],
+  );
   const [goal, setGoal] = useState(profile?.training_goal || "");
   const [saving, setSaving] = useState(false);
 
+  const toggleStyle = (value: PlayingStyle) => {
+    setStyles((prev) =>
+      prev.includes(value) ? prev.filter((s) => s !== value) : [...prev, value],
+    );
+  };
+
+  const canContinue = () => {
+    if (step === 3) return styles.length > 0;
+    return true;
+  };
+
   const finish = async () => {
     if (!user) return;
+    if (styles.length === 0) {
+      toast({
+        title: "Estilo de jogo obrigatório",
+        description: "Escolhe pelo menos um estilo de jogo.",
+        variant: "destructive",
+      });
+      setStep(3);
+      return;
+    }
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
@@ -38,6 +70,8 @@ const Onboarding = () => {
         dominant_hand: hand,
         training_goal: goal || null,
         onboarded: true,
+        // playing_styles is in DB but not yet typed in generated types
+        ...({ playing_styles: styles } as Record<string, unknown>),
       })
       .eq("user_id", user.id);
     setSaving(false);
@@ -57,7 +91,9 @@ const Onboarding = () => {
           <Shield className="h-5 w-5 text-primary-foreground" />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Step {step + 1} of 4</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+            Step {step + 1} of {TOTAL_STEPS}
+          </p>
           <h2 className="font-display text-xl">Set up your kit</h2>
         </div>
       </div>
@@ -65,7 +101,7 @@ const Onboarding = () => {
       <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
           className="h-full gradient-primary transition-all"
-          style={{ width: `${((step + 1) / 4) * 100}%` }}
+          style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
         />
       </div>
 
@@ -140,6 +176,39 @@ const Onboarding = () => {
 
           {step === 3 && (
             <>
+              <h3 className="font-display text-2xl">Estilo de jogo</h3>
+              <p className="text-sm text-muted-foreground">
+                Obrigatório. Escolhe um ou mais que te descrevam.
+              </p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {PLAYING_STYLES.map((s) => {
+                  const active = styles.includes(s.value);
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => toggleStyle(s.value)}
+                      className={cn(
+                        "flex items-center justify-between rounded-xl border p-3 text-left text-sm font-semibold transition",
+                        active
+                          ? "border-primary bg-primary/10 text-primary shadow-glow"
+                          : "border-border bg-muted/30 hover:bg-muted/60",
+                      )}
+                    >
+                      <span>{s.label}</span>
+                      {active && <Check className="h-4 w-4 text-primary" />}
+                    </button>
+                  );
+                })}
+              </div>
+              {styles.length === 0 && (
+                <p className="text-xs text-destructive">Escolhe pelo menos um estilo.</p>
+              )}
+            </>
+          )}
+
+          {step === 4 && (
+            <>
               <h3 className="font-display text-2xl">Your training goal</h3>
               <p className="text-sm text-muted-foreground">Optional. Helps us recommend sessions.</p>
               <div className="space-y-1.5">
@@ -163,8 +232,12 @@ const Onboarding = () => {
             Back
           </Button>
         )}
-        {step < 3 ? (
-          <Button className="flex-1 shadow-glow" onClick={() => setStep((s) => s + 1)}>
+        {step < TOTAL_STEPS - 1 ? (
+          <Button
+            className="flex-1 shadow-glow"
+            onClick={() => setStep((s) => s + 1)}
+            disabled={!canContinue()}
+          >
             Continue
           </Button>
         ) : (
