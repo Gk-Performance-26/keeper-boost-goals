@@ -1,9 +1,21 @@
 import { Instagram } from "lucide-react";
 
+const INSTAGRAM_URL = "https://www.instagram.com/gkperformance.hub/";
+
 export function InstagramFab() {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    // Try opening in new tab first; fall back to same-tab navigation if blocked
+    const win = window.open(INSTAGRAM_URL, "_blank", "noopener,noreferrer");
+    if (!win) {
+      window.location.href = INSTAGRAM_URL;
+    }
+  };
+
   return (
     <a
-      href="https://instagram.com/gkperformance.hub"
+      href={INSTAGRAM_URL}
+      onClick={handleClick}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Segue @gkperformance.hub no Instagram"
