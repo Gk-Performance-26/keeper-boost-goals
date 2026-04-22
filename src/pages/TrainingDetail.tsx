@@ -56,6 +56,26 @@ const TrainingDetail = () => {
   const allDone = accessibleDrills.length > 0 && done.size === accessibleDrills.length;
   const isLocked = (training as any).is_premium && !hasSub;
 
+  // Build flat list of strings to translate, then split back into pieces
+  const drillTitles = drills.map((d) => d.title ?? "");
+  const drillReps = drills.map((d) => d.reps ?? "");
+  const equipmentList = (training.equipment ?? []) as string[];
+  const baseTexts = [
+    training.title ?? "",
+    training.description ?? "",
+    training.categories?.name ?? "",
+    ...drillTitles,
+    ...drillReps,
+    ...equipmentList,
+  ];
+  const translated = useTranslatedTexts(baseTexts);
+  const tTitle = translated[0] || training.title;
+  const tDesc = translated[1] || training.description;
+  const tCategory = translated[2] || training.categories?.name;
+  const tDrillTitles = translated.slice(3, 3 + drills.length);
+  const tDrillReps = translated.slice(3 + drills.length, 3 + drills.length * 2);
+  const tEquipment = translated.slice(3 + drills.length * 2);
+
   const toggle = (i: number) => {
     setDone((s) => {
       const n = new Set(s);
