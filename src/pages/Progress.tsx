@@ -18,6 +18,7 @@ import { StreakBadge } from "@/components/StreakBadge";
 import { Award, Flame, Sparkles, Trophy } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { GoalsSection } from "@/components/GoalsSection";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 
 const Progress = () => {
   const { user } = useAuth();
@@ -88,6 +89,17 @@ const Progress = () => {
 
   const totalMinutes = (sessions ?? []).reduce((s, x) => s + (x.duration_minutes || 0), 0);
   const earnedBadgeIds = new Set((userBadges ?? []).map((b) => b.badge_id));
+
+  // Sort badges (earned first) and limit to 6, then translate names
+  const visibleBadges = (badges ?? [])
+    .slice()
+    .sort((a, b) => {
+      const ae = earnedBadgeIds.has(a.id) ? 0 : 1;
+      const be = earnedBadgeIds.has(b.id) ? 0 : 1;
+      return ae - be;
+    })
+    .slice(0, 6);
+  const translatedBadgeNames = useTranslatedTexts(visibleBadges.map((b) => b.name));
 
   if (!profile) return null;
 
@@ -177,38 +189,30 @@ const Progress = () => {
       <section className="space-y-2">
         <h2 className="font-display text-lg">{t("progress.badges")}</h2>
         <div className="grid grid-cols-3 gap-2">
-          {(badges ?? [])
-            .slice()
-            .sort((a, b) => {
-              const ae = earnedBadgeIds.has(a.id) ? 0 : 1;
-              const be = earnedBadgeIds.has(b.id) ? 0 : 1;
-              return ae - be;
-            })
-            .slice(0, 6)
-            .map((b) => {
-              const earned = earnedBadgeIds.has(b.id);
-              return (
+          {visibleBadges.map((b, i) => {
+            const earned = earnedBadgeIds.has(b.id);
+            return (
+              <div
+                key={b.id}
+                className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center transition ${
+                  earned ? "border-primary/40 bg-primary/10" : "border-border bg-muted/20 opacity-50"
+                }`}
+              >
                 <div
-                  key={b.id}
-                  className={`flex flex-col items-center gap-1 rounded-xl border p-3 text-center transition ${
-                    earned ? "border-primary/40 bg-primary/10" : "border-border bg-muted/20 opacity-50"
+                  className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                    earned ? "shadow-glow" : ""
                   }`}
+                  style={{ backgroundColor: `hsl(var(--${b.color_token}) / ${earned ? 0.3 : 0.1})` }}
                 >
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                      earned ? "shadow-glow" : ""
-                    }`}
-                    style={{ backgroundColor: `hsl(var(--${b.color_token}) / ${earned ? 0.3 : 0.1})` }}
-                  >
-                    <Award
-                      className="h-5 w-5"
-                      style={{ color: `hsl(var(--${b.color_token}))` }}
-                    />
-                  </div>
-                  <p className="text-[11px] font-semibold leading-tight">{b.name}</p>
+                  <Award
+                    className="h-5 w-5"
+                    style={{ color: `hsl(var(--${b.color_token}))` }}
+                  />
                 </div>
-              );
-            })}
+                <p className="text-[11px] font-semibold leading-tight">{translatedBadgeNames[i] || b.name}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>
