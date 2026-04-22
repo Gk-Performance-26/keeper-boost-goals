@@ -1,5 +1,5 @@
 // Edge function: translate an array of short texts using Lovable AI Gateway.
-// Returns translations in the requested target language.
+// Auto-detects each text's source language and translates to the requested target.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,8 +10,6 @@ const corsHeaders = {
 const LANG_NAMES: Record<string, string> = {
   pt: "European Portuguese (pt-PT)",
   en: "English",
-  es: "Spanish",
-  fr: "French",
 };
 
 Deno.serve(async (req) => {
@@ -39,10 +37,16 @@ Deno.serve(async (req) => {
 
     const targetName = LANG_NAMES[target];
     const systemPrompt = `You are a professional translator for a goalkeeper training app.
-Translate each input string into ${targetName}.
+For each input string:
+1. Auto-detect its source language.
+2. If it is ALREADY in ${targetName}, return it unchanged.
+3. Otherwise translate it INTO ${targetName}.
+
+Rules:
 - Preserve emojis and proper nouns (e.g. "GK Performance Hub").
+- Keep numbers, units, and reps formatting (e.g. "3x10", "30s") unchanged.
 - Keep the same tone (motivational, concise).
-- Do NOT add explanations.
+- Do NOT add explanations or quotes around translations.
 - Return ONLY a JSON array of strings, in the SAME order as the input, with the same length.`;
 
     const userPrompt = JSON.stringify(texts);
@@ -54,7 +58,7 @@ Translate each input string into ${targetName}.
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -116,7 +120,6 @@ Translate each input string into ${targetName}.
       }
     }
 
-    // Fallback: if we didn't get the right count, return originals
     if (translations.length !== texts.length) {
       console.warn("Translation count mismatch, returning originals");
       translations = texts;
