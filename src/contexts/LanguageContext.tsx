@@ -53,6 +53,7 @@ const translations: Record<Lang, Dict> = {
     "training.becomePremium": "Tornar-me Premium",
     "training.lockedDrills": "exercício(s) premium bloqueado(s)",
     "training.subscribeToUnlock": "Subscreve para desbloquear →",
+    "training.unlockWithPremium": "Desbloquear com Premium",
 
     // Complete session
     "complete.selfAssessment": "Auto-avaliação",
@@ -289,6 +290,7 @@ const translations: Record<Lang, Dict> = {
     "training.becomePremium": "Become Premium",
     "training.lockedDrills": "premium drill(s) locked",
     "training.subscribeToUnlock": "Subscribe to unlock →",
+    "training.unlockWithPremium": "Unlock with Premium",
 
     "complete.selfAssessment": "Self-assessment",
     "complete.howWasIt": "How did it go?",

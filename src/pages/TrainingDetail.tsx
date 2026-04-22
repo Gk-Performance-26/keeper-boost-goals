@@ -9,6 +9,7 @@ import { ArrowLeft, Check, Clock, Crown, Loader2, Lock, Sparkles } from "lucide-
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
 interface Drill {
@@ -38,6 +39,18 @@ const TrainingDetail = () => {
     },
   });
 
+  const drills = ((training?.drills as unknown as Drill[]) || []);
+  const equipmentList = (training?.equipment ?? []) as string[];
+  const baseTexts = [
+    training?.title ?? "",
+    training?.description ?? "",
+    training?.categories?.name ?? "",
+    ...drills.map((d) => d.title ?? ""),
+    ...drills.map((d) => d.reps ?? ""),
+    ...equipmentList,
+  ];
+  const translated = useTranslatedTexts(baseTexts);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -47,13 +60,19 @@ const TrainingDetail = () => {
   }
   if (!training) return <p className="p-8 text-center">{t("common.notFound")}</p>;
 
-  const drills = (training.drills as unknown as Drill[]) || [];
   const accessibleDrills = drills
     .map((d, i) => ({ ...d, _idx: i, _locked: !!d.is_premium && !hasSub }))
     .filter((d) => !d._locked);
   const lockedDrills = drills.filter((d) => d.is_premium && !hasSub);
   const allDone = accessibleDrills.length > 0 && done.size === accessibleDrills.length;
   const isLocked = (training as any).is_premium && !hasSub;
+
+  const tTitle = translated[0] || training.title;
+  const tDesc = translated[1] || training.description;
+  const tCategory = translated[2] || training.categories?.name;
+  const tDrillTitles = translated.slice(3, 3 + drills.length);
+  const tDrillReps = translated.slice(3 + drills.length, 3 + drills.length * 2);
+  const tEquipment = translated.slice(3 + drills.length * 2);
 
   const toggle = (i: number) => {
     setDone((s) => {
@@ -106,13 +125,13 @@ const TrainingDetail = () => {
               }}
             >
               <CategoryIcon name={training.categories.icon} className="h-3 w-3" />
-              {training.categories.name}
+              {tCategory}
             </span>
           )}
           <span className="rounded-full bg-muted px-2.5 py-1 capitalize">{t(`level.${training.level}`)}</span>
         </div>
-        <h1 className="font-display text-2xl">{training.title}</h1>
-        <p className="text-sm text-muted-foreground">{training.description}</p>
+        <h1 className="font-display text-2xl">{tTitle}</h1>
+        <p className="text-sm text-muted-foreground">{tDesc}</p>
         <div className="flex items-center gap-4 text-sm">
           <span className="flex items-center gap-1 text-muted-foreground">
             <Clock className="h-4 w-4" /> {training.duration_minutes} {t("common.minutesShort")}
@@ -128,9 +147,9 @@ const TrainingDetail = () => {
           <CardContent className="p-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("training.equipment")}</p>
             <div className="flex flex-wrap gap-1.5">
-              {training.equipment.map((e) => (
+              {training.equipment.map((e, idx) => (
                 <span key={e} className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                  {e}
+                  {tEquipment[idx] || e}
                 </span>
               ))}
             </div>
@@ -157,7 +176,7 @@ const TrainingDetail = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-semibold opacity-80">{d.title}</p>
+                          <p className="font-semibold opacity-80">{tDrillTitles[i] || d.title}</p>
                           <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
                             <Crown className="h-2.5 w-2.5" /> {t("trainings.premium")}
                           </span>
@@ -187,8 +206,8 @@ const TrainingDetail = () => {
                       {done.has(i) && <Check className="h-4 w-4" />}
                     </div>
                     <div className="flex-1">
-                      <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{d.title}</p>
-                      <p className="text-xs text-muted-foreground">{d.reps}</p>
+                      <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{tDrillTitles[i] || d.title}</p>
+                      <p className="text-xs text-muted-foreground">{tDrillReps[i] || d.reps}</p>
                     </div>
                   </button>
                 );

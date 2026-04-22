@@ -15,6 +15,7 @@ import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 
 const Home = () => {
   const { user } = useAuth();
@@ -61,6 +62,12 @@ const Home = () => {
       return data;
     },
   });
+
+  const [challengeTitle, challengeDesc, challengeCategory] = useTranslatedTexts([
+    challenge?.title,
+    challenge?.description,
+    (challenge as any)?.categories?.name,
+  ]);
 
   if (!profile) return null;
 
@@ -130,8 +137,8 @@ const Home = () => {
             </div>
             <div className="flex-1">
               <p className="text-[11px] uppercase tracking-wider text-secondary">{t("home.weeklyChallenge")}</p>
-              <p className="font-display text-base font-bold">{challenge.title}</p>
-              <p className="text-xs text-muted-foreground">{challenge.description}</p>
+              <p className="font-display text-base font-bold">{challengeTitle || challenge.title}</p>
+              <p className="text-xs text-muted-foreground">{challengeDesc || challenge.description}</p>
             </div>
           </CardContent>
         </Card>

@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { Clock, Lock, Sparkles } from "lucide-react";
 import { CategoryIcon } from "./CategoryIcon";
 import { cn } from "@/lib/utils";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   id: string;
@@ -28,6 +30,8 @@ export function TrainingCard({
   isPremium,
   locked,
 }: Props) {
+  const { t } = useLanguage();
+  const [tTitle, tCategory] = useTranslatedTexts([title, categoryName]);
   const to = locked ? "/subscription" : `/trainings/${id}`;
 
   return (
@@ -64,8 +68,8 @@ export function TrainingCard({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{categoryName}</p>
-          <h3 className={cn("truncate font-display text-base font-bold", locked && "opacity-80")}>{title}</h3>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{tCategory || categoryName}</p>
+          <h3 className={cn("truncate font-display text-base font-bold", locked && "opacity-80")}>{tTitle || title}</h3>
           <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -79,7 +83,7 @@ export function TrainingCard({
           </div>
           {locked && (
             <p className="mt-2 text-[11px] font-semibold text-primary">
-              Desbloquear com Premium →
+              {t("training.unlockWithPremium")} →
             </p>
           )}
         </div>
