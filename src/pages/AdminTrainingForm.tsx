@@ -407,6 +407,11 @@ const AdminTrainingForm = () => {
           )}
         </CardContent>
       </Card>
+
+      <Card className="gradient-card border-border/60">
+        <CardContent className="space-y-4 p-4">
+          <div className="space-y-1.5">
+            <Label>{t("adminForm.equipmentLabel")}</Label>
             <Input
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}

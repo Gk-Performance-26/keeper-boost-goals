@@ -330,6 +330,8 @@ const translations: Record<Lang, Dict> = {
     "training.lockedDrills": "premium drill(s) locked",
     "training.subscribeToUnlock": "Subscribe to unlock →",
     "training.unlockWithPremium": "Unlock with Premium",
+    "training.introVideo": "Explanation",
+    "training.exerciseVideo": "Exercise",
 
     "complete.selfAssessment": "Self-assessment",
     "complete.howWasIt": "How did it go?",
