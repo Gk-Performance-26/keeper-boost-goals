@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AppShell } from "@/components/layout/AppShell";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
@@ -28,23 +29,25 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route element={<AppShell />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/trainings" element={<Trainings />} />
-              <Route path="/trainings/:id" element={<TrainingDetail />} />
-              <Route path="/trainings/:id/complete" element={<CompleteSession />} />
-              <Route path="/progress" element={<Progress />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/admin/trainings/:id" element={<AdminTrainingForm />} />
-              <Route path="/subscription" element={<Subscription />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <LanguageProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route element={<AppShell />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/trainings" element={<Trainings />} />
+                <Route path="/trainings/:id" element={<TrainingDetail />} />
+                <Route path="/trainings/:id/complete" element={<CompleteSession />} />
+                <Route path="/progress" element={<Progress />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/trainings/:id" element={<AdminTrainingForm />} />
+                <Route path="/subscription" element={<Subscription />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </LanguageProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
