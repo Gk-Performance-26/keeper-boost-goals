@@ -47,11 +47,14 @@ const AdminTrainingForm = () => {
   const [xpReward, setXpReward] = useState(50);
   const [videoType, setVideoType] = useState<VideoType>("youtube");
   const [videoUrl, setVideoUrl] = useState("");
+  const [introVideoType, setIntroVideoType] = useState<VideoType>("upload");
+  const [introVideoUrl, setIntroVideoUrl] = useState("");
   const [equipment, setEquipment] = useState("");
   const [drills, setDrills] = useState<Drill[]>([{ title: "", reps: "" }]);
   const [isPublished, setIsPublished] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const { data: categories } = useQuery({
@@ -82,6 +85,8 @@ const AdminTrainingForm = () => {
       setXpReward(existing.xp_reward ?? 50);
       setVideoType((existing.video_type as VideoType) ?? "youtube");
       setVideoUrl(existing.video_url ?? "");
+      setIntroVideoType(((existing as any).intro_video_type as VideoType) ?? "upload");
+      setIntroVideoUrl((existing as any).intro_video_url ?? "");
       setEquipment((existing.equipment ?? []).join(", "));
       const d = (existing.drills as unknown as Drill[]) ?? [];
       setDrills(
@@ -104,29 +109,40 @@ const AdminTrainingForm = () => {
   }
   if (!isAdmin) return <Navigate to="/admin" replace />;
 
-  const handleVideoFile = async (file: File) => {
+  const uploadVideoFile = async (file: File, target: "main" | "intro") => {
     if (!file) return;
     if (file.size > 200 * 1024 * 1024) {
       toast.error(t("adminForm.fileTooBig"));
       return;
     }
-    setUploading(true);
+    if (target === "main") setUploading(true);
+    else setUploadingIntro(true);
     const ext = file.name.split(".").pop();
-    const path = `${user.id}/${Date.now()}.${ext}`;
+    const path = `${user.id}/${target === "intro" ? "intro-" : ""}${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
       .from("training-videos")
       .upload(path, file, { contentType: file.type, upsert: false });
     if (upErr) {
       toast.error(t("adminForm.uploadFailed") + upErr.message);
-      setUploading(false);
+      if (target === "main") setUploading(false);
+      else setUploadingIntro(false);
       return;
     }
     const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
-    setVideoUrl(pub.publicUrl);
-    setVideoType("upload");
-    setUploading(false);
+    if (target === "main") {
+      setVideoUrl(pub.publicUrl);
+      setVideoType("upload");
+      setUploading(false);
+    } else {
+      setIntroVideoUrl(pub.publicUrl);
+      setIntroVideoType("upload");
+      setUploadingIntro(false);
+    }
     toast.success(t("adminForm.videoLoaded"));
   };
+
+  const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
+  const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
   const save = async () => {
     if (!title.trim()) return toast.error(t("adminForm.titleRequired"));
@@ -143,6 +159,8 @@ const AdminTrainingForm = () => {
       xp_reward: xpReward,
       video_type: videoType as any,
       video_url: videoUrl.trim(),
+      intro_video_url: introVideoUrl.trim() || null,
+      intro_video_type: introVideoUrl.trim() ? (introVideoType as any) : null,
       equipment: equipment
         .split(",")
         .map((e) => e.trim())
