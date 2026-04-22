@@ -91,7 +91,7 @@ const Home = () => {
             <Instagram className="h-5 w-5" />
           </a>
           <a
-            href="https://www.tiktok.com/@gkperformance.hub"
+            href="https://www.tiktok.com/@gk.performancehub"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="TikTok"
