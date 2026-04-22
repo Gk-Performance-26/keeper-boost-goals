@@ -4,11 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { TrainingCard } from "@/components/TrainingCard";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { EXPERIENCE_LEVELS, ExperienceLevel } from "@/lib/gamification";
+import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 
 const Trainings = () => {
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [level, setLevel] = useState<ExperienceLevel | null>(null);
+  const { isActive: hasSub } = useSubscription();
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -89,6 +91,8 @@ const Trainings = () => {
             categoryName={t.categories?.name}
             categoryIcon={t.categories?.icon}
             categoryColorToken={t.categories?.color_token}
+            isPremium={(t as any).is_premium}
+            locked={(t as any).is_premium && !hasSub}
           />
         ))}
         {filtered.length === 0 && (
