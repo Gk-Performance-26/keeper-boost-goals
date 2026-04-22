@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 const Subscription = () => {
   const { user } = useAuth();
-  const { isActive, subscription, isLoading } = useSubscription();
+  const { isActive, hasPaidSub, isTrialActive, trialEndsAt, trialDaysLeft, subscription, isLoading } = useSubscription();
   const [opening, setOpening] = useState(false);
   const { t, lang } = useLanguage();
 
@@ -70,7 +70,7 @@ const Subscription = () => {
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
-        ) : isActive ? (
+        ) : hasPaidSub ? (
           <Card className="gradient-card border-primary/40 shadow-glow">
             <CardContent className="space-y-3 p-5 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
@@ -93,6 +93,34 @@ const Subscription = () => {
           </Card>
         ) : (
           <>
+            {isTrialActive && (
+              <Card className="border-primary/40 bg-primary/5">
+                <CardContent className="space-y-2 p-5 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+                    <Check className="h-6 w-6 text-primary" />
+                  </div>
+                  <h2 className="font-display text-lg">{t("sub.trialTitle")}</h2>
+                  <p className="text-sm text-muted-foreground">{t("sub.trialDesc")}</p>
+                  <p className="text-sm font-medium text-primary">
+                    {trialDaysLeft} {trialDaysLeft === 1 ? t("sub.trialDayLeft") : t("sub.trialDaysLeft")}
+                  </p>
+                  {trialEndsAt && (
+                    <p className="text-xs text-muted-foreground">
+                      {t("sub.trialEndsOn")}{" "}
+                      {trialEndsAt.toLocaleDateString(lang === "pt" ? "pt-PT" : "en-GB")}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            {!isTrialActive && (
+              <Card className="border-amber-500/40 bg-amber-500/5">
+                <CardContent className="space-y-1 p-4 text-center">
+                  <h2 className="font-display text-base">{t("sub.trialEndedTitle")}</h2>
+                  <p className="text-xs text-muted-foreground">{t("sub.trialEndedDesc")}</p>
+                </CardContent>
+              </Card>
+            )}
             <Card className="gradient-card border-primary/30 shadow-glow">
               <CardContent className="space-y-4 p-5">
                 <div className="text-center">
