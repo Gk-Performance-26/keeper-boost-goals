@@ -29,6 +29,10 @@ interface Drill {
   title: string;
   reps: string;
   is_premium?: boolean;
+  intro_video_url?: string;
+  intro_video_type?: VideoType;
+  exercise_video_url?: string;
+  exercise_video_type?: VideoType;
 }
 
 const AdminTrainingForm = () => {
@@ -56,6 +60,7 @@ const AdminTrainingForm = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [drillUploading, setDrillUploading] = useState<Record<string, boolean>>({});
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -91,7 +96,15 @@ const AdminTrainingForm = () => {
       const d = (existing.drills as unknown as Drill[]) ?? [];
       setDrills(
         d.length
-          ? d.map((x) => ({ title: x.title ?? "", reps: x.reps ?? "", is_premium: !!x.is_premium }))
+          ? d.map((x) => ({
+              title: x.title ?? "",
+              reps: x.reps ?? "",
+              is_premium: !!x.is_premium,
+              intro_video_url: x.intro_video_url ?? "",
+              intro_video_type: (x.intro_video_type as VideoType) ?? "upload",
+              exercise_video_url: x.exercise_video_url ?? "",
+              exercise_video_type: (x.exercise_video_type as VideoType) ?? "upload",
+            }))
           : [{ title: "", reps: "", is_premium: false }],
       );
       setIsPublished(existing.is_published ?? true);
@@ -144,6 +157,41 @@ const AdminTrainingForm = () => {
   const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
   const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
+
+  const uploadDrillVideo = async (
+    file: File,
+    drillIdx: number,
+    field: "intro_video_url" | "exercise_video_url",
+  ) => {
+    if (!file) return;
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error(t("adminForm.fileTooBig"));
+      return;
+    }
+    const key = `${drillIdx}-${field}`;
+    setDrillUploading((s) => ({ ...s, [key]: true }));
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/drill-${drillIdx}-${field === "intro_video_url" ? "intro" : "ex"}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("training-videos")
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (upErr) {
+      toast.error(t("adminForm.uploadFailed") + upErr.message);
+      setDrillUploading((s) => ({ ...s, [key]: false }));
+      return;
+    }
+    const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
+    const n = [...drills];
+    n[drillIdx] = {
+      ...n[drillIdx],
+      [field]: pub.publicUrl,
+      [field === "intro_video_url" ? "intro_video_type" : "exercise_video_type"]: "upload",
+    };
+    setDrills(n);
+    setDrillUploading((s) => ({ ...s, [key]: false }));
+    toast.success(t("adminForm.videoLoaded"));
+  };
+
   const save = async () => {
     if (!title.trim()) return toast.error(t("adminForm.titleRequired"));
     if (!videoUrl.trim()) return toast.error(t("adminForm.videoRequired"));
@@ -167,7 +215,15 @@ const AdminTrainingForm = () => {
         .filter(Boolean),
       drills: drills
         .filter((d) => d.title.trim())
-        .map((d) => ({ title: d.title.trim(), reps: d.reps, is_premium: !!d.is_premium })) as any,
+        .map((d) => ({
+          title: d.title.trim(),
+          reps: d.reps,
+          is_premium: !!d.is_premium,
+          intro_video_url: d.intro_video_url?.trim() || null,
+          intro_video_type: d.intro_video_url?.trim() ? d.intro_video_type ?? "upload" : null,
+          exercise_video_url: d.exercise_video_url?.trim() || null,
+          exercise_video_type: d.exercise_video_url?.trim() ? d.exercise_video_type ?? "upload" : null,
+        })) as any,
       is_published: isPublished,
       is_premium: isPremium,
     };
@@ -493,6 +549,96 @@ const AdminTrainingForm = () => {
                     }}
                   />
                 </div>
+
+                {(["intro_video_url", "exercise_video_url"] as const).map((field) => {
+                  const typeField = field === "intro_video_url" ? "intro_video_type" : "exercise_video_type";
+                  const url = (d[field] as string) || "";
+                  const vType = (d[typeField] as VideoType) || "upload";
+                  const labelKey = field === "intro_video_url" ? "adminForm.drillIntroVideo" : "adminForm.drillExerciseVideo";
+                  const uploadKey = `${i}-${field}`;
+                  const isUp = !!drillUploading[uploadKey];
+                  return (
+                    <div key={field} className="space-y-1.5 rounded-md border border-border/40 bg-background/40 p-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {t(labelKey)}
+                      </p>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => {
+                              const n = [...drills];
+                              (n[i] as any)[typeField] = v;
+                              setDrills(n);
+                            }}
+                            className={`rounded-md border px-2 py-1 text-[10px] font-semibold capitalize transition ${
+                              vType === v
+                                ? "border-primary bg-primary/15 text-primary"
+                                : "border-border bg-muted/20 text-muted-foreground"
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                      {vType === "upload" ? (
+                        <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-md border border-dashed border-border bg-muted/10 p-2 text-[11px] text-muted-foreground transition hover:bg-muted/30">
+                          {isUp ? (
+                            <>
+                              <Loader2 className="h-3 w-3 animate-spin" /> {t("adminForm.uploading")}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-3 w-3" /> {url ? t("adminForm.replaceFile") : t("adminForm.chooseFile")}
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) uploadDrillVideo(f, i, field);
+                            }}
+                            disabled={isUp}
+                          />
+                        </label>
+                      ) : (
+                        <Input
+                          value={url}
+                          onChange={(e) => {
+                            const n = [...drills];
+                            (n[i] as any)[field] = e.target.value;
+                            setDrills(n);
+                          }}
+                          placeholder={
+                            vType === "youtube"
+                              ? "https://www.youtube.com/embed/..."
+                              : "https://player.vimeo.com/video/..."
+                          }
+                          className="h-8 text-xs"
+                        />
+                      )}
+                      {url && (
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="break-all text-[10px] text-muted-foreground">{url.length > 50 ? `…${url.slice(-50)}` : url}</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const n = [...drills];
+                              (n[i] as any)[field] = "";
+                              setDrills(n);
+                            }}
+                            className="flex-shrink-0 text-[10px] text-destructive hover:underline"
+                          >
+                            {t("adminForm.removeIntro")}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>

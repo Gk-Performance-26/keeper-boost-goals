@@ -12,10 +12,16 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
+type VideoSrc = "upload" | "youtube" | "vimeo";
+
 interface Drill {
   title: string;
   reps: string;
   is_premium?: boolean;
+  intro_video_url?: string | null;
+  intro_video_type?: VideoSrc | null;
+  exercise_video_url?: string | null;
+  exercise_video_type?: VideoSrc | null;
 }
 
 const TrainingDetail = () => {
@@ -24,6 +30,7 @@ const TrainingDetail = () => {
   const { isActive: hasSub } = useSubscription();
   const { t } = useLanguage();
   const [done, setDone] = useState<Set<number>>(new Set());
+  const [openDrill, setOpenDrill] = useState<number | null>(null);
 
   const { data: training, isLoading } = useQuery({
     queryKey: ["training", id],
@@ -193,30 +200,61 @@ const TrainingDetail = () => {
                     </Link>
                   );
                 }
+                const hasDrillVideo = !!d.exercise_video_url || !!d.intro_video_url;
+                const isOpen = openDrill === i;
                 return (
-                  <button
+                  <div
                     key={i}
-                    onClick={() => toggle(i)}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+                      "rounded-xl border transition",
                       done.has(i)
                         ? "border-primary/40 bg-primary/10"
-                        : "border-border bg-muted/30 hover:bg-muted/50",
+                        : "border-border bg-muted/30",
                     )}
                   >
-                    <div
-                      className={cn(
-                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition",
-                        done.has(i) ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                    <div className="flex items-center gap-3 p-3">
+                      <button
+                        type="button"
+                        onClick={() => toggle(i)}
+                        className={cn(
+                          "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition",
+                          done.has(i) ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                        )}
+                        aria-label={done.has(i) ? t("training.markUndone") : t("training.markDone")}
+                      >
+                        {done.has(i) && <Check className="h-4 w-4" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => hasDrillVideo ? setOpenDrill(isOpen ? null : i) : toggle(i)}
+                        className="flex-1 text-left"
+                      >
+                        <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{tDrillTitles[i] || d.title}</p>
+                        <p className="text-xs text-muted-foreground">{tDrillReps[i] || d.reps}</p>
+                      </button>
+                      {hasDrillVideo && (
+                        <button
+                          type="button"
+                          onClick={() => setOpenDrill(isOpen ? null : i)}
+                          className="flex-shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-primary/25"
+                        >
+                          {isOpen ? t("training.hideVideo") : t("training.watchDrill")}
+                        </button>
                       )}
-                    >
-                      {done.has(i) && <Check className="h-4 w-4" />}
                     </div>
-                    <div className="flex-1">
-                      <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{tDrillTitles[i] || d.title}</p>
-                      <p className="text-xs text-muted-foreground">{tDrillReps[i] || d.reps}</p>
-                    </div>
-                  </button>
+                    {isOpen && hasDrillVideo && (
+                      <div className="px-3 pb-3">
+                        <VideoPlayer
+                          url={d.exercise_video_url || d.intro_video_url || ""}
+                          type={(d.exercise_video_type || d.intro_video_type || "upload") as VideoSrc}
+                          introUrl={d.intro_video_url}
+                          introType={d.intro_video_type}
+                          introLabel={t("training.introVideo")}
+                          exerciseLabel={t("training.exerciseVideo")}
+                        />
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
