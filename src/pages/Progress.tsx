@@ -18,6 +18,7 @@ import { StreakBadge } from "@/components/StreakBadge";
 import { Award, Flame, Sparkles, Trophy } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { GoalsSection } from "@/components/GoalsSection";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 
 const Progress = () => {
   const { user } = useAuth();
