@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,6 +37,7 @@ const AdminTrainingForm = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const { t } = useLanguage();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -105,7 +107,7 @@ const AdminTrainingForm = () => {
   const handleVideoFile = async (file: File) => {
     if (!file) return;
     if (file.size > 200 * 1024 * 1024) {
-      toast.error("Ficheiro demasiado grande (máx 200MB).");
+      toast.error(t("adminForm.fileTooBig"));
       return;
     }
     setUploading(true);
@@ -115,7 +117,7 @@ const AdminTrainingForm = () => {
       .from("training-videos")
       .upload(path, file, { contentType: file.type, upsert: false });
     if (upErr) {
-      toast.error("Falha no upload: " + upErr.message);
+      toast.error(t("adminForm.uploadFailed") + upErr.message);
       setUploading(false);
       return;
     }
@@ -123,13 +125,13 @@ const AdminTrainingForm = () => {
     setVideoUrl(pub.publicUrl);
     setVideoType("upload");
     setUploading(false);
-    toast.success("Vídeo carregado");
+    toast.success(t("adminForm.videoLoaded"));
   };
 
   const save = async () => {
-    if (!title.trim()) return toast.error("Título obrigatório");
-    if (!videoUrl.trim()) return toast.error("Adiciona um vídeo");
-    if (!categoryId) return toast.error("Escolhe uma categoria");
+    if (!title.trim()) return toast.error(t("adminForm.titleRequired"));
+    if (!videoUrl.trim()) return toast.error(t("adminForm.videoRequired"));
+    if (!categoryId) return toast.error(t("adminForm.categoryRequired"));
 
     setSaving(true);
     const payload = {
@@ -161,7 +163,7 @@ const AdminTrainingForm = () => {
       toast.error("Erro: " + error.message);
       return;
     }
-    toast.success(isEdit ? "Treino atualizado" : "Treino criado");
+    toast.success(isEdit ? t("adminForm.updated") : t("adminForm.created"));
     navigate("/admin");
   };
 
@@ -173,17 +175,17 @@ const AdminTrainingForm = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <h1 className="font-display text-2xl">{isEdit ? "Editar treino" : "Novo treino"}</h1>
+        <h1 className="font-display text-2xl">{isEdit ? t("adminForm.editTitle") : t("adminForm.newTitle")}</h1>
       </header>
 
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
           <div className="space-y-1.5">
-            <Label>Título *</Label>
+            <Label>{t("adminForm.titleLabel")}</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
           </div>
           <div className="space-y-1.5">
-            <Label>Descrição</Label>
+            <Label>{t("adminForm.descLabel")}</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -193,10 +195,10 @@ const AdminTrainingForm = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Categoria *</Label>
+              <Label>{t("adminForm.categoryLabel")}</Label>
               <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Escolher" />
+                  <SelectValue placeholder={t("adminForm.categoryPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {(categories ?? []).map((c) => (
@@ -208,7 +210,7 @@ const AdminTrainingForm = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Nível</Label>
+              <Label>{t("adminForm.levelLabel")}</Label>
               <Select value={level} onValueChange={setLevel}>
                 <SelectTrigger>
                   <SelectValue />
@@ -223,7 +225,7 @@ const AdminTrainingForm = () => {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Duração (min)</Label>
+              <Label>{t("adminForm.durationLabel")}</Label>
               <Input
                 type="number"
                 min={1}
@@ -233,7 +235,7 @@ const AdminTrainingForm = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>XP recompensa</Label>
+              <Label>{t("adminForm.xpLabel")}</Label>
               <Input
                 type="number"
                 min={0}
@@ -248,7 +250,7 @@ const AdminTrainingForm = () => {
 
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vídeo</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("adminForm.video")}</p>
           <div className="grid grid-cols-3 gap-2">
             {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
               <button
@@ -270,11 +272,11 @@ const AdminTrainingForm = () => {
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground transition hover:bg-muted/40">
                 {uploading ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> A carregar...
+                    <Loader2 className="h-4 w-4 animate-spin" /> {t("adminForm.uploading")}
                   </>
                 ) : (
                   <>
-                    <Upload className="h-4 w-4" /> Escolher ficheiro de vídeo
+                    <Upload className="h-4 w-4" /> {t("adminForm.chooseFile")}
                   </>
                 )}
                 <input
@@ -294,7 +296,7 @@ const AdminTrainingForm = () => {
             </div>
           ) : (
             <div className="space-y-1.5">
-              <Label>URL embed ({videoType})</Label>
+              <Label>{t("adminForm.embedUrl")} ({videoType})</Label>
               <Input
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
@@ -305,7 +307,7 @@ const AdminTrainingForm = () => {
                 }
               />
               <p className="text-[11px] text-muted-foreground">
-                Usa o link de "embed" (não o link normal de partilha).
+                {t("adminForm.embedHint")}
               </p>
             </div>
           )}
@@ -315,28 +317,28 @@ const AdminTrainingForm = () => {
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
           <div className="space-y-1.5">
-            <Label>Equipamento (separado por vírgulas)</Label>
+            <Label>{t("adminForm.equipmentLabel")}</Label>
             <Input
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
-              placeholder="bola, cones, parede"
+              placeholder={t("adminForm.equipmentPlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Exercícios</Label>
+              <Label>{t("adminForm.drills")}</Label>
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
                 onClick={() => setDrills([...drills, { title: "", reps: "", is_premium: false }])}
               >
-                <Plus className="h-3.5 w-3.5" /> Adicionar
+                <Plus className="h-3.5 w-3.5" /> {t("adminForm.add")}
               </Button>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Marca individualmente quais exercícios são premium (úteis em treinos gratuitos com partes pagas).
+              {t("adminForm.drillsHint")}
             </p>
             {drills.map((d, i) => (
               <div
@@ -348,7 +350,7 @@ const AdminTrainingForm = () => {
               >
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Título"
+                    placeholder={t("adminForm.drillTitle")}
                     value={d.title}
                     onChange={(e) => {
                       const n = [...drills];
@@ -358,7 +360,7 @@ const AdminTrainingForm = () => {
                   />
                   <Input
                     className="w-28"
-                    placeholder="Reps"
+                    placeholder={t("adminForm.drillReps")}
                     value={d.reps}
                     onChange={(e) => {
                       const n = [...drills];
@@ -385,7 +387,7 @@ const AdminTrainingForm = () => {
                       )}
                     />
                     <span className={d.is_premium ? "font-semibold text-primary" : "text-muted-foreground"}>
-                      {d.is_premium ? "Exercício Premium" : "Exercício gratuito"}
+                      {d.is_premium ? t("adminForm.drillPremium") : t("adminForm.drillFree")}
                     </span>
                   </div>
                   <Switch
@@ -403,8 +405,8 @@ const AdminTrainingForm = () => {
 
           <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-3">
             <div>
-              <p className="text-sm font-semibold">Publicado</p>
-              <p className="text-xs text-muted-foreground">Visível para todos os utilizadores</p>
+              <p className="text-sm font-semibold">{t("adminForm.published")}</p>
+              <p className="text-xs text-muted-foreground">{t("adminForm.publishedDesc")}</p>
             </div>
             <Switch checked={isPublished} onCheckedChange={setIsPublished} />
           </div>
@@ -413,9 +415,9 @@ const AdminTrainingForm = () => {
             <div className="flex items-start gap-2">
               <Crown className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-semibold">Exercício Premium</p>
+                <p className="text-sm font-semibold">{t("adminForm.premiumExercise")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Apenas utilizadores com subscrição podem aceder
+                  {t("adminForm.premiumExerciseDesc")}
                 </p>
               </div>
             </div>
@@ -426,7 +428,7 @@ const AdminTrainingForm = () => {
 
       <Button onClick={save} disabled={saving || uploading} className="w-full" size="lg">
         {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-        {isEdit ? "Guardar alterações" : "Criar treino"}
+        {isEdit ? t("adminForm.saveChanges") : t("adminForm.create")}
       </Button>
     </div>
   );
