@@ -7,6 +7,7 @@ import { Crown, Flame, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import leaderboardBg from "@/assets/leaderboard-bg.jpg";
 
 const Leaderboard = () => {
   const { user } = useAuth();
@@ -42,7 +43,17 @@ const Leaderboard = () => {
   });
 
   return (
-    <div className="space-y-5 px-5 pt-8 pb-6">
+    <div className="relative space-y-5 px-5 pt-8 pb-6">
+      {/* Background image with low opacity overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-15"
+        style={{ backgroundImage: `url(${leaderboardBg})` }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background"
+      />
       <header>
         <h1 className="font-display text-3xl">{t("leaderboard.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("leaderboard.subtitle")}</p>
