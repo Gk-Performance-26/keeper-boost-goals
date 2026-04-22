@@ -1,49 +1,106 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const CACHE_PREFIX = "gk-tr2:";
 
-function cacheKey(target: string, text: string) {
+// In-memory cache and inflight tracker (shared across all hook instances)
+const memCache = new Map<string, string>(); // key: `${lang}:${text}` -> translation
+const inflight = new Map<string, Promise<void>>(); // key: `${lang}:${text}` -> pending fetch
+
+function memKey(target: string, text: string) {
+  return `${target}:${text}`;
+}
+
+function lsKey(target: string, text: string) {
   let h = 0;
   for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
   return `${CACHE_PREFIX}${target}:${h}`;
 }
 
 function readCache(target: string, text: string): string | null {
+  const mk = memKey(target, text);
+  if (memCache.has(mk)) return memCache.get(mk)!;
   if (typeof localStorage === "undefined") return null;
   try {
-    return localStorage.getItem(cacheKey(target, text));
+    const v = localStorage.getItem(lsKey(target, text));
+    if (v != null) memCache.set(mk, v);
+    return v;
   } catch {
     return null;
   }
 }
 
 function writeCache(target: string, text: string, value: string) {
+  memCache.set(memKey(target, text), value);
   if (typeof localStorage === "undefined") return;
   try {
-    localStorage.setItem(cacheKey(target, text), value);
+    localStorage.setItem(lsKey(target, text), value);
   } catch {
     /* quota */
   }
+}
+
+async function fetchAndCache(target: string, missing: string[]): Promise<void> {
+  // Filter out items already inflight; share their promises
+  const toFetch: string[] = [];
+  const waitOn: Promise<void>[] = [];
+  for (const t of missing) {
+    const k = memKey(target, t);
+    const p = inflight.get(k);
+    if (p) waitOn.push(p);
+    else toFetch.push(t);
+  }
+
+  if (toFetch.length > 0) {
+    const promise = (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("translate-content", {
+          body: { texts: toFetch, target },
+        });
+        if (error || !data?.translations) {
+          console.warn("[translate-content] failed", error);
+          return;
+        }
+        const translations: string[] = data.translations;
+        toFetch.forEach((src, i) => {
+          const tr = translations[i];
+          if (typeof tr === "string" && tr) writeCache(target, src, tr);
+        });
+      } catch (e) {
+        console.warn("[translate-content] threw", e);
+      }
+    })();
+    // Register inflight for each text
+    toFetch.forEach((t) => inflight.set(memKey(target, t), promise));
+    promise.finally(() => {
+      toFetch.forEach((t) => inflight.delete(memKey(target, t)));
+    });
+    waitOn.push(promise);
+  }
+
+  await Promise.all(waitOn);
 }
 
 /**
  * Translates an array of strings to the active app language.
  * - Source language is auto-detected per text by the edge function.
  * - Texts already in the target language are returned unchanged.
- * - Reads from localStorage cache when available.
+ * - Reads from in-memory + localStorage cache when available.
  */
 export function useTranslatedTexts(texts: (string | null | undefined)[]): string[] {
   const { lang } = useLanguage();
   const cleanInputs = texts.map((t) => t ?? "");
+  const inputsKey = cleanInputs.join("\u0001");
 
   const compute = (): string[] =>
     cleanInputs.map((t) => (t ? readCache(lang, t) ?? t : ""));
 
   const [results, setResults] = useState<string[]>(compute);
+  const tickRef = useRef(0);
 
   useEffect(() => {
+    const myTick = ++tickRef.current;
     setResults(compute());
 
     const missing = Array.from(
@@ -52,27 +109,16 @@ export function useTranslatedTexts(texts: (string | null | undefined)[]): string
     if (missing.length === 0) return;
 
     let cancelled = false;
-    (async () => {
-      const { data, error } = await supabase.functions.invoke("translate-content", {
-        body: { texts: missing, target: lang },
-      });
-      if (cancelled) return;
-      if (error || !data?.translations) return;
-      const translations: string[] = data.translations;
-      missing.forEach((src, i) => {
-        const tr = translations[i];
-        if (typeof tr === "string" && tr) writeCache(lang, src, tr);
-      });
-      setResults(
-        cleanInputs.map((t) => (t ? readCache(lang, t) ?? t : "")),
-      );
-    })();
+    fetchAndCache(lang, missing).then(() => {
+      if (cancelled || tickRef.current !== myTick) return;
+      setResults(cleanInputs.map((t) => (t ? readCache(lang, t) ?? t : "")));
+    });
 
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang, cleanInputs.join("\u0001")]);
+  }, [lang, inputsKey]);
 
   return results;
 }
