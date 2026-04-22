@@ -104,7 +104,7 @@ const Progress = () => {
   if (!profile) return null;
 
   return (
-    <div className="space-y-5 px-5 pt-8 pb-6">
+    <div className="space-y-10 px-5 pt-8 pb-10">
       <header className="flex items-start justify-between">
         <div>
           <h1 className="font-display text-3xl">{t("progress.title")}</h1>
@@ -136,7 +136,7 @@ const Progress = () => {
       </Card>
 
       {/* Streak heatmap */}
-      <Card className="gradient-card border-border/60 my-10">
+      <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("progress.last4Weeks")}</p>
           <div className="grid grid-cols-7 gap-1.5">
