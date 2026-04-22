@@ -13,11 +13,13 @@ import { ChevronRight, Instagram, Sparkles, Trophy } from "lucide-react";
 import { format, startOfDay } from "date-fns";
 import gkLogo from "@/assets/gk-logo.jpg";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Home = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const { isActive: hasSub } = useSubscription();
+  const { t, lang } = useLanguage();
 
   const { data: recommended } = useQuery({
     queryKey: ["recommended", profile?.experience_level],
