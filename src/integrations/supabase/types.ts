@@ -331,6 +331,10 @@ export type Database = {
           duration_minutes: number
           equipment: string[] | null
           id: string
+          intro_video_type:
+            | Database["public"]["Enums"]["video_source_type"]
+            | null
+          intro_video_url: string | null
           is_premium: boolean
           is_published: boolean
           level: Database["public"]["Enums"]["experience_level"]
@@ -349,6 +353,10 @@ export type Database = {
           duration_minutes?: number
           equipment?: string[] | null
           id?: string
+          intro_video_type?:
+            | Database["public"]["Enums"]["video_source_type"]
+            | null
+          intro_video_url?: string | null
           is_premium?: boolean
           is_published?: boolean
           level?: Database["public"]["Enums"]["experience_level"]
@@ -367,6 +375,10 @@ export type Database = {
           duration_minutes?: number
           equipment?: string[] | null
           id?: string
+          intro_video_type?:
+            | Database["public"]["Enums"]["video_source_type"]
+            | null
+          intro_video_url?: string | null
           is_premium?: boolean
           is_published?: boolean
           level?: Database["public"]["Enums"]["experience_level"]
