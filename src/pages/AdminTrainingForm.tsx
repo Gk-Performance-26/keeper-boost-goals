@@ -20,12 +20,14 @@ import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Crown, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { EXPERIENCE_LEVELS } from "@/lib/gamification";
+import { cn } from "@/lib/utils";
 
 type VideoType = "upload" | "youtube" | "vimeo";
 
 interface Drill {
   title: string;
   reps: string;
+  is_premium?: boolean;
 }
 
 const AdminTrainingForm = () => {
@@ -80,7 +82,11 @@ const AdminTrainingForm = () => {
       setVideoUrl(existing.video_url ?? "");
       setEquipment((existing.equipment ?? []).join(", "));
       const d = (existing.drills as unknown as Drill[]) ?? [];
-      setDrills(d.length ? d : [{ title: "", reps: "" }]);
+      setDrills(
+        d.length
+          ? d.map((x) => ({ title: x.title ?? "", reps: x.reps ?? "", is_premium: !!x.is_premium }))
+          : [{ title: "", reps: "", is_premium: false }],
+      );
       setIsPublished(existing.is_published ?? true);
       setIsPremium((existing as any).is_premium ?? false);
     }
@@ -139,7 +145,9 @@ const AdminTrainingForm = () => {
         .split(",")
         .map((e) => e.trim())
         .filter(Boolean),
-      drills: drills.filter((d) => d.title.trim()) as any,
+      drills: drills
+        .filter((d) => d.title.trim())
+        .map((d) => ({ title: d.title.trim(), reps: d.reps, is_premium: !!d.is_premium })) as any,
       is_published: isPublished,
       is_premium: isPremium,
     };
@@ -322,41 +330,73 @@ const AdminTrainingForm = () => {
                 type="button"
                 size="sm"
                 variant="outline"
-                onClick={() => setDrills([...drills, { title: "", reps: "" }])}
+                onClick={() => setDrills([...drills, { title: "", reps: "", is_premium: false }])}
               >
                 <Plus className="h-3.5 w-3.5" /> Adicionar
               </Button>
             </div>
+            <p className="text-[11px] text-muted-foreground">
+              Marca individualmente quais exercícios são premium (úteis em treinos gratuitos com partes pagas).
+            </p>
             {drills.map((d, i) => (
-              <div key={i} className="flex gap-2">
-                <Input
-                  placeholder="Título"
-                  value={d.title}
-                  onChange={(e) => {
-                    const n = [...drills];
-                    n[i].title = e.target.value;
-                    setDrills(n);
-                  }}
-                />
-                <Input
-                  className="w-28"
-                  placeholder="Reps"
-                  value={d.reps}
-                  onChange={(e) => {
-                    const n = [...drills];
-                    n[i].reps = e.target.value;
-                    setDrills(n);
-                  }}
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="outline"
-                  className="flex-shrink-0 text-destructive"
-                  onClick={() => setDrills(drills.filter((_, idx) => idx !== i))}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+              <div
+                key={i}
+                className={cn(
+                  "space-y-2 rounded-lg border p-2.5 transition",
+                  d.is_premium ? "border-primary/40 bg-primary/5" : "border-border/60 bg-muted/20",
+                )}
+              >
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Título"
+                    value={d.title}
+                    onChange={(e) => {
+                      const n = [...drills];
+                      n[i].title = e.target.value;
+                      setDrills(n);
+                    }}
+                  />
+                  <Input
+                    className="w-28"
+                    placeholder="Reps"
+                    value={d.reps}
+                    onChange={(e) => {
+                      const n = [...drills];
+                      n[i].reps = e.target.value;
+                      setDrills(n);
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="flex-shrink-0 text-destructive"
+                    onClick={() => setDrills(drills.filter((_, idx) => idx !== i))}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between gap-2 px-1">
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <Crown
+                      className={cn(
+                        "h-3.5 w-3.5",
+                        d.is_premium ? "text-primary" : "text-muted-foreground",
+                      )}
+                    />
+                    <span className={d.is_premium ? "font-semibold text-primary" : "text-muted-foreground"}>
+                      {d.is_premium ? "Exercício Premium" : "Exercício gratuito"}
+                    </span>
+                  </div>
+                  <Switch
+                    checked={!!d.is_premium}
+                    onCheckedChange={(v) => {
+                      const n = [...drills];
+                      n[i].is_premium = v;
+                      setDrills(n);
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </div>
