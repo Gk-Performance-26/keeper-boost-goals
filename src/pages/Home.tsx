@@ -9,7 +9,7 @@ import { XpRing } from "@/components/XpRing";
 import { TrainingCard } from "@/components/TrainingCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Sparkles, Trophy, Instagram } from "lucide-react";
+import { ChevronRight, Sparkles, Trophy, Instagram, Gift } from "lucide-react";
 import { format, startOfDay } from "date-fns";
 import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
@@ -20,7 +20,7 @@ import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 const Home = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
-  const { isActive: hasSub } = useSubscription();
+  const { isActive: hasSub, isTrialActive, hasPaidSub, trialDaysLeft } = useSubscription();
   const { t, lang } = useLanguage();
 
   const { data: recommended } = useQuery({
