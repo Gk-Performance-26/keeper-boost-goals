@@ -56,6 +56,10 @@ const translations: Record<Lang, Dict> = {
     "training.unlockWithPremium": "Desbloquear com Premium",
     "training.introVideo": "Explicação",
     "training.exerciseVideo": "Exercício",
+    "training.watchDrill": "Ver vídeo",
+    "training.hideVideo": "Esconder",
+    "training.markDone": "Marcar como feito",
+    "training.markUndone": "Marcar como não feito",
 
     // Complete session
     "complete.selfAssessment": "Auto-avaliação",
@@ -332,6 +336,10 @@ const translations: Record<Lang, Dict> = {
     "training.unlockWithPremium": "Unlock with Premium",
     "training.introVideo": "Explanation",
     "training.exerciseVideo": "Exercise",
+    "training.watchDrill": "Watch video",
+    "training.hideVideo": "Hide",
+    "training.markDone": "Mark as done",
+    "training.markUndone": "Mark as not done",
 
     "complete.selfAssessment": "Self-assessment",
     "complete.howWasIt": "How did it go?",
