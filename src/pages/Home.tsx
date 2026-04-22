@@ -126,7 +126,6 @@ const Home = () => {
                 src={gkLogo}
                 alt="GK Performance Hub"
                 className="h-full w-full object-cover scale-110"
-                style={{ objectPosition: "center 100%" }}
               />
             </div>
           </div>
