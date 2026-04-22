@@ -92,34 +92,63 @@ const Home = () => {
 
   return (
     <div className="space-y-6 px-5 pt-8">
-      {/* Brand */}
-      <div className="flex flex-col items-center gap-3">
-        <img
-          src={gkLogo}
-          alt="GK Performance Hub"
-          className="h-28 w-28 rounded-2xl object-cover shadow-glow"
+      {/* Brand hero */}
+      <div className="relative -mx-5 -mt-8 overflow-hidden px-5 pt-12 pb-8">
+        {/* Glow background */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 30%, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.12) 35%, transparent 70%)",
+          }}
         />
-        <div className="flex items-center gap-3">
-          <a
-            href="https://www.instagram.com/gkperformance.hub"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-foreground hover:text-primary transition-colors shadow-card"
-          >
-            <Instagram className="h-5 w-5" />
-          </a>
-          <a
-            href="https://www.tiktok.com/@gk.performancehub"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="TikTok"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/60 text-foreground hover:text-primary transition-colors shadow-card"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.84a8.16 8.16 0 0 0 4.77 1.52V6.93a4.85 4.85 0 0 1-1.84-.24z"/>
-            </svg>
-          </a>
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            {/* Outer glow ring */}
+            <div
+              aria-hidden
+              className="absolute inset-0 -m-3 rounded-full blur-2xl"
+              style={{ background: "hsl(var(--primary) / 0.45)" }}
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0 -m-1 rounded-3xl"
+              style={{
+                background:
+                  "conic-gradient(from 180deg at 50% 50%, hsl(var(--primary)) 0deg, transparent 120deg, hsl(var(--primary)) 240deg, transparent 360deg)",
+                opacity: 0.4,
+                filter: "blur(8px)",
+              }}
+            />
+            <img
+              src={gkLogo}
+              alt="GK Performance Hub"
+              className="relative h-36 w-36 rounded-3xl object-cover shadow-glow ring-1 ring-primary/40"
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://www.instagram.com/gkperformance.hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-card/80 backdrop-blur border border-border/60 text-foreground hover:text-primary transition-colors shadow-card"
+            >
+              <Instagram className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@gk.performancehub"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-card/80 backdrop-blur border border-border/60 text-foreground hover:text-primary transition-colors shadow-card"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.84a8.16 8.16 0 0 0 4.77 1.52V6.93a4.85 4.85 0 0 1-1.84-.24z"/>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
 
