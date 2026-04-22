@@ -60,6 +60,7 @@ const AdminTrainingForm = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [drillUploading, setDrillUploading] = useState<Record<string, boolean>>({});
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -156,7 +157,6 @@ const AdminTrainingForm = () => {
   const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
   const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
-  const [drillUploading, setDrillUploading] = useState<Record<string, boolean>>({});
 
   const uploadDrillVideo = async (
     file: File,
