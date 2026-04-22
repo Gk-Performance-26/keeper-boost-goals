@@ -2,7 +2,6 @@ import { Instagram } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -10,11 +9,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const INSTAGRAM_URL = "https://www.instagram.com/gkperformance.hub/";
 
 export function InstagramFab() {
   const [open, setOpen] = useState(false);
+
+  const handleContinue = () => {
+    window.location.assign(INSTAGRAM_URL);
+  };
 
   return (
     <>
@@ -37,11 +41,9 @@ export function InstagramFab() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <a href={INSTAGRAM_URL} target="_top" rel="noopener noreferrer">
-                Continuar
-              </a>
-            </AlertDialogAction>
+            <Button type="button" onClick={handleContinue}>
+              Continuar
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
