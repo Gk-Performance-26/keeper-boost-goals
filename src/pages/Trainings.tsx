@@ -6,6 +6,7 @@ import { CategoryIcon } from "@/components/CategoryIcon";
 import { EXPERIENCE_LEVELS, ExperienceLevel } from "@/lib/gamification";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
 const Trainings = () => {
@@ -41,6 +42,8 @@ const Trainings = () => {
     });
   }, [trainings, categorySlug, level]);
 
+  const translatedCategoryNames = useTranslatedTexts((categories ?? []).map((c) => c.name));
+
   return (
     <div className="space-y-5 px-5 pt-8">
       <header>
@@ -54,7 +57,7 @@ const Trainings = () => {
           <FilterChip active={!categorySlug} onClick={() => setCategorySlug(null)}>
             {t("common.all")}
           </FilterChip>
-          {(categories ?? []).map((c) => (
+          {(categories ?? []).map((c, idx) => (
             <FilterChip
               key={c.id}
               active={categorySlug === c.slug}
@@ -62,7 +65,7 @@ const Trainings = () => {
               colorToken={c.color_token}
             >
               <CategoryIcon name={c.icon} className="h-3.5 w-3.5" />
-              {c.name}
+              {translatedCategoryNames[idx] || c.name}
             </FilterChip>
           ))}
         </div>
