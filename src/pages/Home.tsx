@@ -82,7 +82,7 @@ const Home = () => {
         />
         <div className="flex items-center gap-3">
           <a
-            href="https://www.instagram.com/gkperformancehub"
+            href="https://www.instagram.com/gkperformance.hub/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Segue-nos no Instagram"
