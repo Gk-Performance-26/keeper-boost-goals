@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const CACHE_PREFIX = "gk-tr:";
+const CACHE_PREFIX = "gk-tr2:";
 
 function cacheKey(target: string, text: string) {
   let h = 0;
