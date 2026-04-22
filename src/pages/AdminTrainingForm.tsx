@@ -156,6 +156,42 @@ const AdminTrainingForm = () => {
   const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
   const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
+  const [drillUploading, setDrillUploading] = useState<Record<string, boolean>>({});
+
+  const uploadDrillVideo = async (
+    file: File,
+    drillIdx: number,
+    field: "intro_video_url" | "exercise_video_url",
+  ) => {
+    if (!file) return;
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error(t("adminForm.fileTooBig"));
+      return;
+    }
+    const key = `${drillIdx}-${field}`;
+    setDrillUploading((s) => ({ ...s, [key]: true }));
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/drill-${drillIdx}-${field === "intro_video_url" ? "intro" : "ex"}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("training-videos")
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (upErr) {
+      toast.error(t("adminForm.uploadFailed") + upErr.message);
+      setDrillUploading((s) => ({ ...s, [key]: false }));
+      return;
+    }
+    const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
+    const n = [...drills];
+    n[drillIdx] = {
+      ...n[drillIdx],
+      [field]: pub.publicUrl,
+      [field === "intro_video_url" ? "intro_video_type" : "exercise_video_type"]: "upload",
+    };
+    setDrills(n);
+    setDrillUploading((s) => ({ ...s, [key]: false }));
+    toast.success(t("adminForm.videoLoaded"));
+  };
+
   const save = async () => {
     if (!title.trim()) return toast.error(t("adminForm.titleRequired"));
     if (!videoUrl.trim()) return toast.error(t("adminForm.videoRequired"));
