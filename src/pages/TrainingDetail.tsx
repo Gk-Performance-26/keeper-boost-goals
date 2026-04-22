@@ -12,10 +12,16 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
+type VideoSrc = "upload" | "youtube" | "vimeo";
+
 interface Drill {
   title: string;
   reps: string;
   is_premium?: boolean;
+  intro_video_url?: string | null;
+  intro_video_type?: VideoSrc | null;
+  exercise_video_url?: string | null;
+  exercise_video_type?: VideoSrc | null;
 }
 
 const TrainingDetail = () => {
@@ -24,6 +30,7 @@ const TrainingDetail = () => {
   const { isActive: hasSub } = useSubscription();
   const { t } = useLanguage();
   const [done, setDone] = useState<Set<number>>(new Set());
+  const [openDrill, setOpenDrill] = useState<number | null>(null);
 
   const { data: training, isLoading } = useQuery({
     queryKey: ["training", id],
