@@ -29,6 +29,10 @@ interface Drill {
   title: string;
   reps: string;
   is_premium?: boolean;
+  intro_video_url?: string;
+  intro_video_type?: VideoType;
+  exercise_video_url?: string;
+  exercise_video_type?: VideoType;
 }
 
 const AdminTrainingForm = () => {
