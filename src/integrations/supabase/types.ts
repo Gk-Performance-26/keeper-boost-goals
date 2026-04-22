@@ -232,6 +232,45 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
+          price_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          price_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          price_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trainings: {
         Row: {
           category_id: string | null
@@ -241,6 +280,7 @@ export type Database = {
           duration_minutes: number
           equipment: string[] | null
           id: string
+          is_premium: boolean
           is_published: boolean
           level: Database["public"]["Enums"]["experience_level"]
           thumbnail_url: string | null
@@ -258,6 +298,7 @@ export type Database = {
           duration_minutes?: number
           equipment?: string[] | null
           id?: string
+          is_premium?: boolean
           is_published?: boolean
           level?: Database["public"]["Enums"]["experience_level"]
           thumbnail_url?: string | null
@@ -275,6 +316,7 @@ export type Database = {
           duration_minutes?: number
           equipment?: string[] | null
           id?: string
+          is_premium?: boolean
           is_published?: boolean
           level?: Database["public"]["Enums"]["experience_level"]
           thumbnail_url?: string | null
@@ -425,6 +467,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
