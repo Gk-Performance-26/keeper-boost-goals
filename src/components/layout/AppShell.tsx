@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { BottomNav } from "./BottomNav";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { InstagramFab } from "@/components/InstagramFab";
 import { Loader2 } from "lucide-react";
 
 export function AppShell() {
