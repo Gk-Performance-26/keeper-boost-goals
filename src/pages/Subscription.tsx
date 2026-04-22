@@ -114,7 +114,7 @@ const Subscription = () => {
               </Card>
             )}
             {!isTrialActive && (
-              <Card className="border-amber-500/40 bg-amber-500/5">
+              <Card className="border-destructive/40 bg-destructive/5">
                 <CardContent className="space-y-1 p-4 text-center">
                   <h2 className="font-display text-base">{t("sub.trialEndedTitle")}</h2>
                   <p className="text-xs text-muted-foreground">{t("sub.trialEndedDesc")}</p>
