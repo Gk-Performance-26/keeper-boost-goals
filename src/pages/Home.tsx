@@ -121,11 +121,13 @@ const Home = () => {
                 filter: "blur(8px)",
               }}
             />
-            <img
-              src={gkLogo}
-              alt="GK Performance Hub"
-              className="relative h-40 w-64 rounded-3xl object-cover shadow-glow ring-1 ring-primary/40"
-            />
+            <div className="relative h-40 w-64 overflow-hidden rounded-3xl shadow-glow ring-1 ring-primary/40">
+              <img
+                src={gkLogo}
+                alt="GK Performance Hub"
+                className="h-full w-full object-cover scale-125"
+              />
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <a
