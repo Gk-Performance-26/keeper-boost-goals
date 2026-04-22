@@ -10,12 +10,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import gkLogo from "@/assets/gk-logo.jpg";
-
-const schema = z.object({
-  email: z.string().trim().email("Enter a valid email").max(255),
-  password: z.string().min(6, "Min 6 characters").max(72),
-  displayName: z.string().trim().min(2, "Min 2 characters").max(40).optional(),
-});
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -26,6 +22,13 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+
+  const schema = z.object({
+    email: z.string().trim().email(t("auth.email")).max(255),
+    password: z.string().min(6).max(72),
+    displayName: z.string().trim().min(2).max(40).optional(),
+  });
 
   if (!loading && user) return <Navigate to="/" replace />;
 
@@ -37,7 +40,7 @@ const Auth = () => {
       displayName: mode === "signup" ? displayName : undefined,
     });
     if (!parsed.success) {
-      toast({ title: "Check your details", description: parsed.error.errors[0].message, variant: "destructive" });
+      toast({ title: t("auth.checkDetails"), description: parsed.error.errors[0].message, variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -52,7 +55,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast({ title: "Welcome to GK Performance Hub 🧤", description: "Let's set up your profile." });
+        toast({ title: t("auth.welcome"), description: t("auth.welcomeDesc") });
         navigate("/onboarding");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -60,15 +63,18 @@ const Auth = () => {
         navigate("/");
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
-      toast({ title: "Auth error", description: msg, variant: "destructive" });
+      const msg = err instanceof Error ? err.message : t("auth.somethingWrong");
+      toast({ title: t("auth.error"), description: msg, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
+    <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
+      <div className="absolute right-4 top-4">
+        <LanguageSwitcher />
+      </div>
       <div className="mb-6 flex flex-col items-center gap-3">
         <div className="overflow-hidden rounded-2xl shadow-glow ring-1 ring-primary/30">
           <img
@@ -80,9 +86,7 @@ const Auth = () => {
         <h1 className="font-display text-2xl text-center tracking-wide">
           GK <span className="text-gradient-primary">PERFORMANCE</span> HUB
         </h1>
-        <p className="text-center text-sm text-muted-foreground italic">
-          Train like a pro. Save like a legend.
-        </p>
+        <p className="text-center text-sm text-muted-foreground italic">{t("auth.tagline")}</p>
       </div>
 
       <Card className="w-full gradient-card border-border/60 shadow-card">
@@ -95,7 +99,7 @@ const Auth = () => {
                 mode === "signup" ? "bg-card text-foreground shadow" : "text-muted-foreground"
               }`}
             >
-              Sign up
+              {t("auth.signup")}
             </button>
             <button
               type="button"
@@ -104,7 +108,7 @@ const Auth = () => {
                 mode === "signin" ? "bg-card text-foreground shadow" : "text-muted-foreground"
               }`}
             >
-              Log in
+              {t("auth.signin")}
             </button>
           </div>
         </CardHeader>
@@ -112,7 +116,7 @@ const Auth = () => {
           <form onSubmit={submit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="display">Goalkeeper name</Label>
+                <Label htmlFor="display">{t("auth.gkName")}</Label>
                 <Input
                   id="display"
                   value={displayName}
@@ -123,7 +127,7 @@ const Auth = () => {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -135,7 +139,7 @@ const Auth = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -155,9 +159,9 @@ const Auth = () => {
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : mode === "signup" ? (
-                "Start training"
+                t("auth.startTraining")
               ) : (
-                "Log in"
+                t("auth.login")
               )}
             </Button>
           </form>

@@ -6,10 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Crown, Flame, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Leaderboard = () => {
   const { user } = useAuth();
   const [scope, setScope] = useState<"global" | "level">("global");
+  const { t } = useLanguage();
 
   const { data: me } = useQuery({
     queryKey: ["me-profile-min", user?.id],
@@ -42,8 +44,8 @@ const Leaderboard = () => {
   return (
     <div className="space-y-5 px-5 pt-8 pb-6">
       <header>
-        <h1 className="font-display text-3xl">Leaderboard</h1>
-        <p className="text-sm text-muted-foreground">Compete with keepers worldwide</p>
+        <h1 className="font-display text-3xl">{t("leaderboard.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("leaderboard.subtitle")}</p>
       </header>
 
       <div className="flex rounded-xl bg-muted p-1">
@@ -52,11 +54,11 @@ const Leaderboard = () => {
             key={s}
             onClick={() => setScope(s)}
             className={cn(
-              "flex-1 rounded-lg py-2 text-sm font-semibold capitalize transition",
+              "flex-1 rounded-lg py-2 text-sm font-semibold transition",
               scope === s ? "bg-card shadow" : "text-muted-foreground",
             )}
           >
-            {s === "global" ? "Global" : "My level"}
+            {s === "global" ? t("leaderboard.global") : t("leaderboard.myLevel")}
           </button>
         ))}
       </div>
@@ -86,10 +88,11 @@ const Leaderboard = () => {
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">
-                    {r.display_name ?? "Keeper"} {isMe && <span className="text-xs text-primary">(you)</span>}
+                    {r.display_name ?? t("profile.fallbackName")}{" "}
+                    {isMe && <span className="text-xs text-primary">{t("leaderboard.you")}</span>}
                   </p>
                   <p className="text-[11px] capitalize text-muted-foreground">
-                    Lv {r.current_level} · {r.experience_level}
+                    {t("leaderboard.lvShort")} {r.current_level} · {t(`level.${r.experience_level}`)}
                   </p>
                 </div>
                 <div className="flex flex-col items-end">
@@ -105,7 +108,7 @@ const Leaderboard = () => {
           );
         })}
         {(rows ?? []).length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">No keepers yet — be the first!</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">{t("leaderboard.empty")}</p>
         )}
       </div>
     </div>
