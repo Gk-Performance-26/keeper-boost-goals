@@ -90,6 +90,17 @@ const Progress = () => {
   const totalMinutes = (sessions ?? []).reduce((s, x) => s + (x.duration_minutes || 0), 0);
   const earnedBadgeIds = new Set((userBadges ?? []).map((b) => b.badge_id));
 
+  // Sort badges (earned first) and limit to 6, then translate names
+  const visibleBadges = (badges ?? [])
+    .slice()
+    .sort((a, b) => {
+      const ae = earnedBadgeIds.has(a.id) ? 0 : 1;
+      const be = earnedBadgeIds.has(b.id) ? 0 : 1;
+      return ae - be;
+    })
+    .slice(0, 6);
+  const translatedBadgeNames = useTranslatedTexts(visibleBadges.map((b) => b.name));
+
   if (!profile) return null;
 
   return (
