@@ -2,6 +2,7 @@ import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { BottomNav } from "./BottomNav";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Loader2 } from "lucide-react";
 
 export function AppShell() {
@@ -25,6 +26,11 @@ export function AppShell() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col">
+      <div className="pointer-events-none fixed left-0 right-0 top-0 z-40 mx-auto flex max-w-md justify-end px-4 pt-4">
+        <div className="pointer-events-auto">
+          <LanguageSwitcher />
+        </div>
+      </div>
       <main className="flex-1 pb-2">
         <Outlet />
       </main>
@@ -32,3 +38,4 @@ export function AppShell() {
     </div>
   );
 }
+

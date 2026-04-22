@@ -11,13 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Instagram, Sparkles, Trophy } from "lucide-react";
 import { format, startOfDay } from "date-fns";
+import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Home = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
   const { isActive: hasSub } = useSubscription();
+  const { t, lang } = useLanguage();
 
   const { data: recommended } = useQuery({
     queryKey: ["recommended", profile?.experience_level],
@@ -97,9 +100,11 @@ const Home = () => {
       {/* Header */}
       <header className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">{format(new Date(), "EEEE, d LLL")}</p>
+          <p className="text-sm text-muted-foreground">
+            {format(new Date(), "EEEE, d LLL", { locale: lang === "pt" ? pt : enUS })}
+          </p>
           <h1 className="font-display text-3xl">
-            Hey, {profile.display_name?.split(" ")[0] || "Keeper"} 🧤
+            {t("home.greeting")}, {profile.display_name?.split(" ")[0] || "Keeper"} 🧤
           </h1>
         </div>
         <StreakBadge streak={profile.current_streak} />
@@ -110,7 +115,7 @@ const Home = () => {
         <CardContent className="flex items-center gap-4 p-4">
           <XpRing current={todayXp ?? 0} goal={profile.daily_xp_goal} />
           <div className="flex-1 space-y-2">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Daily goal</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">{t("home.dailyGoal")}</p>
             <LevelBar totalXp={profile.total_xp} />
           </div>
         </CardContent>
@@ -124,7 +129,7 @@ const Home = () => {
               <Trophy className="h-6 w-6" />
             </div>
             <div className="flex-1">
-              <p className="text-[11px] uppercase tracking-wider text-secondary">Weekly challenge</p>
+              <p className="text-[11px] uppercase tracking-wider text-secondary">{t("home.weeklyChallenge")}</p>
               <p className="font-display text-base font-bold">{challenge.title}</p>
               <p className="text-xs text-muted-foreground">{challenge.description}</p>
             </div>
@@ -137,26 +142,26 @@ const Home = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg">
             <Sparkles className="mr-1.5 inline h-4 w-4 text-primary" />
-            Today's picks
+            {t("home.todayPicks")}
           </h2>
           <Link to="/trainings" className="flex items-center text-xs text-muted-foreground hover:text-foreground">
-            All <ChevronRight className="h-3 w-3" />
+            {t("common.all")} <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
         <div className="space-y-3">
-          {(recommended ?? []).map((t) => (
+          {(recommended ?? []).map((tr) => (
             <TrainingCard
-              key={t.id}
-              id={t.id}
-              title={t.title}
-              level={t.level}
-              duration={t.duration_minutes}
-              xp={t.xp_reward}
-              categoryName={t.categories?.name}
-              categoryIcon={t.categories?.icon}
-              categoryColorToken={t.categories?.color_token}
-              isPremium={(t as any).is_premium}
-              locked={(t as any).is_premium && !hasSub}
+              key={tr.id}
+              id={tr.id}
+              title={tr.title}
+              level={tr.level}
+              duration={tr.duration_minutes}
+              xp={tr.xp_reward}
+              categoryName={tr.categories?.name}
+              categoryIcon={tr.categories?.icon}
+              categoryColorToken={tr.categories?.color_token}
+              isPremium={(tr as any).is_premium}
+              locked={(tr as any).is_premium && !hasSub}
             />
           ))}
         </div>
@@ -164,7 +169,7 @@ const Home = () => {
 
       <Link to="/trainings">
         <Button size="lg" className="w-full shadow-glow">
-          Browse all trainings
+          {t("home.browseAll")}
         </Button>
       </Link>
     </div>
