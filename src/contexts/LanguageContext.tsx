@@ -497,6 +497,9 @@ const translations: Record<Lang, Dict> = {
     "sub.trialEndsOn": "Ends on",
     "sub.trialEndedTitle": "Your free trial has ended",
     "sub.trialEndedDesc": "Subscribe to keep accessing all trainings.",
+    "sub.trialSignupBadge": "🎁 5 days free on sign up — no card required",
+    "sub.trialHomeBanner": "You're on your free trial",
+    "sub.trialHomeCta": "See details",
 
     "auth.tagline": "Train like a pro. Save like a legend.",
     "auth.signup": "Sign up",
