@@ -95,7 +95,15 @@ const AdminTrainingForm = () => {
       const d = (existing.drills as unknown as Drill[]) ?? [];
       setDrills(
         d.length
-          ? d.map((x) => ({ title: x.title ?? "", reps: x.reps ?? "", is_premium: !!x.is_premium }))
+          ? d.map((x) => ({
+              title: x.title ?? "",
+              reps: x.reps ?? "",
+              is_premium: !!x.is_premium,
+              intro_video_url: x.intro_video_url ?? "",
+              intro_video_type: (x.intro_video_type as VideoType) ?? "upload",
+              exercise_video_url: x.exercise_video_url ?? "",
+              exercise_video_type: (x.exercise_video_type as VideoType) ?? "upload",
+            }))
           : [{ title: "", reps: "", is_premium: false }],
       );
       setIsPublished(existing.is_published ?? true);
