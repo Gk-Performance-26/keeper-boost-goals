@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Check, Clock, Crown, Loader2, Lock, Sparkles } from "lucide-react";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 interface Drill {
@@ -20,6 +21,7 @@ const TrainingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isActive: hasSub } = useSubscription();
+  const { t } = useLanguage();
   const [done, setDone] = useState<Set<number>>(new Set());
 
   const { data: training, isLoading } = useQuery({
@@ -43,7 +45,7 @@ const TrainingDetail = () => {
       </div>
     );
   }
-  if (!training) return <p className="p-8 text-center">Not found</p>;
+  if (!training) return <p className="p-8 text-center">{t("common.notFound")}</p>;
 
   const drills = (training.drills as unknown as Drill[]) || [];
   const accessibleDrills = drills
@@ -68,7 +70,7 @@ const TrainingDetail = () => {
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Back
+        <ArrowLeft className="h-4 w-4" /> {t("common.back")}
       </button>
 
       {isLocked ? (
@@ -78,15 +80,13 @@ const TrainingDetail = () => {
               <Lock className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Conteúdo Premium</p>
-              <h2 className="font-display text-xl">Desbloqueia este treino</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Subscreve por 10€/mês para aceder ao vídeo e a todos os exercícios premium.
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">{t("training.premiumContent")}</p>
+              <h2 className="font-display text-xl">{t("training.unlock")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("training.subscribeCta")}</p>
             </div>
             <Link to="/subscription" className="w-full">
               <Button size="lg" className="w-full shadow-glow">
-                <Crown className="h-4 w-4" /> Tornar-me Premium
+                <Crown className="h-4 w-4" /> {t("training.becomePremium")}
               </Button>
             </Link>
           </CardContent>
@@ -109,13 +109,13 @@ const TrainingDetail = () => {
               {training.categories.name}
             </span>
           )}
-          <span className="rounded-full bg-muted px-2.5 py-1 capitalize">{training.level}</span>
+          <span className="rounded-full bg-muted px-2.5 py-1 capitalize">{t(`level.${training.level}`)}</span>
         </div>
         <h1 className="font-display text-2xl">{training.title}</h1>
         <p className="text-sm text-muted-foreground">{training.description}</p>
         <div className="flex items-center gap-4 text-sm">
           <span className="flex items-center gap-1 text-muted-foreground">
-            <Clock className="h-4 w-4" /> {training.duration_minutes} min
+            <Clock className="h-4 w-4" /> {training.duration_minutes} {t("common.minutesShort")}
           </span>
           <span className="flex items-center gap-1 text-primary">
             <Sparkles className="h-4 w-4" /> {training.xp_reward} XP
@@ -126,7 +126,7 @@ const TrainingDetail = () => {
       {training.equipment && training.equipment.length > 0 && (
         <Card className="gradient-card border-border/60">
           <CardContent className="p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Equipment</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("training.equipment")}</p>
             <div className="flex flex-wrap gap-1.5">
               {training.equipment.map((e) => (
                 <span key={e} className="rounded-full bg-muted px-2.5 py-1 text-xs">
@@ -141,7 +141,7 @@ const TrainingDetail = () => {
       {!isLocked && (
         <>
           <section className="space-y-2">
-            <h2 className="font-display text-lg">Drills</h2>
+            <h2 className="font-display text-lg">{t("training.drills")}</h2>
             <div className="space-y-2">
               {drills.map((d, i) => {
                 const drillLocked = !!d.is_premium && !hasSub;
@@ -159,10 +159,10 @@ const TrainingDetail = () => {
                         <div className="flex items-center gap-1.5">
                           <p className="font-semibold opacity-80">{d.title}</p>
                           <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
-                            <Crown className="h-2.5 w-2.5" /> Premium
+                            <Crown className="h-2.5 w-2.5" /> {t("trainings.premium")}
                           </span>
                         </div>
-                        <p className="text-xs text-primary">Subscreve para desbloquear →</p>
+                        <p className="text-xs text-primary">{t("training.subscribeToUnlock")}</p>
                       </div>
                     </Link>
                   );
@@ -196,7 +196,7 @@ const TrainingDetail = () => {
             </div>
             {lockedDrills.length > 0 && (
               <p className="pt-1 text-center text-[11px] text-muted-foreground">
-                {lockedDrills.length} exercício(s) premium bloqueado(s)
+                {lockedDrills.length} {t("training.lockedDrills")}
               </p>
             )}
           </section>
@@ -204,8 +204,8 @@ const TrainingDetail = () => {
           <Link to={`/trainings/${training.id}/complete`}>
             <Button size="lg" disabled={!allDone} className="w-full shadow-glow">
               {allDone
-                ? "Finish session"
-                : `Tick all drills (${done.size}/${accessibleDrills.length})`}
+                ? t("training.finish")
+                : `${t("training.tickAll")} (${done.size}/${accessibleDrills.length})`}
             </Button>
           </Link>
         </>
