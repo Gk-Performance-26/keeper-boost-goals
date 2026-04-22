@@ -179,7 +179,15 @@ const AdminTrainingForm = () => {
         .filter(Boolean),
       drills: drills
         .filter((d) => d.title.trim())
-        .map((d) => ({ title: d.title.trim(), reps: d.reps, is_premium: !!d.is_premium })) as any,
+        .map((d) => ({
+          title: d.title.trim(),
+          reps: d.reps,
+          is_premium: !!d.is_premium,
+          intro_video_url: d.intro_video_url?.trim() || null,
+          intro_video_type: d.intro_video_url?.trim() ? d.intro_video_type ?? "upload" : null,
+          exercise_video_url: d.exercise_video_url?.trim() || null,
+          exercise_video_type: d.exercise_video_url?.trim() ? d.exercise_video_type ?? "upload" : null,
+        })) as any,
       is_published: isPublished,
       is_premium: isPremium,
     };
