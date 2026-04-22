@@ -213,6 +213,9 @@ const translations: Record<Lang, Dict> = {
     "sub.trialEndsOn": "Termina a",
     "sub.trialEndedTitle": "O teu período gratuito terminou",
     "sub.trialEndedDesc": "Subscreve para continuares a ter acesso a todos os treinos.",
+    "sub.trialSignupBadge": "🎁 5 dias grátis ao registar — sem cartão",
+    "sub.trialHomeBanner": "Estás no teu período gratuito",
+    "sub.trialHomeCta": "Ver detalhes",
 
     // Auth
     "auth.tagline": "Treina como um profissional. Defende como uma lenda.",
