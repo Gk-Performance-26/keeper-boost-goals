@@ -47,11 +47,14 @@ const AdminTrainingForm = () => {
   const [xpReward, setXpReward] = useState(50);
   const [videoType, setVideoType] = useState<VideoType>("youtube");
   const [videoUrl, setVideoUrl] = useState("");
+  const [introVideoType, setIntroVideoType] = useState<VideoType>("upload");
+  const [introVideoUrl, setIntroVideoUrl] = useState("");
   const [equipment, setEquipment] = useState("");
   const [drills, setDrills] = useState<Drill[]>([{ title: "", reps: "" }]);
   const [isPublished, setIsPublished] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const { data: categories } = useQuery({
@@ -82,6 +85,8 @@ const AdminTrainingForm = () => {
       setXpReward(existing.xp_reward ?? 50);
       setVideoType((existing.video_type as VideoType) ?? "youtube");
       setVideoUrl(existing.video_url ?? "");
+      setIntroVideoType(((existing as any).intro_video_type as VideoType) ?? "upload");
+      setIntroVideoUrl((existing as any).intro_video_url ?? "");
       setEquipment((existing.equipment ?? []).join(", "));
       const d = (existing.drills as unknown as Drill[]) ?? [];
       setDrills(
@@ -104,29 +109,40 @@ const AdminTrainingForm = () => {
   }
   if (!isAdmin) return <Navigate to="/admin" replace />;
 
-  const handleVideoFile = async (file: File) => {
+  const uploadVideoFile = async (file: File, target: "main" | "intro") => {
     if (!file) return;
     if (file.size > 200 * 1024 * 1024) {
       toast.error(t("adminForm.fileTooBig"));
       return;
     }
-    setUploading(true);
+    if (target === "main") setUploading(true);
+    else setUploadingIntro(true);
     const ext = file.name.split(".").pop();
-    const path = `${user.id}/${Date.now()}.${ext}`;
+    const path = `${user.id}/${target === "intro" ? "intro-" : ""}${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
       .from("training-videos")
       .upload(path, file, { contentType: file.type, upsert: false });
     if (upErr) {
       toast.error(t("adminForm.uploadFailed") + upErr.message);
-      setUploading(false);
+      if (target === "main") setUploading(false);
+      else setUploadingIntro(false);
       return;
     }
     const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
-    setVideoUrl(pub.publicUrl);
-    setVideoType("upload");
-    setUploading(false);
+    if (target === "main") {
+      setVideoUrl(pub.publicUrl);
+      setVideoType("upload");
+      setUploading(false);
+    } else {
+      setIntroVideoUrl(pub.publicUrl);
+      setIntroVideoType("upload");
+      setUploadingIntro(false);
+    }
     toast.success(t("adminForm.videoLoaded"));
   };
+
+  const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
+  const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
   const save = async () => {
     if (!title.trim()) return toast.error(t("adminForm.titleRequired"));
@@ -143,6 +159,8 @@ const AdminTrainingForm = () => {
       xp_reward: xpReward,
       video_type: videoType as any,
       video_url: videoUrl.trim(),
+      intro_video_url: introVideoUrl.trim() || null,
+      intro_video_type: introVideoUrl.trim() ? (introVideoType as any) : null,
       equipment: equipment
         .split(",")
         .map((e) => e.trim())
@@ -309,6 +327,82 @@ const AdminTrainingForm = () => {
               <p className="text-[11px] text-muted-foreground">
                 {t("adminForm.embedHint")}
               </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="gradient-card border-border/60">
+        <CardContent className="space-y-4 p-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("adminForm.introVideo")}
+            </p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{t("adminForm.introVideoHint")}</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
+              <button
+                key={v}
+                onClick={() => setIntroVideoType(v)}
+                className={`rounded-lg border px-3 py-2 text-xs font-semibold capitalize transition ${
+                  introVideoType === v
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-border bg-muted/30 text-muted-foreground"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+
+          {introVideoType === "upload" ? (
+            <div className="space-y-2">
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground transition hover:bg-muted/40">
+                {uploadingIntro ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> {t("adminForm.uploading")}
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" /> {t("adminForm.chooseFile")}
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleIntroVideoFile(f);
+                  }}
+                  disabled={uploadingIntro}
+                />
+              </label>
+              {introVideoUrl && (
+                <div className="flex items-start justify-between gap-2">
+                  <p className="break-all text-xs text-muted-foreground">URL: {introVideoUrl}</p>
+                  <button
+                    onClick={() => setIntroVideoUrl("")}
+                    className="flex-shrink-0 text-xs text-destructive hover:underline"
+                  >
+                    {t("adminForm.removeIntro")}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label>{t("adminForm.embedUrl")} ({introVideoType})</Label>
+              <Input
+                value={introVideoUrl}
+                onChange={(e) => setIntroVideoUrl(e.target.value)}
+                placeholder={
+                  introVideoType === "youtube"
+                    ? "https://www.youtube.com/embed/..."
+                    : "https://player.vimeo.com/video/..."
+                }
+              />
             </div>
           )}
         </CardContent>

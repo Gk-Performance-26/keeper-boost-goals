@@ -111,7 +111,14 @@ const TrainingDetail = () => {
           </CardContent>
         </Card>
       ) : (
-        <VideoPlayer url={training.video_url} type={training.video_type} />
+        <VideoPlayer
+          url={training.video_url}
+          type={training.video_type}
+          introUrl={(training as any).intro_video_url}
+          introType={(training as any).intro_video_type}
+          introLabel={t("training.introVideo")}
+          exerciseLabel={t("training.exerciseVideo")}
+        />
       )}
 
       <header className="space-y-2">
