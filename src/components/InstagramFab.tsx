@@ -16,14 +16,6 @@ const INSTAGRAM_URL = "https://www.instagram.com/gkperformance.hub/";
 export function InstagramFab() {
   const [open, setOpen] = useState(false);
 
-  const handleConfirm = () => {
-    setOpen(false);
-    const win = window.open(INSTAGRAM_URL, "_blank", "noopener,noreferrer");
-    if (!win) {
-      window.location.href = INSTAGRAM_URL;
-    }
-  };
-
   return (
     <>
       <button
@@ -40,12 +32,16 @@ export function InstagramFab() {
           <AlertDialogHeader>
             <AlertDialogTitle>Sair para o Instagram?</AlertDialogTitle>
             <AlertDialogDescription>
-              Vais ser redirecionado para <strong>@gkperformance.hub</strong> no Instagram, numa nova aba.
+              Vais ser redirecionado para <strong>@gkperformance.hub</strong> no Instagram.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>Continuar</AlertDialogAction>
+            <AlertDialogAction asChild>
+              <a href={INSTAGRAM_URL} target="_top" rel="noopener noreferrer">
+                Continuar
+              </a>
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
