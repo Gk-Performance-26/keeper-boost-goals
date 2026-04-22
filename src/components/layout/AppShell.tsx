@@ -35,6 +35,7 @@ export function AppShell() {
       <main className="flex-1 pb-2">
         <Outlet />
       </main>
+      <InstagramFab />
       <BottomNav />
     </div>
   );
