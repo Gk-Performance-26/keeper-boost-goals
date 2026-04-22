@@ -14,6 +14,7 @@ import { differenceInCalendarDays } from "date-fns";
 import { generateFeedback } from "@/lib/gamification";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CompleteSession = () => {
   const { id } = useParams();
@@ -22,6 +23,7 @@ const CompleteSession = () => {
   const invalidateProfile = useInvalidateProfile();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [notes, setNotes] = useState("");
   const [rating, setRating] = useState(4);
@@ -58,7 +60,6 @@ const CompleteSession = () => {
     if (!user || !training || !profile) return;
     setSubmitting(true);
     try {
-      // 1) insert session
       const { data: sessionRow, error: sessionErr } = await supabase
         .from("completed_sessions")
         .insert({
@@ -73,7 +74,6 @@ const CompleteSession = () => {
         .single();
       if (sessionErr) throw sessionErr;
 
-      // 2) insert skill scores
       const skillRows = Object.entries(scores).map(([category_id, score]) => ({
         user_id: user.id,
         session_id: sessionRow.id,
@@ -85,14 +85,13 @@ const CompleteSession = () => {
         if (skillErr) throw skillErr;
       }
 
-      // 3) update profile xp + streak
       const today = new Date();
       const last = profile.last_training_date ? new Date(profile.last_training_date) : null;
       let newStreak = profile.current_streak;
       if (!last) newStreak = 1;
       else {
         const diff = differenceInCalendarDays(today, last);
-        if (diff === 0) newStreak = profile.current_streak; // same day
+        if (diff === 0) newStreak = profile.current_streak;
         else if (diff === 1) newStreak = profile.current_streak + 1;
         else if (diff === 2 && profile.freeze_tokens > 0) newStreak = profile.current_streak + 1;
         else newStreak = 1;
@@ -116,7 +115,6 @@ const CompleteSession = () => {
         .eq("user_id", user.id);
       if (profErr) throw profErr;
 
-      // 4) feedback
       const tips = generateFeedback(
         Object.fromEntries(
           Object.entries(scores).map(([cid, s]) => {
@@ -128,10 +126,13 @@ const CompleteSession = () => {
       setFeedback(tips);
       setXpGained(training.xp_reward);
       invalidateProfile();
-      toast({ title: `+${training.xp_reward} XP earned 🔥`, description: `Streak: ${newStreak} days` });
+      toast({
+        title: `+${training.xp_reward} ${t("complete.xpEarned")} 🔥`,
+        description: `${t("complete.streakDays")}: ${newStreak}d`,
+      });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Could not save session";
-      toast({ title: "Save failed", description: msg, variant: "destructive" });
+      const msg = err instanceof Error ? err.message : t("complete.couldNotSave");
+      toast({ title: t("complete.saveFailed"), description: msg, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
@@ -159,25 +160,25 @@ const CompleteSession = () => {
           <div className="flex h-24 w-24 items-center justify-center rounded-full gradient-primary shadow-glow">
             <Trophy className="h-12 w-12 text-primary-foreground" />
           </div>
-          <h1 className="font-display text-3xl">Session complete!</h1>
+          <h1 className="font-display text-3xl">{t("complete.sessionComplete")}</h1>
           <p className="text-2xl font-bold text-gradient-primary">+{xpGained} XP</p>
         </motion.div>
         <Card className="gradient-card border-border/60">
           <CardContent className="space-y-2 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Coach feedback</p>
-            {feedback.map((t, i) => (
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">{t("complete.coachFeedback")}</p>
+            {feedback.map((tip, i) => (
               <p key={i} className="text-sm">
-                • {t}
+                • {tip}
               </p>
             ))}
           </CardContent>
         </Card>
         <div className="flex gap-3">
           <Button className="flex-1" variant="outline" onClick={() => navigate("/progress")}>
-            See progress
+            {t("complete.seeProgress")}
           </Button>
           <Button className="flex-1 shadow-glow" onClick={() => navigate("/")}>
-            Done
+            {t("complete.doneBtn")}
           </Button>
         </div>
       </div>
@@ -187,14 +188,13 @@ const CompleteSession = () => {
   return (
     <div className="space-y-6 px-5 pt-8 pb-6">
       <header>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Self-assessment</p>
-        <h1 className="font-display text-2xl">How did it go?</h1>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">{t("complete.selfAssessment")}</p>
+        <h1 className="font-display text-2xl">{t("complete.howWasIt")}</h1>
       </header>
 
-      {/* Rating */}
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-3 p-4">
-          <p className="text-sm font-semibold">Overall feel</p>
+          <p className="text-sm font-semibold">{t("complete.overallFeel")}</p>
           <div className="flex justify-between">
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} onClick={() => setRating(n)} className="p-1">
@@ -210,11 +210,10 @@ const CompleteSession = () => {
         </CardContent>
       </Card>
 
-      {/* Skill scores — featured first */}
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
           <p className="text-sm font-semibold">
-            Rate yourself <span className="text-muted-foreground">(0–10)</span>
+            {t("complete.rateYourself")} <span className="text-muted-foreground">{t("complete.scale")}</span>
           </p>
           {(categories ?? [])
             .sort((a, b) => (a.id === trainingCategoryId ? -1 : b.id === trainingCategoryId ? 1 : 0))
@@ -244,14 +243,13 @@ const CompleteSession = () => {
         </CardContent>
       </Card>
 
-      {/* Notes */}
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-2 p-4">
-          <p className="text-sm font-semibold">Notes</p>
+          <p className="text-sm font-semibold">{t("complete.notes")}</p>
           <Textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value.slice(0, 500))}
-            placeholder="What worked, what didn't..."
+            placeholder={t("complete.notesPlaceholder")}
             rows={3}
           />
           <p className="text-right text-[10px] text-muted-foreground">{notes.length}/500</p>
@@ -263,7 +261,7 @@ const CompleteSession = () => {
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <>
-            <Sparkles className="h-4 w-4" /> Submit & earn {training.xp_reward} XP
+            <Sparkles className="h-4 w-4" /> {t("complete.submitEarn")} {training.xp_reward} {t("complete.xp")}
           </>
         )}
       </Button>
