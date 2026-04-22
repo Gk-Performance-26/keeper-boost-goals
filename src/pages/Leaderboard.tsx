@@ -47,15 +47,15 @@ const Leaderboard = () => {
       {/* Background image */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-cover bg-no-repeat opacity-60 brightness-125"
+        className="pointer-events-none fixed inset-0 -z-10 bg-contain bg-no-repeat opacity-60 brightness-125"
         style={{
           backgroundImage: `url(${leaderboardBg})`,
-          backgroundPosition: "center 75%",
+          backgroundPosition: "center bottom",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/30 via-background/50 to-background/80"
+        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/40 via-background/30 to-background/70"
       />
       <header>
         <h1 className="font-display text-3xl">{t("leaderboard.title")}</h1>
