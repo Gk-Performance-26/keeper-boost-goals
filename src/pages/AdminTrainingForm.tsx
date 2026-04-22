@@ -549,6 +549,96 @@ const AdminTrainingForm = () => {
                     }}
                   />
                 </div>
+
+                {(["intro_video_url", "exercise_video_url"] as const).map((field) => {
+                  const typeField = field === "intro_video_url" ? "intro_video_type" : "exercise_video_type";
+                  const url = (d[field] as string) || "";
+                  const vType = (d[typeField] as VideoType) || "upload";
+                  const labelKey = field === "intro_video_url" ? "adminForm.drillIntroVideo" : "adminForm.drillExerciseVideo";
+                  const uploadKey = `${i}-${field}`;
+                  const isUp = !!drillUploading[uploadKey];
+                  return (
+                    <div key={field} className="space-y-1.5 rounded-md border border-border/40 bg-background/40 p-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {t(labelKey)}
+                      </p>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => {
+                              const n = [...drills];
+                              (n[i] as any)[typeField] = v;
+                              setDrills(n);
+                            }}
+                            className={`rounded-md border px-2 py-1 text-[10px] font-semibold capitalize transition ${
+                              vType === v
+                                ? "border-primary bg-primary/15 text-primary"
+                                : "border-border bg-muted/20 text-muted-foreground"
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                      {vType === "upload" ? (
+                        <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-md border border-dashed border-border bg-muted/10 p-2 text-[11px] text-muted-foreground transition hover:bg-muted/30">
+                          {isUp ? (
+                            <>
+                              <Loader2 className="h-3 w-3 animate-spin" /> {t("adminForm.uploading")}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-3 w-3" /> {url ? t("adminForm.replaceFile") : t("adminForm.chooseFile")}
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) uploadDrillVideo(f, i, field);
+                            }}
+                            disabled={isUp}
+                          />
+                        </label>
+                      ) : (
+                        <Input
+                          value={url}
+                          onChange={(e) => {
+                            const n = [...drills];
+                            (n[i] as any)[field] = e.target.value;
+                            setDrills(n);
+                          }}
+                          placeholder={
+                            vType === "youtube"
+                              ? "https://www.youtube.com/embed/..."
+                              : "https://player.vimeo.com/video/..."
+                          }
+                          className="h-8 text-xs"
+                        />
+                      )}
+                      {url && (
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="break-all text-[10px] text-muted-foreground">{url.length > 50 ? `…${url.slice(-50)}` : url}</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const n = [...drills];
+                              (n[i] as any)[field] = "";
+                              setDrills(n);
+                            }}
+                            className="flex-shrink-0 text-[10px] text-destructive hover:underline"
+                          >
+                            {t("adminForm.removeIntro")}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
