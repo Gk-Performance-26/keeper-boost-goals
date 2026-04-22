@@ -102,6 +102,19 @@ const Admin = () => {
     refetch();
   };
 
+  const togglePremium = async (id: string, currentValue: boolean) => {
+    const { error } = await supabase
+      .from("trainings")
+      .update({ is_premium: !currentValue })
+      .eq("id", id);
+    if (error) {
+      toast.error("Erro: " + error.message);
+      return;
+    }
+    toast.success(!currentValue ? "Tornado Premium 👑" : "Tornado gratuito");
+    refetch();
+  };
+
   return (
     <div className="space-y-5 px-5 pt-8 pb-6">
       <header className="flex items-start justify-between gap-3">
