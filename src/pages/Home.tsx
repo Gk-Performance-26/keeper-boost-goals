@@ -140,9 +140,6 @@ const Home = () => {
       <Dialog open={showTrialBanner} onOpenChange={(open) => { if (!open) dismissTrialBanner(); }}>
         <DialogContent className="max-w-sm gradient-card border-primary/40 shadow-glow p-0 overflow-hidden">
           <div className="space-y-5 p-6 text-center">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/40 to-primary/10 shadow-glow">
-              <Gift className="h-10 w-10 text-primary" />
-            </div>
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                 {t("sub.trialModalEyebrow")}
