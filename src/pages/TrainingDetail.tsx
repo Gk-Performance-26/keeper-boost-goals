@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 interface Drill {
   title: string;
   reps: string;
+  is_premium?: boolean;
 }
 
 const TrainingDetail = () => {
@@ -45,7 +46,11 @@ const TrainingDetail = () => {
   if (!training) return <p className="p-8 text-center">Not found</p>;
 
   const drills = (training.drills as unknown as Drill[]) || [];
-  const allDone = drills.length > 0 && done.size === drills.length;
+  const accessibleDrills = drills
+    .map((d, i) => ({ ...d, _idx: i, _locked: !!d.is_premium && !hasSub }))
+    .filter((d) => !d._locked);
+  const lockedDrills = drills.filter((d) => d.is_premium && !hasSub);
+  const allDone = accessibleDrills.length > 0 && done.size === accessibleDrills.length;
   const isLocked = (training as any).is_premium && !hasSub;
 
   const toggle = (i: number) => {
@@ -138,37 +143,69 @@ const TrainingDetail = () => {
           <section className="space-y-2">
             <h2 className="font-display text-lg">Drills</h2>
             <div className="space-y-2">
-              {drills.map((d, i) => (
-                <button
-                  key={i}
-                  onClick={() => toggle(i)}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
-                    done.has(i)
-                      ? "border-primary/40 bg-primary/10"
-                      : "border-border bg-muted/30 hover:bg-muted/50",
-                  )}
-                >
-                  <div
+              {drills.map((d, i) => {
+                const drillLocked = !!d.is_premium && !hasSub;
+                if (drillLocked) {
+                  return (
+                    <Link
+                      key={i}
+                      to="/subscription"
+                      className="flex w-full items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-left transition hover:border-primary/60 hover:bg-primary/10"
+                    >
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-primary/40 bg-primary/10 text-primary">
+                        <Lock className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-semibold opacity-80">{d.title}</p>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+                            <Crown className="h-2.5 w-2.5" /> Premium
+                          </span>
+                        </div>
+                        <p className="text-xs text-primary">Subscreve para desbloquear →</p>
+                      </div>
+                    </Link>
+                  );
+                }
+                return (
+                  <button
+                    key={i}
+                    onClick={() => toggle(i)}
                     className={cn(
-                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition",
-                      done.has(i) ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                      "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+                      done.has(i)
+                        ? "border-primary/40 bg-primary/10"
+                        : "border-border bg-muted/30 hover:bg-muted/50",
                     )}
                   >
-                    {done.has(i) && <Check className="h-4 w-4" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{d.title}</p>
-                    <p className="text-xs text-muted-foreground">{d.reps}</p>
-                  </div>
-                </button>
-              ))}
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition",
+                        done.has(i) ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                      )}
+                    >
+                      {done.has(i) && <Check className="h-4 w-4" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{d.title}</p>
+                      <p className="text-xs text-muted-foreground">{d.reps}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
+            {lockedDrills.length > 0 && (
+              <p className="pt-1 text-center text-[11px] text-muted-foreground">
+                {lockedDrills.length} exercício(s) premium bloqueado(s)
+              </p>
+            )}
           </section>
 
           <Link to={`/trainings/${training.id}/complete`}>
             <Button size="lg" disabled={!allDone} className="w-full shadow-glow">
-              {allDone ? "Finish session" : `Tick all drills (${done.size}/${drills.length})`}
+              {allDone
+                ? "Finish session"
+                : `Tick all drills (${done.size}/${accessibleDrills.length})`}
             </Button>
           </Link>
         </>
