@@ -4,14 +4,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { Flame, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { Crown, Flame, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
+  const { isActive: hasSub } = useSubscription();
 
   if (!profile) return null;
 
@@ -29,6 +31,11 @@ const Profile = () => {
           <p className="text-sm text-muted-foreground capitalize">
             {profile.experience_level} · {profile.age_group ?? "—"}
           </p>
+          {hasSub && (
+            <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
+              <Crown className="h-3 w-3" /> Premium
+            </span>
+          )}
         </div>
       </header>
 
@@ -53,6 +60,15 @@ const Profile = () => {
       )}
 
       <div className="space-y-2">
+        <Link to="/subscription">
+          <Button
+            variant="outline"
+            className={`w-full justify-start ${hasSub ? "" : "border-primary/40 text-primary hover:bg-primary/10"}`}
+          >
+            <Crown className="h-4 w-4" />
+            {hasSub ? "Gerir subscrição" : "Tornar-me Premium · 10€/mês"}
+          </Button>
+        </Link>
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
             <Settings className="h-4 w-4" /> Edit profile

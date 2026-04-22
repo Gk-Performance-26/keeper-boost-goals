@@ -12,10 +12,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Sparkles, Trophy } from "lucide-react";
 import { format, startOfDay } from "date-fns";
 import gkLogo from "@/assets/gk-logo.jpg";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Home = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
+  const { isActive: hasSub } = useSubscription();
 
   const { data: recommended } = useQuery({
     queryKey: ["recommended", profile?.experience_level],
@@ -131,6 +133,8 @@ const Home = () => {
               categoryName={t.categories?.name}
               categoryIcon={t.categories?.icon}
               categoryColorToken={t.categories?.color_token}
+              isPremium={(t as any).is_premium}
+              locked={(t as any).is_premium && !hasSub}
             />
           ))}
         </div>
