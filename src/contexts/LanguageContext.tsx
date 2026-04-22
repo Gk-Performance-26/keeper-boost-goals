@@ -206,6 +206,13 @@ const translations: Record<Lang, Dict> = {
     "sub.benefit6": "Cancela quando quiseres",
     "sub.testBanner": "Pagamentos em modo de teste. Usa o cartão",
     "sub.testBannerSuffix": "para testar.",
+    "sub.trialTitle": "Período gratuito ativo",
+    "sub.trialDesc": "Tens acesso total a todo o conteúdo premium durante 5 dias, sem precisares de pagar.",
+    "sub.trialDaysLeft": "dias restantes",
+    "sub.trialDayLeft": "dia restante",
+    "sub.trialEndsOn": "Termina a",
+    "sub.trialEndedTitle": "O teu período gratuito terminou",
+    "sub.trialEndedDesc": "Subscreve para continuares a ter acesso a todos os treinos.",
 
     // Auth
     "auth.tagline": "Treina como um profissional. Defende como uma lenda.",
@@ -480,6 +487,13 @@ const translations: Record<Lang, Dict> = {
     "sub.benefit6": "Cancel anytime",
     "sub.testBanner": "Payments in test mode. Use card",
     "sub.testBannerSuffix": "to test.",
+    "sub.trialTitle": "Free trial active",
+    "sub.trialDesc": "You have full access to all premium content for 5 days, no payment required.",
+    "sub.trialDaysLeft": "days left",
+    "sub.trialDayLeft": "day left",
+    "sub.trialEndsOn": "Ends on",
+    "sub.trialEndedTitle": "Your free trial has ended",
+    "sub.trialEndedDesc": "Subscribe to keep accessing all trainings.",
 
     "auth.tagline": "Train like a pro. Save like a legend.",
     "auth.signup": "Sign up",
