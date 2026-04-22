@@ -39,6 +39,18 @@ const TrainingDetail = () => {
     },
   });
 
+  const drills = ((training?.drills as unknown as Drill[]) || []);
+  const equipmentList = (training?.equipment ?? []) as string[];
+  const baseTexts = [
+    training?.title ?? "",
+    training?.description ?? "",
+    training?.categories?.name ?? "",
+    ...drills.map((d) => d.title ?? ""),
+    ...drills.map((d) => d.reps ?? ""),
+    ...equipmentList,
+  ];
+  const translated = useTranslatedTexts(baseTexts);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -48,7 +60,6 @@ const TrainingDetail = () => {
   }
   if (!training) return <p className="p-8 text-center">{t("common.notFound")}</p>;
 
-  const drills = (training.drills as unknown as Drill[]) || [];
   const accessibleDrills = drills
     .map((d, i) => ({ ...d, _idx: i, _locked: !!d.is_premium && !hasSub }))
     .filter((d) => !d._locked);
@@ -56,19 +67,6 @@ const TrainingDetail = () => {
   const allDone = accessibleDrills.length > 0 && done.size === accessibleDrills.length;
   const isLocked = (training as any).is_premium && !hasSub;
 
-  // Build flat list of strings to translate, then split back into pieces
-  const drillTitles = drills.map((d) => d.title ?? "");
-  const drillReps = drills.map((d) => d.reps ?? "");
-  const equipmentList = (training.equipment ?? []) as string[];
-  const baseTexts = [
-    training.title ?? "",
-    training.description ?? "",
-    training.categories?.name ?? "",
-    ...drillTitles,
-    ...drillReps,
-    ...equipmentList,
-  ];
-  const translated = useTranslatedTexts(baseTexts);
   const tTitle = translated[0] || training.title;
   const tDesc = translated[1] || training.description;
   const tCategory = translated[2] || training.categories?.name;
