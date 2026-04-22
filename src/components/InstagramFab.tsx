@@ -58,20 +58,19 @@ export function InstagramFab() {
               <span className="block">
                 Vais ser redirecionado para <strong>@gkperformance.hub</strong> no Instagram.
               </span>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-primary underline underline-offset-4"
-              >
-                instagram.com/gkperformance.hub
-              </a>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <Button type="button" onClick={handleContinue}>
-              Continuar
+            <Button asChild>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+              >
+                Continuar
+              </a>
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
