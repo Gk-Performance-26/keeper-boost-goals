@@ -10,7 +10,8 @@ import { XpRing } from "@/components/XpRing";
 import { TrainingCard } from "@/components/TrainingCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Sparkles, Trophy, Instagram, Gift, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ChevronRight, Sparkles, Trophy, Instagram, Gift, Check } from "lucide-react";
 import { format, startOfDay } from "date-fns";
 import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
@@ -135,33 +136,47 @@ const Home = () => {
         <StreakBadge streak={profile.current_streak} />
       </header>
 
-      {/* Trial welcome banner — shows once after signup, dismissible */}
-      {showTrialBanner && (
-        <Card className="border-primary/40 bg-gradient-to-r from-primary/15 to-primary/5">
-          <CardContent className="flex items-start gap-3 p-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
-              <Gift className="h-5 w-5" />
+      {/* Trial welcome modal — shows once automatically after first login */}
+      <Dialog open={showTrialBanner} onOpenChange={(open) => { if (!open) dismissTrialBanner(); }}>
+        <DialogContent className="max-w-sm gradient-card border-primary/40 shadow-glow p-0 overflow-hidden">
+          <div className="space-y-5 p-6 text-center">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/40 to-primary/10 shadow-glow">
+              <Gift className="h-10 w-10 text-primary" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] uppercase tracking-wider text-primary">{t("sub.trialHomeBanner")}</p>
-              <p className="text-sm font-semibold">
-                {trialDaysLeft} {trialDaysLeft === 1 ? t("sub.trialDayLeft") : t("sub.trialDaysLeft")}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                {t("sub.trialModalEyebrow")}
               </p>
-              <Link to="/subscription" className="text-xs text-primary underline-offset-2 hover:underline">
-                {t("sub.trialHomeCta")}
-              </Link>
+              <h2 className="font-display text-2xl leading-tight">
+                {t("sub.trialModalTitle")}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t("sub.trialModalDesc")}
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={dismissTrialBanner}
-              aria-label="Dismiss"
-              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </CardContent>
-        </Card>
-      )}
+
+            <ul className="space-y-2.5 text-left">
+              {[t("sub.benefit1"), t("sub.benefit2"), t("sub.benefit4")].map((b) => (
+                <li key={b} className="flex items-start gap-2.5 text-sm">
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="rounded-xl bg-primary/10 px-4 py-3">
+              <p className="font-display text-3xl text-primary">{trialDaysLeft}</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {trialDaysLeft === 1 ? t("sub.trialDayLeft") : t("sub.trialDaysLeft")}
+              </p>
+            </div>
+
+            <Button size="lg" className="w-full shadow-glow" onClick={dismissTrialBanner}>
+              {t("sub.trialModalCta")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* XP / Level summary */}
       <Card className="gradient-card border-border/60 shadow-card">

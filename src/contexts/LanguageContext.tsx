@@ -216,6 +216,10 @@ const translations: Record<Lang, Dict> = {
     "sub.trialSignupBadge": "🎁 5 dias grátis ao registar — sem cartão",
     "sub.trialHomeBanner": "Estás no teu período gratuito",
     "sub.trialHomeCta": "Ver detalhes",
+    "sub.trialModalEyebrow": "Bem-vindo ao GK Performance Hub",
+    "sub.trialModalTitle": "Tens 5 dias grátis para experimentar tudo",
+    "sub.trialModalDesc": "Acesso completo a todos os treinos e exercícios premium, sem precisares de cartão.",
+    "sub.trialModalCta": "Começar a treinar",
 
     // Auth
     "auth.tagline": "Treina como um profissional. Defende como uma lenda.",
@@ -500,6 +504,10 @@ const translations: Record<Lang, Dict> = {
     "sub.trialSignupBadge": "🎁 5 days free on sign up — no card required",
     "sub.trialHomeBanner": "You're on your free trial",
     "sub.trialHomeCta": "See details",
+    "sub.trialModalEyebrow": "Welcome to GK Performance Hub",
+    "sub.trialModalTitle": "You have 5 free days to try everything",
+    "sub.trialModalDesc": "Full access to all trainings and premium drills — no card required.",
+    "sub.trialModalCta": "Start training",
 
     "auth.tagline": "Train like a pro. Save like a legend.",
     "auth.signup": "Sign up",
