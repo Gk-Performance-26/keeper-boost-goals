@@ -9,6 +9,7 @@ import { ArrowLeft, Check, Clock, Crown, Loader2, Lock, Sparkles } from "lucide-
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
 interface Drill {
