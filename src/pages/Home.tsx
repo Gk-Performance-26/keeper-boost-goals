@@ -124,7 +124,7 @@ const Home = () => {
             <img
               src={gkLogo}
               alt="GK Performance Hub"
-              className="relative h-36 w-36 rounded-3xl object-cover shadow-glow ring-1 ring-primary/40"
+              className="relative h-44 w-44 rounded-3xl object-cover shadow-glow ring-1 ring-primary/40"
             />
           </div>
           <div className="flex items-center gap-3">
