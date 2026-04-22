@@ -83,8 +83,8 @@ const Progress = () => {
     return Array.from(map.values()).map((e) => ({ category: e.name, score: e.total / e.count }));
   })();
 
-  // streak heatmap (last 28 days)
-  const days = Array.from({ length: 28 }).map((_, i) => subDays(new Date(), 27 - i));
+  // streak heatmap (last 7 days)
+  const days = Array.from({ length: 7 }).map((_, i) => subDays(new Date(), 6 - i));
   const trainedSet = new Set((sessions ?? []).map((s) => format(startOfDay(new Date(s.completed_at)), "yyyy-MM-dd")));
 
   const totalMinutes = (sessions ?? []).reduce((s, x) => s + (x.duration_minutes || 0), 0);
