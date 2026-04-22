@@ -50,7 +50,7 @@ const Home = () => {
         .from("trainings")
         .select("*, categories(name, icon, color_token, slug)")
         .eq("level", profile!.experience_level)
-        .limit(3);
+        .limit(2);
       return data ?? [];
     },
   });
@@ -200,7 +200,7 @@ const Home = () => {
       )}
 
       {/* Recommended */}
-      <section className="space-y-3">
+      <section className="space-y-3 pt-6">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg">
             <Sparkles className="mr-1.5 inline h-4 w-4 text-primary" />
