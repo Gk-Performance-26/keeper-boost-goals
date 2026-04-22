@@ -88,7 +88,7 @@ const translations: Record<Lang, Dict> = {
     "progress.bestStreak": "Melhor sequência",
     "progress.timeTrained": "Tempo treinado",
     "progress.level": "Nível",
-    "progress.last4Weeks": "Última semana",
+    "progress.last4Weeks": "Últimos 14 dias",
     "progress.skillProfile": "Perfil de habilidades",
     "progress.badges": "Distintivos",
 
@@ -383,7 +383,7 @@ const translations: Record<Lang, Dict> = {
     "progress.bestStreak": "Best streak",
     "progress.timeTrained": "Time trained",
     "progress.level": "Level",
-    "progress.last4Weeks": "Last week",
+    "progress.last4Weeks": "Last 14 days",
     "progress.skillProfile": "Skill profile",
     "progress.badges": "Badges",
 
