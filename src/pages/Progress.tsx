@@ -101,6 +101,13 @@ const Progress = () => {
         <StreakBadge streak={profile.current_streak} />
       </header>
 
+      {/* Goals (admin can create, users can activate) */}
+      <GoalsSection
+        sessions={sessions ?? []}
+        totalXp={profile.total_xp}
+        currentStreak={profile.current_streak}
+      />
+
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
         <StatCard icon={<Sparkles className="h-4 w-4" />} label={t("progress.totalXp")} value={profile.total_xp.toLocaleString()} />
@@ -115,13 +122,6 @@ const Progress = () => {
           <LevelBar totalXp={profile.total_xp} />
         </CardContent>
       </Card>
-
-      {/* Goals (admin can create, users can activate) */}
-      <GoalsSection
-        sessions={sessions ?? []}
-        totalXp={profile.total_xp}
-        currentStreak={profile.current_streak}
-      />
 
       {/* Streak heatmap */}
       <Card className="gradient-card border-border/60">
