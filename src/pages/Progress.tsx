@@ -83,8 +83,8 @@ const Progress = () => {
     return Array.from(map.values()).map((e) => ({ category: e.name, score: e.total / e.count }));
   })();
 
-  // streak heatmap (last 7 days)
-  const days = Array.from({ length: 7 }).map((_, i) => subDays(new Date(), 6 - i));
+  // streak heatmap (last 14 days)
+  const days = Array.from({ length: 14 }).map((_, i) => subDays(new Date(), 13 - i));
   const trainedSet = new Set((sessions ?? []).map((s) => format(startOfDay(new Date(s.completed_at)), "yyyy-MM-dd")));
 
   const totalMinutes = (sessions ?? []).reduce((s, x) => s + (x.duration_minutes || 0), 0);
@@ -136,8 +136,8 @@ const Progress = () => {
       </Card>
 
       {/* Streak heatmap */}
-      <Card className="gradient-card border-border/60">
-        <CardContent className="space-y-3 p-4">
+      <Card className="gradient-card border-border/60 my-4">
+        <CardContent className="space-y-4 p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("progress.last4Weeks")}</p>
           <div className="grid grid-cols-7 gap-1.5">
             {days.map((d) => {
