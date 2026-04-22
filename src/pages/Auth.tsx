@@ -115,21 +115,16 @@ const Auth = () => {
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
             {mode === "signup" && (
-              <>
-                <div className="rounded-xl border border-primary/40 bg-primary/10 px-3 py-2.5 text-center text-sm font-medium text-primary">
-                  {t("sub.trialSignupBadge")}
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="display">{t("auth.gkName")}</Label>
-                  <Input
-                    id="display"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Iker, Manuel, Alisson..."
-                    maxLength={40}
-                  />
-                </div>
-              </>
+              <div className="space-y-1.5">
+                <Label htmlFor="display">{t("auth.gkName")}</Label>
+                <Input
+                  id="display"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Iker, Manuel, Alisson..."
+                  maxLength={40}
+                />
+              </div>
             )}
             <div className="space-y-1.5">
               <Label htmlFor="email">{t("auth.email")}</Label>

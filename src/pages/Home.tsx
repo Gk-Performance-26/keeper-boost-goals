@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,7 +10,7 @@ import { XpRing } from "@/components/XpRing";
 import { TrainingCard } from "@/components/TrainingCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Sparkles, Trophy, Instagram, Gift } from "lucide-react";
+import { ChevronRight, Sparkles, Trophy, Instagram, Gift, X } from "lucide-react";
 import { format, startOfDay } from "date-fns";
 import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
@@ -22,6 +23,23 @@ const Home = () => {
   const { data: profile } = useProfile();
   const { isActive: hasSub, isTrialActive, hasPaidSub, trialDaysLeft } = useSubscription();
   const { t, lang } = useLanguage();
+
+  // Trial welcome banner: only shown once after signup, then dismissed forever
+  const trialBannerKey = user ? `trial-welcome-dismissed-${user.id}` : null;
+  const [showTrialBanner, setShowTrialBanner] = useState(false);
+
+  useEffect(() => {
+    if (!trialBannerKey || !isTrialActive || hasPaidSub) {
+      setShowTrialBanner(false);
+      return;
+    }
+    setShowTrialBanner(localStorage.getItem(trialBannerKey) !== "1");
+  }, [trialBannerKey, isTrialActive, hasPaidSub]);
+
+  const dismissTrialBanner = () => {
+    if (trialBannerKey) localStorage.setItem(trialBannerKey, "1");
+    setShowTrialBanner(false);
+  };
 
   const { data: recommended } = useQuery({
     queryKey: ["recommended", profile?.experience_level],
@@ -117,24 +135,32 @@ const Home = () => {
         <StreakBadge streak={profile.current_streak} />
       </header>
 
-      {/* Trial banner */}
-      {isTrialActive && !hasPaidSub && (
-        <Link to="/subscription" className="block">
-          <Card className="border-primary/40 bg-gradient-to-r from-primary/15 to-primary/5 hover:border-primary/60 transition-colors">
-            <CardContent className="flex items-center gap-3 p-3">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
-                <Gift className="h-5 w-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] uppercase tracking-wider text-primary">{t("sub.trialHomeBanner")}</p>
-                <p className="text-sm font-semibold">
-                  {trialDaysLeft} {trialDaysLeft === 1 ? t("sub.trialDayLeft") : t("sub.trialDaysLeft")}
-                </p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </CardContent>
-          </Card>
-        </Link>
+      {/* Trial welcome banner — shows once after signup, dismissible */}
+      {showTrialBanner && (
+        <Card className="border-primary/40 bg-gradient-to-r from-primary/15 to-primary/5">
+          <CardContent className="flex items-start gap-3 p-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
+              <Gift className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] uppercase tracking-wider text-primary">{t("sub.trialHomeBanner")}</p>
+              <p className="text-sm font-semibold">
+                {trialDaysLeft} {trialDaysLeft === 1 ? t("sub.trialDayLeft") : t("sub.trialDaysLeft")}
+              </p>
+              <Link to="/subscription" className="text-xs text-primary underline-offset-2 hover:underline">
+                {t("sub.trialHomeCta")}
+              </Link>
+            </div>
+            <button
+              type="button"
+              onClick={dismissTrialBanner}
+              aria-label="Dismiss"
+              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </CardContent>
+        </Card>
       )}
 
       {/* XP / Level summary */}
