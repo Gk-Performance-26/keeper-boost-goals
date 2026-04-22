@@ -5,8 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Check, Clock, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Clock, Crown, Loader2, Lock, Sparkles } from "lucide-react";
 import { CategoryIcon } from "@/components/CategoryIcon";
+import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 
 interface Drill {
@@ -17,6 +18,7 @@ interface Drill {
 const TrainingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isActive: hasSub } = useSubscription();
   const [done, setDone] = useState<Set<number>>(new Set());
 
   const { data: training, isLoading } = useQuery({
@@ -44,6 +46,7 @@ const TrainingDetail = () => {
 
   const drills = (training.drills as unknown as Drill[]) || [];
   const allDone = drills.length > 0 && done.size === drills.length;
+  const isLocked = (training as any).is_premium && !hasSub;
 
   const toggle = (i: number) => {
     setDone((s) => {
@@ -63,7 +66,29 @@ const TrainingDetail = () => {
         <ArrowLeft className="h-4 w-4" /> Back
       </button>
 
-      <VideoPlayer url={training.video_url} type={training.video_type} />
+      {isLocked ? (
+        <Card className="gradient-card border-primary/40 shadow-glow">
+          <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/20">
+              <Lock className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Conteúdo Premium</p>
+              <h2 className="font-display text-xl">Desbloqueia este treino</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Subscreve por 10€/mês para aceder ao vídeo e a todos os exercícios premium.
+              </p>
+            </div>
+            <Link to="/subscription" className="w-full">
+              <Button size="lg" className="w-full shadow-glow">
+                <Crown className="h-4 w-4" /> Tornar-me Premium
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : (
+        <VideoPlayer url={training.video_url} type={training.video_type} />
+      )}
 
       <header className="space-y-2">
         <div className="flex items-center gap-2 text-xs">
@@ -108,42 +133,46 @@ const TrainingDetail = () => {
         </Card>
       )}
 
-      <section className="space-y-2">
-        <h2 className="font-display text-lg">Drills</h2>
-        <div className="space-y-2">
-          {drills.map((d, i) => (
-            <button
-              key={i}
-              onClick={() => toggle(i)}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
-                done.has(i)
-                  ? "border-primary/40 bg-primary/10"
-                  : "border-border bg-muted/30 hover:bg-muted/50",
-              )}
-            >
-              <div
-                className={cn(
-                  "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition",
-                  done.has(i) ? "border-primary bg-primary text-primary-foreground" : "border-border",
-                )}
-              >
-                {done.has(i) && <Check className="h-4 w-4" />}
-              </div>
-              <div className="flex-1">
-                <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{d.title}</p>
-                <p className="text-xs text-muted-foreground">{d.reps}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+      {!isLocked && (
+        <>
+          <section className="space-y-2">
+            <h2 className="font-display text-lg">Drills</h2>
+            <div className="space-y-2">
+              {drills.map((d, i) => (
+                <button
+                  key={i}
+                  onClick={() => toggle(i)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+                    done.has(i)
+                      ? "border-primary/40 bg-primary/10"
+                      : "border-border bg-muted/30 hover:bg-muted/50",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition",
+                      done.has(i) ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                    )}
+                  >
+                    {done.has(i) && <Check className="h-4 w-4" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{d.title}</p>
+                    <p className="text-xs text-muted-foreground">{d.reps}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
 
-      <Link to={`/trainings/${training.id}/complete`}>
-        <Button size="lg" disabled={!allDone} className="w-full shadow-glow">
-          {allDone ? "Finish session" : `Tick all drills (${done.size}/${drills.length})`}
-        </Button>
-      </Link>
+          <Link to={`/trainings/${training.id}/complete`}>
+            <Button size="lg" disabled={!allDone} className="w-full shadow-glow">
+              {allDone ? "Finish session" : `Tick all drills (${done.size}/${drills.length})`}
+            </Button>
+          </Link>
+        </>
+      )}
     </div>
   );
 };
