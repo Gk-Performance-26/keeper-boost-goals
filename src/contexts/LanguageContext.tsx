@@ -54,6 +54,8 @@ const translations: Record<Lang, Dict> = {
     "training.lockedDrills": "exercício(s) premium bloqueado(s)",
     "training.subscribeToUnlock": "Subscreve para desbloquear →",
     "training.unlockWithPremium": "Desbloquear com Premium",
+    "training.introVideo": "Explicação",
+    "training.exerciseVideo": "Exercício",
 
     // Complete session
     "complete.selfAssessment": "Auto-avaliação",
@@ -244,7 +246,10 @@ const translations: Record<Lang, Dict> = {
     "adminForm.levelLabel": "Nível",
     "adminForm.durationLabel": "Duração (min)",
     "adminForm.xpLabel": "XP recompensa",
-    "adminForm.video": "Vídeo",
+    "adminForm.video": "Vídeo principal (exercício)",
+    "adminForm.introVideo": "Vídeo de explicação (curto)",
+    "adminForm.introVideoHint": "Opcional. Vídeo curto que explica o exercício antes do vídeo principal.",
+    "adminForm.removeIntro": "Remover",
     "adminForm.uploading": "A carregar...",
     "adminForm.chooseFile": "Escolher ficheiro de vídeo",
     "adminForm.embedUrl": "URL embed",

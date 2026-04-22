@@ -334,8 +334,79 @@ const AdminTrainingForm = () => {
 
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
-          <div className="space-y-1.5">
-            <Label>{t("adminForm.equipmentLabel")}</Label>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("adminForm.introVideo")}
+            </p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{t("adminForm.introVideoHint")}</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
+              <button
+                key={v}
+                onClick={() => setIntroVideoType(v)}
+                className={`rounded-lg border px-3 py-2 text-xs font-semibold capitalize transition ${
+                  introVideoType === v
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-border bg-muted/30 text-muted-foreground"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+
+          {introVideoType === "upload" ? (
+            <div className="space-y-2">
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground transition hover:bg-muted/40">
+                {uploadingIntro ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> {t("adminForm.uploading")}
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" /> {t("adminForm.chooseFile")}
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleIntroVideoFile(f);
+                  }}
+                  disabled={uploadingIntro}
+                />
+              </label>
+              {introVideoUrl && (
+                <div className="flex items-start justify-between gap-2">
+                  <p className="break-all text-xs text-muted-foreground">URL: {introVideoUrl}</p>
+                  <button
+                    onClick={() => setIntroVideoUrl("")}
+                    className="flex-shrink-0 text-xs text-destructive hover:underline"
+                  >
+                    {t("adminForm.removeIntro")}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label>{t("adminForm.embedUrl")} ({introVideoType})</Label>
+              <Input
+                value={introVideoUrl}
+                onChange={(e) => setIntroVideoUrl(e.target.value)}
+                placeholder={
+                  introVideoType === "youtube"
+                    ? "https://www.youtube.com/embed/..."
+                    : "https://player.vimeo.com/video/..."
+                }
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
             <Input
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
