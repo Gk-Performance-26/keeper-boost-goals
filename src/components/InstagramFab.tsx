@@ -16,29 +16,6 @@ const INSTAGRAM_URL = "https://www.instagram.com/gkperformance.hub/";
 export function InstagramFab() {
   const [open, setOpen] = useState(false);
 
-  const handleContinue = () => {
-    const isFramed = window.self !== window.top;
-
-    if (isFramed) {
-      const popup = window.open(INSTAGRAM_URL, "_blank", "noopener,noreferrer");
-      if (popup) {
-        setOpen(false);
-        return;
-      }
-
-      try {
-        window.top?.location.assign(INSTAGRAM_URL);
-        setOpen(false);
-        return;
-      } catch {
-        return;
-      }
-    }
-
-    window.location.assign(INSTAGRAM_URL);
-    setOpen(false);
-  };
-
   return (
     <>
       <button
@@ -54,24 +31,21 @@ export function InstagramFab() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Sair para o Instagram?</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-2">
-              <span className="block">
-                Vais ser redirecionado para <strong>@gkperformance.hub</strong> no Instagram.
-              </span>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-primary underline underline-offset-4"
-              >
-                instagram.com/gkperformance.hub
-              </a>
+            <AlertDialogDescription>
+              Vais ser redirecionado para <strong>@gkperformance.hub</strong> no Instagram.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <Button type="button" onClick={handleContinue}>
-              Continuar
+            <Button asChild>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+              >
+                Continuar
+              </a>
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
