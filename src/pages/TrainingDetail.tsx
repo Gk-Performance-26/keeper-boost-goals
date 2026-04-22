@@ -206,8 +206,8 @@ const TrainingDetail = () => {
                       {done.has(i) && <Check className="h-4 w-4" />}
                     </div>
                     <div className="flex-1">
-                      <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{d.title}</p>
-                      <p className="text-xs text-muted-foreground">{d.reps}</p>
+                      <p className={cn("font-semibold", done.has(i) && "line-through opacity-70")}>{tDrillTitles[i] || d.title}</p>
+                      <p className="text-xs text-muted-foreground">{tDrillReps[i] || d.reps}</p>
                     </div>
                   </button>
                 );
