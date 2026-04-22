@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -97,10 +97,8 @@ export function useTranslatedTexts(texts: (string | null | undefined)[]): string
     cleanInputs.map((t) => (t ? readCache(lang, t) ?? t : ""));
 
   const [results, setResults] = useState<string[]>(compute);
-  const tickRef = useRef(0);
 
   useEffect(() => {
-    const myTick = ++tickRef.current;
     setResults(compute());
 
     const missing = Array.from(
@@ -110,7 +108,7 @@ export function useTranslatedTexts(texts: (string | null | undefined)[]): string
 
     let cancelled = false;
     fetchAndCache(lang, missing).then(() => {
-      if (cancelled || tickRef.current !== myTick) return;
+      if (cancelled) return;
       setResults(cleanInputs.map((t) => (t ? readCache(lang, t) ?? t : "")));
     });
 
