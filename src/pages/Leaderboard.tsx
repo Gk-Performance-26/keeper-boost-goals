@@ -47,7 +47,7 @@ const Leaderboard = () => {
       {/* Background image */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-contain bg-no-repeat opacity-60 brightness-125"
+        className="pointer-events-none fixed inset-0 -z-10 bg-contain bg-no-repeat opacity-50 brightness-125"
         style={{
           backgroundImage: `url(${leaderboardBg})`,
           backgroundPosition: "center bottom",
