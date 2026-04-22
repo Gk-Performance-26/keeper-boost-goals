@@ -44,15 +44,15 @@ const Leaderboard = () => {
 
   return (
     <div className="relative space-y-5 px-5 pt-8 pb-6">
-      {/* Background image with low opacity overlay */}
+      {/* Background image */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-15"
+        className="pointer-events-none fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat opacity-50"
         style={{ backgroundImage: `url(${leaderboardBg})` }}
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/70 via-background/85 to-background"
+        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/30 via-background/50 to-background/80"
       />
       <header>
         <h1 className="font-display text-3xl">{t("leaderboard.title")}</h1>
