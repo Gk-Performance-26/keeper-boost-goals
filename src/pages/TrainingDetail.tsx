@@ -125,13 +125,13 @@ const TrainingDetail = () => {
               }}
             >
               <CategoryIcon name={training.categories.icon} className="h-3 w-3" />
-              {training.categories.name}
+              {tCategory}
             </span>
           )}
           <span className="rounded-full bg-muted px-2.5 py-1 capitalize">{t(`level.${training.level}`)}</span>
         </div>
-        <h1 className="font-display text-2xl">{training.title}</h1>
-        <p className="text-sm text-muted-foreground">{training.description}</p>
+        <h1 className="font-display text-2xl">{tTitle}</h1>
+        <p className="text-sm text-muted-foreground">{tDesc}</p>
         <div className="flex items-center gap-4 text-sm">
           <span className="flex items-center gap-1 text-muted-foreground">
             <Clock className="h-4 w-4" /> {training.duration_minutes} {t("common.minutesShort")}
@@ -147,9 +147,9 @@ const TrainingDetail = () => {
           <CardContent className="p-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("training.equipment")}</p>
             <div className="flex flex-wrap gap-1.5">
-              {training.equipment.map((e) => (
+              {training.equipment.map((e, idx) => (
                 <span key={e} className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                  {e}
+                  {tEquipment[idx] || e}
                 </span>
               ))}
             </div>
@@ -176,7 +176,7 @@ const TrainingDetail = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-semibold opacity-80">{d.title}</p>
+                          <p className="font-semibold opacity-80">{tDrillTitles[i] || d.title}</p>
                           <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
                             <Crown className="h-2.5 w-2.5" /> {t("trainings.premium")}
                           </span>
