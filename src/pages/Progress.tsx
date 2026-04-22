@@ -17,6 +17,7 @@ import { LevelBar } from "@/components/LevelBar";
 import { StreakBadge } from "@/components/StreakBadge";
 import { Award, Flame, Sparkles, Trophy } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { GoalsSection } from "@/components/GoalsSection";
 
 const Progress = () => {
   const { user } = useAuth();
@@ -114,6 +115,13 @@ const Progress = () => {
           <LevelBar totalXp={profile.total_xp} />
         </CardContent>
       </Card>
+
+      {/* Goals (admin can create, users can activate) */}
+      <GoalsSection
+        sessions={sessions ?? []}
+        totalXp={profile.total_xp}
+        currentStreak={profile.current_streak}
+      />
 
       {/* Streak heatmap */}
       <Card className="gradient-card border-border/60">
