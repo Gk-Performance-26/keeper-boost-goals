@@ -31,7 +31,7 @@ const translations: Record<Lang, Dict> = {
     "home.greeting": "Olá",
     "home.dailyGoal": "Objetivo diário",
     "home.weeklyChallenge": "Desafio semanal",
-    "home.todayPicks": "Sugestões de hoje",
+    "home.todayPicks": "Sugestões",
     "home.browseAll": "Ver todos os treinos",
     "home.followUs": "Segue-nos",
 
@@ -330,7 +330,7 @@ const translations: Record<Lang, Dict> = {
     "home.greeting": "Hey",
     "home.dailyGoal": "Daily goal",
     "home.weeklyChallenge": "Weekly challenge",
-    "home.todayPicks": "Today's picks",
+    "home.todayPicks": "Suggestions",
     "home.browseAll": "Browse all trainings",
     "home.followUs": "Follow us",
 
