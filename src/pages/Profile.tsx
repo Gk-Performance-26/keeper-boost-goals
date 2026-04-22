@@ -8,12 +8,14 @@ import { Crown, Flame, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "l
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
   const { isActive: hasSub } = useSubscription();
+  const { t } = useLanguage();
 
   if (!profile) return null;
 
@@ -27,13 +29,13 @@ const Profile = () => {
           </AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="font-display text-2xl">{profile.display_name ?? "Keeper"}</h1>
+          <h1 className="font-display text-2xl">{profile.display_name ?? t("profile.fallbackName")}</h1>
           <p className="text-sm text-muted-foreground capitalize">
-            {profile.experience_level} · {profile.age_group ?? "—"}
+            {t(`level.${profile.experience_level}`)} · {profile.age_group ?? "—"}
           </p>
           {hasSub && (
             <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
-              <Crown className="h-3 w-3" /> Premium
+              <Crown className="h-3 w-3" /> {t("trainings.premium")}
             </span>
           )}
         </div>
@@ -43,9 +45,9 @@ const Profile = () => {
         <CardContent className="space-y-3 p-4">
           <LevelBar totalXp={profile.total_xp} />
           <div className="grid grid-cols-3 gap-2 pt-2 text-center">
-            <Stat icon={<Sparkles className="h-3 w-3" />} value={profile.total_xp} label="XP" />
-            <Stat icon={<Flame className="h-3 w-3" />} value={profile.current_streak} label="Streak" />
-            <Stat icon={<Trophy className="h-3 w-3" />} value={profile.longest_streak} label="Best" />
+            <Stat icon={<Sparkles className="h-3 w-3" />} value={profile.total_xp} label={t("profile.statXp")} />
+            <Stat icon={<Flame className="h-3 w-3" />} value={profile.current_streak} label={t("profile.statStreak")} />
+            <Stat icon={<Trophy className="h-3 w-3" />} value={profile.longest_streak} label={t("profile.statBest")} />
           </div>
         </CardContent>
       </Card>
@@ -53,7 +55,7 @@ const Profile = () => {
       {profile.training_goal && (
         <Card className="gradient-card border-border/60">
           <CardContent className="p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">My goal</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("profile.myGoal")}</p>
             <p className="mt-1 text-sm">{profile.training_goal}</p>
           </CardContent>
         </Card>
@@ -66,23 +68,23 @@ const Profile = () => {
             className={`w-full justify-start ${hasSub ? "" : "border-primary/40 text-primary hover:bg-primary/10"}`}
           >
             <Crown className="h-4 w-4" />
-            {hasSub ? "Gerir subscrição" : "Tornar-me Premium · 10€/mês"}
+            {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
           </Button>
         </Link>
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
-            <Settings className="h-4 w-4" /> Edit profile
+            <Settings className="h-4 w-4" /> {t("profile.editProfile")}
           </Button>
         </Link>
         {isAdmin && (
           <Link to="/admin">
             <Button variant="outline" className="w-full justify-start">
-              <ShieldCheck className="h-4 w-4" /> Admin
+              <ShieldCheck className="h-4 w-4" /> {t("profile.admin")}
             </Button>
           </Link>
         )}
         <Button variant="outline" className="w-full justify-start text-destructive" onClick={signOut}>
-          <LogOut className="h-4 w-4" /> Sign out
+          <LogOut className="h-4 w-4" /> {t("profile.signOut")}
         </Button>
       </div>
 

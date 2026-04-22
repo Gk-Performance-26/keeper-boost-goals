@@ -18,6 +18,7 @@ import {
 } from "@/lib/gamification";
 import { Check, ChevronRight, Loader2, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const TOTAL_STEPS = 5;
 
@@ -27,6 +28,7 @@ const Onboarding = () => {
   const invalidate = useInvalidateProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [step, setStep] = useState(0);
   const [level, setLevel] = useState<ExperienceLevel>(profile?.experience_level || "beginner");
   const [age, setAge] = useState<string>(profile?.age_group || "Senior");
@@ -54,8 +56,8 @@ const Onboarding = () => {
     if (!user) return;
     if (styles.length === 0) {
       toast({
-        title: "Estilo de jogo obrigatório",
-        description: "Escolhe pelo menos um estilo de jogo.",
+        title: t("onb.styleRequired"),
+        description: t("onb.styleRequiredDesc"),
         variant: "destructive",
       });
       setStep(3);
@@ -70,17 +72,16 @@ const Onboarding = () => {
         dominant_hand: hand,
         training_goal: goal || null,
         onboarded: true,
-        // playing_styles is in DB but not yet typed in generated types
         ...({ playing_styles: styles } as Record<string, unknown>),
       })
       .eq("user_id", user.id);
     setSaving(false);
     if (error) {
-      toast({ title: "Could not save", description: error.message, variant: "destructive" });
+      toast({ title: t("onb.couldNotSave"), description: error.message, variant: "destructive" });
       return;
     }
     invalidate();
-    toast({ title: "All set! 🧤", description: "Let's get you training." });
+    toast({ title: t("onb.allSet"), description: t("onb.allSetDesc") });
     navigate("/");
   };
 
@@ -92,9 +93,9 @@ const Onboarding = () => {
         </div>
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            Step {step + 1} of {TOTAL_STEPS}
+            {t("onb.stepOf", { current: step + 1, total: TOTAL_STEPS })}
           </p>
-          <h2 className="font-display text-xl">Set up your kit</h2>
+          <h2 className="font-display text-xl">{t("onb.setupKit")}</h2>
         </div>
       </div>
 
@@ -109,7 +110,7 @@ const Onboarding = () => {
         <CardContent className="space-y-5 p-6">
           {step === 0 && (
             <>
-              <h3 className="font-display text-2xl">What's your level?</h3>
+              <h3 className="font-display text-2xl">{t("onb.levelTitle")}</h3>
               <div className="grid gap-2">
                 {EXPERIENCE_LEVELS.map((l) => (
                   <button
@@ -122,7 +123,7 @@ const Onboarding = () => {
                         : "border-border bg-muted/30 hover:bg-muted/60",
                     )}
                   >
-                    <span className="font-semibold">{l.label}</span>
+                    <span className="font-semibold">{t(`level.${l.value}`)}</span>
                     {level === l.value && <ChevronRight className="h-4 w-4 text-primary" />}
                   </button>
                 ))}
@@ -132,7 +133,7 @@ const Onboarding = () => {
 
           {step === 1 && (
             <>
-              <h3 className="font-display text-2xl">Age group</h3>
+              <h3 className="font-display text-2xl">{t("onb.ageTitle")}</h3>
               <div className="grid grid-cols-3 gap-2">
                 {AGE_GROUPS.map((a) => (
                   <button
@@ -154,7 +155,7 @@ const Onboarding = () => {
 
           {step === 2 && (
             <>
-              <h3 className="font-display text-2xl">Dominant hand</h3>
+              <h3 className="font-display text-2xl">{t("onb.handTitle")}</h3>
               <div className="grid grid-cols-3 gap-2">
                 {DOMINANT_HANDS.map((h) => (
                   <button
@@ -167,7 +168,7 @@ const Onboarding = () => {
                         : "border-border bg-muted/30 hover:bg-muted/60",
                     )}
                   >
-                    {h.label}
+                    {t(`hand.${h.value}`)}
                   </button>
                 ))}
               </div>
@@ -176,10 +177,8 @@ const Onboarding = () => {
 
           {step === 3 && (
             <>
-              <h3 className="font-display text-2xl">Estilo de jogo</h3>
-              <p className="text-sm text-muted-foreground">
-                Obrigatório. Escolhe um ou mais que te descrevam.
-              </p>
+              <h3 className="font-display text-2xl">{t("onb.styleTitle")}</h3>
+              <p className="text-sm text-muted-foreground">{t("onb.styleHelp")}</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {PLAYING_STYLES.map((s) => {
                   const active = styles.includes(s.value);
@@ -195,29 +194,29 @@ const Onboarding = () => {
                           : "border-border bg-muted/30 hover:bg-muted/60",
                       )}
                     >
-                      <span>{s.label}</span>
+                      <span>{t(`style.${s.value}`)}</span>
                       {active && <Check className="h-4 w-4 text-primary" />}
                     </button>
                   );
                 })}
               </div>
               {styles.length === 0 && (
-                <p className="text-xs text-destructive">Escolhe pelo menos um estilo.</p>
+                <p className="text-xs text-destructive">{t("onb.stylePickAtLeastOne")}</p>
               )}
             </>
           )}
 
           {step === 4 && (
             <>
-              <h3 className="font-display text-2xl">Your training goal</h3>
-              <p className="text-sm text-muted-foreground">Optional. Helps us recommend sessions.</p>
+              <h3 className="font-display text-2xl">{t("onb.goalTitle")}</h3>
+              <p className="text-sm text-muted-foreground">{t("onb.goalHelp")}</p>
               <div className="space-y-1.5">
-                <Label htmlFor="goal">Goal</Label>
+                <Label htmlFor="goal">{t("onb.goalLabel")}</Label>
                 <Input
                   id="goal"
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  placeholder="Be more confident on crosses..."
+                  placeholder={t("onb.goalPlaceholder")}
                   maxLength={120}
                 />
               </div>
@@ -229,7 +228,7 @@ const Onboarding = () => {
       <div className="mt-6 flex gap-3">
         {step > 0 && (
           <Button variant="outline" className="flex-1" onClick={() => setStep((s) => s - 1)}>
-            Back
+            {t("onb.back")}
           </Button>
         )}
         {step < TOTAL_STEPS - 1 ? (
@@ -238,11 +237,11 @@ const Onboarding = () => {
             onClick={() => setStep((s) => s + 1)}
             disabled={!canContinue()}
           >
-            Continue
+            {t("onb.continue")}
           </Button>
         ) : (
           <Button className="flex-1 shadow-glow" onClick={finish} disabled={saving}>
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Start training"}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("onb.start")}
           </Button>
         )}
       </div>

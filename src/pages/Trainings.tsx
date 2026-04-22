@@ -5,12 +5,14 @@ import { TrainingCard } from "@/components/TrainingCard";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { EXPERIENCE_LEVELS, ExperienceLevel } from "@/lib/gamification";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 const Trainings = () => {
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [level, setLevel] = useState<ExperienceLevel | null>(null);
   const { isActive: hasSub } = useSubscription();
+  const { t } = useLanguage();
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -32,9 +34,9 @@ const Trainings = () => {
   });
 
   const filtered = useMemo(() => {
-    return (trainings ?? []).filter((t) => {
-      if (categorySlug && t.categories?.slug !== categorySlug) return false;
-      if (level && t.level !== level) return false;
+    return (trainings ?? []).filter((tr) => {
+      if (categorySlug && tr.categories?.slug !== categorySlug) return false;
+      if (level && tr.level !== level) return false;
       return true;
     });
   }, [trainings, categorySlug, level]);
@@ -42,15 +44,15 @@ const Trainings = () => {
   return (
     <div className="space-y-5 px-5 pt-8">
       <header>
-        <h1 className="font-display text-3xl">Training Library</h1>
-        <p className="text-sm text-muted-foreground">Find your next session</p>
+        <h1 className="font-display text-3xl">{t("trainings.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("trainings.subtitle")}</p>
       </header>
 
       {/* Categories */}
       <div className="-mx-5 overflow-x-auto">
         <div className="flex gap-2 px-5 pb-1">
           <FilterChip active={!categorySlug} onClick={() => setCategorySlug(null)}>
-            All
+            {t("common.all")}
           </FilterChip>
           {(categories ?? []).map((c) => (
             <FilterChip
@@ -74,29 +76,29 @@ const Trainings = () => {
             active={level === l.value}
             onClick={() => setLevel(level === l.value ? null : l.value)}
           >
-            {l.label}
+            {t(`level.${l.value}`)}
           </FilterChip>
         ))}
       </div>
 
       <div className="space-y-3">
-        {filtered.map((t) => (
+        {filtered.map((tr) => (
           <TrainingCard
-            key={t.id}
-            id={t.id}
-            title={t.title}
-            level={t.level}
-            duration={t.duration_minutes}
-            xp={t.xp_reward}
-            categoryName={t.categories?.name}
-            categoryIcon={t.categories?.icon}
-            categoryColorToken={t.categories?.color_token}
-            isPremium={(t as any).is_premium}
-            locked={(t as any).is_premium && !hasSub}
+            key={tr.id}
+            id={tr.id}
+            title={tr.title}
+            level={tr.level}
+            duration={tr.duration_minutes}
+            xp={tr.xp_reward}
+            categoryName={tr.categories?.name}
+            categoryIcon={tr.categories?.icon}
+            categoryColorToken={tr.categories?.color_token}
+            isPremium={(tr as any).is_premium}
+            locked={(tr as any).is_premium && !hasSub}
           />
         ))}
         {filtered.length === 0 && (
-          <p className="py-10 text-center text-sm text-muted-foreground">No sessions match those filters.</p>
+          <p className="py-10 text-center text-sm text-muted-foreground">{t("trainings.empty")}</p>
         )}
       </div>
     </div>

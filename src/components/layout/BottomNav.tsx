@@ -1,16 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { Home, Dumbbell, BarChart3, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const items = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/trainings", label: "Trainings", icon: Dumbbell },
-  { to: "/progress", label: "Progress", icon: BarChart3 },
-  { to: "/leaderboard", label: "Ranking", icon: Trophy },
-  { to: "/profile", label: "Profile", icon: User },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function BottomNav() {
+  const { t } = useLanguage();
+  const items = [
+    { to: "/", label: t("nav.home"), icon: Home },
+    { to: "/trainings", label: t("nav.trainings"), icon: Dumbbell },
+    { to: "/progress", label: t("nav.progress"), icon: BarChart3 },
+    { to: "/leaderboard", label: t("nav.leaderboard"), icon: Trophy },
+    { to: "/profile", label: t("nav.profile"), icon: User },
+  ];
+
   return (
     <nav className="sticky bottom-0 z-40 border-t border-border/50 bg-card/80 backdrop-blur-lg">
       <ul className="mx-auto flex max-w-md items-stretch justify-around">

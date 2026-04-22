@@ -12,13 +12,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { format, subDays, startOfDay, isSameDay } from "date-fns";
+import { pt as ptLocale, enUS } from "date-fns/locale";
 import { LevelBar } from "@/components/LevelBar";
 import { StreakBadge } from "@/components/StreakBadge";
 import { Award, Flame, Sparkles, Trophy } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Progress = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile();
+  const { t, lang } = useLanguage();
+  const dateLocale = lang === "pt" ? ptLocale : enUS;
 
   const { data: scores } = useQuery({
     queryKey: ["skill-scores", user?.id],
@@ -90,23 +94,23 @@ const Progress = () => {
     <div className="space-y-5 px-5 pt-8 pb-6">
       <header className="flex items-start justify-between">
         <div>
-          <h1 className="font-display text-3xl">Progress</h1>
-          <p className="text-sm text-muted-foreground">Your goalkeeping journey</p>
+          <h1 className="font-display text-3xl">{t("progress.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("progress.subtitle")}</p>
         </div>
         <StreakBadge streak={profile.current_streak} />
       </header>
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard icon={<Sparkles className="h-4 w-4" />} label="Total XP" value={profile.total_xp.toLocaleString()} />
-        <StatCard icon={<Trophy className="h-4 w-4" />} label="Sessions" value={(sessions?.length ?? 0).toString()} />
-        <StatCard icon={<Flame className="h-4 w-4" />} label="Best streak" value={`${profile.longest_streak}d`} />
-        <StatCard icon={<Award className="h-4 w-4" />} label="Time trained" value={`${totalMinutes}m`} />
+        <StatCard icon={<Sparkles className="h-4 w-4" />} label={t("progress.totalXp")} value={profile.total_xp.toLocaleString()} />
+        <StatCard icon={<Trophy className="h-4 w-4" />} label={t("progress.sessions")} value={(sessions?.length ?? 0).toString()} />
+        <StatCard icon={<Flame className="h-4 w-4" />} label={t("progress.bestStreak")} value={`${profile.longest_streak}d`} />
+        <StatCard icon={<Award className="h-4 w-4" />} label={t("progress.timeTrained")} value={`${totalMinutes}m`} />
       </div>
 
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-2 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Level</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("progress.level")}</p>
           <LevelBar totalXp={profile.total_xp} />
         </CardContent>
       </Card>
@@ -114,7 +118,7 @@ const Progress = () => {
       {/* Streak heatmap */}
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-3 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Last 4 weeks</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("progress.last4Weeks")}</p>
           <div className="grid grid-cols-7 gap-1.5">
             {days.map((d) => {
               const trained = trainedSet.has(format(d, "yyyy-MM-dd"));
@@ -127,7 +131,7 @@ const Progress = () => {
                       ? "border-primary/40 bg-primary/70 shadow-glow"
                       : "border-border bg-muted/30"
                   } ${isToday ? "ring-2 ring-primary" : ""}`}
-                  title={format(d, "PP")}
+                  title={format(d, "PP", { locale: dateLocale })}
                 />
               );
             })}
@@ -140,7 +144,7 @@ const Progress = () => {
         <Card className="gradient-card border-border/60">
           <CardContent className="p-3">
             <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Skill profile
+              {t("progress.skillProfile")}
             </p>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -163,7 +167,7 @@ const Progress = () => {
 
       {/* Badges */}
       <section className="space-y-2">
-        <h2 className="font-display text-lg">Badges</h2>
+        <h2 className="font-display text-lg">{t("progress.badges")}</h2>
         <div className="grid grid-cols-3 gap-2">
           {(badges ?? []).map((b) => {
             const earned = earnedBadgeIds.has(b.id);
