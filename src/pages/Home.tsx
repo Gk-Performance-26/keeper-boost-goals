@@ -150,9 +150,6 @@ const Home = () => {
               <h2 className="font-display text-2xl leading-tight">
                 {t("sub.trialModalTitle")}
               </h2>
-              <p className="text-sm text-muted-foreground">
-                {t("sub.trialModalDesc")}
-              </p>
             </div>
 
             <ul className="space-y-2.5 text-left">
