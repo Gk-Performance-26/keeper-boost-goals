@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Instagram, Sparkles, Trophy } from "lucide-react";
 import { format, startOfDay } from "date-fns";
+import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -100,7 +101,7 @@ const Home = () => {
       <header className="flex items-start justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
-            {format(new Date(), "EEEE, d LLL", { locale: undefined })}
+            {format(new Date(), "EEEE, d LLL", { locale: lang === "pt" ? pt : enUS })}
           </p>
           <h1 className="font-display text-3xl">
             {t("home.greeting")}, {profile.display_name?.split(" ")[0] || "Keeper"} 🧤
