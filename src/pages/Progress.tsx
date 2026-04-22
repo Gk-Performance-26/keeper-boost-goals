@@ -136,7 +136,7 @@ const Progress = () => {
       </Card>
 
       {/* Streak heatmap */}
-      <Card className="gradient-card border-border/60 my-4">
+      <Card className="gradient-card border-border/60 my-10">
         <CardContent className="space-y-4 p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("progress.last4Weeks")}</p>
           <div className="grid grid-cols-7 gap-1.5">
