@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Loader2, Plus, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, Crown, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { EXPERIENCE_LEVELS } from "@/lib/gamification";
 
@@ -46,6 +46,7 @@ const AdminTrainingForm = () => {
   const [equipment, setEquipment] = useState("");
   const [drills, setDrills] = useState<Drill[]>([{ title: "", reps: "" }]);
   const [isPublished, setIsPublished] = useState(true);
+  const [isPremium, setIsPremium] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -81,6 +82,7 @@ const AdminTrainingForm = () => {
       const d = (existing.drills as unknown as Drill[]) ?? [];
       setDrills(d.length ? d : [{ title: "", reps: "" }]);
       setIsPublished(existing.is_published ?? true);
+      setIsPremium((existing as any).is_premium ?? false);
     }
   }, [existing]);
 
@@ -139,6 +141,7 @@ const AdminTrainingForm = () => {
         .filter(Boolean),
       drills: drills.filter((d) => d.title.trim()) as any,
       is_published: isPublished,
+      is_premium: isPremium,
     };
 
     const { error } = isEdit
@@ -364,6 +367,19 @@ const AdminTrainingForm = () => {
               <p className="text-xs text-muted-foreground">Visível para todos os utilizadores</p>
             </div>
             <Switch checked={isPublished} onCheckedChange={setIsPublished} />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border border-primary/40 bg-primary/5 p-3">
+            <div className="flex items-start gap-2">
+              <Crown className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+              <div>
+                <p className="text-sm font-semibold">Exercício Premium</p>
+                <p className="text-xs text-muted-foreground">
+                  Apenas utilizadores com subscrição podem aceder
+                </p>
+              </div>
+            </div>
+            <Switch checked={isPremium} onCheckedChange={setIsPremium} />
           </div>
         </CardContent>
       </Card>
