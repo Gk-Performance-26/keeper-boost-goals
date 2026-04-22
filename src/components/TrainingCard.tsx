@@ -75,10 +75,6 @@ export function TrainingCard({
               <Clock className="h-3 w-3" />
               {duration} min
             </span>
-            <span className="flex items-center gap-1 text-primary">
-              <Sparkles className="h-3 w-3" />
-              {xp} XP
-            </span>
             <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] capitalize">{level}</span>
           </div>
           {locked && (
