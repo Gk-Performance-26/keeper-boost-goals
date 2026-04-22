@@ -7,7 +7,7 @@ import { useIsAdmin, useAdminCount } from "@/hooks/useIsAdmin";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, ShieldCheck, ArrowLeft, Video } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, ShieldCheck, ArrowLeft, Video, Crown, Unlock } from "lucide-react";
 import { toast } from "sonner";
 
 const Admin = () => {
@@ -102,6 +102,19 @@ const Admin = () => {
     refetch();
   };
 
+  const togglePremium = async (id: string, currentValue: boolean) => {
+    const { error } = await supabase
+      .from("trainings")
+      .update({ is_premium: !currentValue })
+      .eq("id", id);
+    if (error) {
+      toast.error("Erro: " + error.message);
+      return;
+    }
+    toast.success(!currentValue ? "Tornado Premium 👑" : "Tornado gratuito");
+    refetch();
+  };
+
   return (
     <div className="space-y-5 px-5 pt-8 pb-6">
       <header className="flex items-start justify-between gap-3">
@@ -124,8 +137,13 @@ const Admin = () => {
                 <Video className="h-5 w-5 text-muted-foreground" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <p className="truncate font-semibold">{t.title}</p>
+                  {t.is_premium && (
+                    <Badge className="gap-1 bg-primary/15 text-primary border-primary/30 text-[10px]" variant="outline">
+                      <Crown className="h-3 w-3" /> Premium
+                    </Badge>
+                  )}
                   {!t.is_published && (
                     <Badge variant="outline" className="text-[10px]">
                       rascunho
@@ -135,6 +153,22 @@ const Admin = () => {
                 <p className="text-xs text-muted-foreground">
                   {t.categories?.name ?? "—"} · {t.level} · {t.duration_minutes}min · {t.xp_reward} XP
                 </p>
+                <Button
+                  size="sm"
+                  variant={t.is_premium ? "outline" : "default"}
+                  className="mt-2 h-7 gap-1.5 text-xs"
+                  onClick={() => togglePremium(t.id, t.is_premium)}
+                >
+                  {t.is_premium ? (
+                    <>
+                      <Unlock className="h-3.5 w-3.5" /> Tornar gratuito
+                    </>
+                  ) : (
+                    <>
+                      <Crown className="h-3.5 w-3.5" /> Tornar Premium
+                    </>
+                  )}
+                </Button>
               </div>
               <div className="flex flex-col gap-1.5">
                 <Link to={`/admin/trainings/${t.id}`}>
