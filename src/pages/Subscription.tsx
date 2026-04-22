@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 const Subscription = () => {
   const { user } = useAuth();
-  const { isActive, hasPaidSub, isTrialActive, trialEndsAt, trialDaysLeft, subscription, isLoading } = useSubscription();
+  const { hasPaidSub, isTrialActive, trialEndsAt, trialDaysLeft, subscription, isLoading } = useSubscription();
   const [opening, setOpening] = useState(false);
   const { t, lang } = useLanguage();
 
