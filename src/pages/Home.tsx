@@ -11,7 +11,7 @@ import { TrainingCard } from "@/components/TrainingCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ChevronRight, Sparkles, Trophy, Instagram, Gift, Check } from "lucide-react";
+import { ChevronRight, Sparkles, Trophy, Instagram, Youtube, Gift, Check } from "lucide-react";
 import { format, startOfDay } from "date-fns";
 import { pt, enUS } from "date-fns/locale";
 import gkLogo from "@/assets/gk-logo.jpg";
@@ -150,6 +150,15 @@ const Home = () => {
               <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
                 <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.84a8.16 8.16 0 0 0 4.77 1.52V6.93a4.85 4.85 0 0 1-1.84-.24z"/>
               </svg>
+            </a>
+            <a
+              href="https://www.youtube.com/@gkperformancehub"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-card/80 backdrop-blur border border-border/60 text-foreground hover:text-primary transition-colors shadow-card"
+            >
+              <Youtube className="h-5 w-5" />
             </a>
           </div>
         </div>
