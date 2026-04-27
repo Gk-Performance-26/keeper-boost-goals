@@ -270,6 +270,20 @@ const AdminTrainingForm = () => {
               maxLength={1000}
             />
           </div>
+          <div className="space-y-1.5">
+            <Label>Grupo</Label>
+            <Select value={trainingGroup} onValueChange={(v) => setTrainingGroup(v as any)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fisico">Físico</SelectItem>
+                <SelectItem value="tecnico">Técnico</SelectItem>
+                <SelectItem value="aquecimento">Aquecimento</SelectItem>
+                <SelectItem value="alongamento">Alongamento</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>{t("adminForm.categoryLabel")}</Label>
