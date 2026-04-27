@@ -80,20 +80,27 @@ const TrainingGroupPage = () => {
         <h1 className="font-display text-2xl">{config.title}</h1>
       </header>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         {config.parents.map((parent) => {
           const parentSubs = (subs ?? []).filter((s: any) => s.parent === parent.value);
           return (
-            <div key={parent.value} className="space-y-3">
-              <h2 className="font-display text-base text-muted-foreground">{parent.label}</h2>
-              <div className="space-y-4">
+            <section
+              key={parent.value}
+              className="rounded-2xl border-2 border-purple-500/70 bg-purple-500/5 p-4 space-y-4 shadow-[0_0_0_1px_hsl(var(--background))]"
+            >
+              <h2 className="font-display text-xl font-bold uppercase tracking-wide text-purple-400">
+                {parent.label}
+              </h2>
+              <div className="space-y-5">
                 {parentSubs.map((sub: any) => {
                   const subItems = (trainings ?? []).filter(
                     (tr: any) => tr[config.subFk] === sub.id,
                   );
                   return (
                     <div key={sub.id} className="space-y-2">
-                      <h3 className="text-sm font-semibold">{sub.name}</h3>
+                      <h3 className="font-display text-base font-bold text-foreground">
+                        {sub.name}
+                      </h3>
                       {subItems.length === 0 ? (
                         <p className="rounded-lg border border-dashed border-border/60 bg-muted/20 py-3 text-center text-[11px] text-muted-foreground">
                           {t("trainings.emptyGroup")}
@@ -121,7 +128,7 @@ const TrainingGroupPage = () => {
                   );
                 })}
               </div>
-            </div>
+            </section>
           );
         })}
       </div>
