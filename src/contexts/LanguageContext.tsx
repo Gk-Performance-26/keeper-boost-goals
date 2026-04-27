@@ -39,8 +39,13 @@ const translations: Record<Lang, Dict> = {
     "trainings.title": "Biblioteca de Treinos",
     "trainings.subtitle": "Encontra a tua próxima sessão",
     "trainings.empty": "Nenhuma sessão corresponde a estes filtros.",
+    "trainings.emptyGroup": "Sem treinos neste grupo ainda.",
     "trainings.premium": "Premium",
     "trainings.unlockPremium": "Desbloquear com Premium →",
+    "trainings.group.fisico": "Físico",
+    "trainings.group.tecnico": "Técnico",
+    "trainings.group.aquecimento": "Aquecimento",
+    "trainings.group.alongamento": "Alongamento",
 
     // Training detail
     "training.equipment": "Equipamento",
@@ -420,8 +425,13 @@ const translations: Record<Lang, Dict> = {
     "trainings.title": "Training Library",
     "trainings.subtitle": "Find your next session",
     "trainings.empty": "No sessions match those filters.",
+    "trainings.emptyGroup": "No trainings in this group yet.",
     "trainings.premium": "Premium",
     "trainings.unlockPremium": "Unlock with Premium →",
+    "trainings.group.fisico": "Physical",
+    "trainings.group.tecnico": "Technical",
+    "trainings.group.aquecimento": "Warm-up",
+    "trainings.group.alongamento": "Stretching",
 
     "training.equipment": "Equipment",
     "training.drills": "Drills",

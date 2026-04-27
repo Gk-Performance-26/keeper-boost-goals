@@ -57,6 +57,7 @@ const AdminTrainingForm = () => {
   const [drills, setDrills] = useState<Drill[]>([{ title: "", reps: "" }]);
   const [isPublished, setIsPublished] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const [trainingGroup, setTrainingGroup] = useState<"fisico" | "tecnico" | "aquecimento" | "alongamento">("tecnico");
   const [uploading, setUploading] = useState(false);
   const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -109,6 +110,7 @@ const AdminTrainingForm = () => {
       );
       setIsPublished(existing.is_published ?? true);
       setIsPremium((existing as any).is_premium ?? false);
+      setTrainingGroup(((existing as any).training_group as any) ?? "tecnico");
     }
   }, [existing]);
 
@@ -226,6 +228,7 @@ const AdminTrainingForm = () => {
         })) as any,
       is_published: isPublished,
       is_premium: isPremium,
+      training_group: trainingGroup as any,
     };
 
     const { error } = isEdit
@@ -266,6 +269,20 @@ const AdminTrainingForm = () => {
               rows={3}
               maxLength={1000}
             />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Grupo</Label>
+            <Select value={trainingGroup} onValueChange={(v) => setTrainingGroup(v as any)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fisico">Físico</SelectItem>
+                <SelectItem value="tecnico">Técnico</SelectItem>
+                <SelectItem value="aquecimento">Aquecimento</SelectItem>
+                <SelectItem value="alongamento">Alongamento</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
