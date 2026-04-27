@@ -106,14 +106,16 @@ export function PrivacyPolicyContent() {
 
       <section>
         <h3 className="font-semibold text-base">1. Introdução</h3>
-        <p>A presente Política de Privacidade descreve como recolhemos, utilizamos e protegemos os dados pessoais dos utilizadores da nossa aplicação de treinos para guarda-redes (“Aplicação”). Ao utilizar a Aplicação, concorda com os termos aqui descritos.</p>
+        <p>
+          A presente Política de Privacidade descreve como <strong>Guilherme Fernandes</strong> (o “Vendedor”, “nós”), a operar sob o nome <strong>GK Performance Hub</strong>, recolhe, utiliza e protege os dados pessoais dos utilizadores da nossa aplicação de treinos para guarda-redes (a “Aplicação”). O Vendedor é o <strong>responsável pelo tratamento</strong> dos dados pessoais recolhidos através da Aplicação. Ao utilizar a Aplicação, concorda com os termos aqui descritos.
+        </p>
       </section>
 
       <section>
         <h3 className="font-semibold text-base">2. Dados Recolhidos</h3>
         <p><strong>2.1 Dados fornecidos pelo utilizador:</strong> nome completo, endereço de email, número de telefone, data de nascimento, informação de perfil desportivo (nível, posição, histórico de treinos).</p>
         <p><strong>2.2 Dados de utilização:</strong> histórico de treinos e desempenho, interações com a Aplicação, preferências e configurações.</p>
-        <p><strong>2.3 Dados de pagamento:</strong> informações necessárias para processar pagamentos (ex: ID de transação, método de pagamento). Não armazenamos diretamente dados completos de cartões bancários. Os pagamentos são processados por fornecedores externos seguros.</p>
+        <p><strong>2.3 Dados de pagamento:</strong> os dados de faturação necessários para processar pagamentos (ex: ID de transação, método de pagamento, país de faturação) são recolhidos e tratados diretamente pelo nosso Comerciante Registado, <strong>Paddle.com Market Limited</strong> (“Paddle”). Não armazenamos dados completos de cartões bancários.</p>
         <p><strong>2.4 Dados técnicos:</strong> endereço IP, tipo de dispositivo, sistema operativo, logs de acesso.</p>
       </section>
 
@@ -122,7 +124,7 @@ export function PrivacyPolicyContent() {
         <ul className="list-disc pl-5 space-y-1">
           <li>Fornecer e melhorar os serviços de treino</li>
           <li>Personalizar planos de treino</li>
-          <li>Processar pagamentos e subscrições</li>
+          <li>Processar pagamentos e subscrições (através da Paddle)</li>
           <li>Comunicar com o utilizador (suporte, notificações, atualizações)</li>
           <li>Garantir segurança e prevenir fraude</li>
           <li>Cumprir obrigações legais</li>
@@ -130,43 +132,64 @@ export function PrivacyPolicyContent() {
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">4. Partilha de Dados</h3>
-        <p>Podemos partilhar dados com prestadores de serviços (ex: processamento de pagamentos, armazenamento cloud), autoridades legais quando exigido por lei, e parceiros técnicos exclusivamente para funcionamento da Aplicação. Nunca vendemos os seus dados pessoais.</p>
+        <h3 className="font-semibold text-base">4. Fundamento Legal do Tratamento</h3>
+        <p>Tratamos os seus dados pessoais com base nos seguintes fundamentos legais ao abrigo do RGPD:</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li><strong>Execução do contrato</strong> (Art. 6.º, n.º 1, al. b)) — para fornecer a Aplicação e os serviços que subscreve (criação de conta, entrega de treinos, gestão de subscrições).</li>
+          <li><strong>Interesses legítimos</strong> (Art. 6.º, n.º 1, al. f)) — para garantir a segurança da Aplicação, prevenir fraude e abuso, e melhorar o produto.</li>
+          <li><strong>Consentimento</strong> (Art. 6.º, n.º 1, al. a)) — para analítica opcional, comunicações de marketing e cookies não essenciais, podendo retirá-lo a qualquer momento.</li>
+          <li><strong>Obrigação legal</strong> (Art. 6.º, n.º 1, al. c)) — para cumprir deveres fiscais, contabilísticos e outras obrigações legais aplicáveis.</li>
+        </ul>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">5. Segurança</h3>
-        <p>Adotamos medidas técnicas e organizativas adequadas, incluindo encriptação de dados sensíveis, acesso restrito a informação pessoal e monitorização de sistemas. Apesar disso, nenhum sistema é totalmente seguro.</p>
+        <h3 className="font-semibold text-base">5. Partilha de Dados</h3>
+        <p>Partilhamos dados pessoais com as seguintes categorias de destinatários:</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li><strong>Comerciante Registado — Paddle.com Market Limited:</strong> para venda do produto, gestão de subscrições, processamento de pagamentos, conformidade fiscal, faturação e gestão de reembolsos. A Paddle atua como responsável de tratamento independente para os dados de faturação. Ver a política de privacidade da Paddle em <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">paddle.com/legal/privacy</a>.</li>
+          <li><strong>Prestadores de serviços / subcontratantes:</strong> alojamento e base de dados (Supabase), autenticação, envio de email, analítica e ferramentas de suporte ao cliente.</li>
+          <li><strong>Consultores profissionais:</strong> consultores jurídicos, contabilísticos e fiscais, quando estritamente necessário.</li>
+          <li><strong>Autoridades:</strong> reguladores, tribunais ou autoridades policiais quando exigido por lei.</li>
+        </ul>
+        <p>Nunca vendemos os seus dados pessoais.</p>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">6. Retenção de Dados</h3>
-        <p>Os dados serão mantidos apenas pelo período necessário para cumprir as finalidades descritas, obrigações legais e resolução de disputas.</p>
+        <h3 className="font-semibold text-base">6. Transferências Internacionais</h3>
+        <p>Alguns dos nossos prestadores de serviços podem tratar dados fora do EEE/Reino Unido. Quando isso acontece, recorremos a salvaguardas adequadas, como as Cláusulas Contratuais Tipo da Comissão Europeia ou decisões de adequação.</p>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">7. Direitos do Utilizador</h3>
-        <p>Nos termos da legislação aplicável (ex: RGPD), o utilizador tem direito a aceder aos seus dados, retificar dados incorretos, solicitar eliminação (“direito ao esquecimento”), limitar ou opor-se ao tratamento, e à portabilidade dos dados. Para exercer estes direitos, contacte-nos através de gkperformancehub.pt@gmail.com.</p>
+        <h3 className="font-semibold text-base">7. Segurança</h3>
+        <p>Adotamos medidas técnicas e organizativas adequadas, incluindo encriptação em trânsito, acesso restrito a informação pessoal e monitorização de sistemas. Apesar disso, nenhum sistema é totalmente seguro.</p>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">8. Pagamentos e Subscrições</h3>
-        <p>Todos os pagamentos são processados por plataformas seguras de terceiros. A Aplicação pode oferecer planos de subscrição renováveis automaticamente. O utilizador pode cancelar a subscrição a qualquer momento através das definições da conta.</p>
+        <h3 className="font-semibold text-base">8. Retenção de Dados</h3>
+        <p>Os dados são mantidos apenas pelo período necessário para cumprir as finalidades descritas, obrigações legais (ex: registos fiscais) e resolução de disputas. Quando deixarem de ser necessários, são eliminados ou anonimizados.</p>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">9. Cookies e Tecnologias Semelhantes</h3>
-        <p>Podemos utilizar cookies ou tecnologias similares para melhorar a experiência do utilizador e analisar a utilização da Aplicação. O utilizador pode gerir preferências no seu dispositivo.</p>
+        <h3 className="font-semibold text-base">9. Direitos do Utilizador (RGPD)</h3>
+        <p>Tem direito a aceder, retificar, solicitar eliminação (“direito ao esquecimento”), limitar ou opor-se ao tratamento, à portabilidade dos dados, e a retirar o consentimento a qualquer momento. Tem também o direito de apresentar reclamação a uma autoridade de controlo (em Portugal, a CNPD). Para exercer estes direitos, contacte-nos através de gkperformancehub.pt@gmail.com — responderemos no prazo de um mês.</p>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">10. Alterações à Política</h3>
-        <p>Podemos atualizar esta Política periodicamente. Notificaremos os utilizadores em caso de alterações relevantes.</p>
+        <h3 className="font-semibold text-base">10. Cookies e Tecnologias Semelhantes</h3>
+        <p>Podemos utilizar cookies essenciais para autenticação e gestão de sessão, e cookies de analítica opcionais sujeitos ao seu consentimento. Pode gerir preferências no seu dispositivo ou navegador.</p>
       </section>
 
       <section>
-        <h3 className="font-semibold text-base">11. Contacto</h3>
-        <p>Email: gkperformancehub.pt@gmail.com<br />Responsável pelo tratamento: Guilherme Fernandes</p>
+        <h3 className="font-semibold text-base">11. Alterações à Política</h3>
+        <p>Podemos atualizar esta Política periodicamente. Notificaremos os utilizadores de alterações relevantes através da Aplicação.</p>
+      </section>
+
+      <section>
+        <h3 className="font-semibold text-base">12. Contacto</h3>
+        <p>
+          Responsável pelo tratamento: <strong>Guilherme Fernandes</strong> (a operar sob o nome GK Performance Hub)<br />
+          Email: gkperformancehub.pt@gmail.com
+        </p>
         <p className="italic text-muted-foreground">Ao utilizar esta Aplicação, confirma que leu e compreendeu esta Política de Privacidade.</p>
       </section>
     </div>
