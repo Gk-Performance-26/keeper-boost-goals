@@ -671,6 +671,16 @@ const translations: Record<Lang, Dict> = {
     "auth.continueWithApple": "Continue with Apple",
     "auth.or": "or",
 
+    // Pricing (public)
+    "pricing.subtitle": "Train like a pro. Save like a legend.",
+    "pricing.monthlyDesc": "Flexibility month to month.",
+    "pricing.whatYouGet": "What's included",
+    "pricing.subscribeNow": "Subscribe now",
+    "pricing.getStarted": "Get started",
+    "pricing.refundPolicy": "Refund Policy",
+    "pricing.disclosureTitle": "Subscription information",
+    "pricing.disclosure": "Subscriptions renew automatically at the end of the period (€10/month or €96/year) unless cancelled. Cancel any time. Web payments are processed by Paddle.com (Merchant of Record). 30-day money-back guarantee on web purchases.",
+
     "admin.title": "Admin",
     "admin.subtitle": "Manage trainings and videos",
     "admin.new": "New",
