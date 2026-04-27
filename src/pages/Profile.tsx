@@ -18,8 +18,26 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
-  const { isActive: hasSub } = useSubscription();
+  const { isActive: hasSub, hasPaidSub } = useSubscription();
   const { t } = useLanguage();
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const openPortal = async () => {
+    setOpeningPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("paddle-portal", {
+        body: { environment: isTestMode() ? "sandbox" : "live" },
+      });
+      if (error) throw error;
+      const url = data?.subscriptionUrls?.[0]?.updatePaymentMethod ?? data?.overviewUrl;
+      if (!url) throw new Error("No portal URL");
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e: any) {
+      toast.error(t("profile.portalError") + (e.message ?? ""));
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   if (!profile) return null;
 
