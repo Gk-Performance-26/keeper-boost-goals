@@ -151,7 +151,7 @@ const Auth = () => {
         <Card className="w-full gradient-card border-border/60 shadow-card">
           <CardContent className="space-y-4 p-6 text-center">
             <p className="text-sm text-muted-foreground">
-              {t("auth.alreadySignedInAs") /* fallback below */ ?? "Já tens sessão ativa como"}
+              {t("auth.alreadySignedInAs")}
             </p>
             <p className="font-display text-lg break-all">{user?.email}</p>
             <div className="space-y-2 pt-2">
@@ -160,7 +160,7 @@ const Auth = () => {
                 className="w-full shadow-glow"
                 onClick={() => navigate("/", { replace: true })}
               >
-                {t("auth.continueAs") ?? "Continuar"}
+                {t("auth.continueAs")}
               </Button>
               <Button
                 variant="outline"
@@ -172,7 +172,7 @@ const Auth = () => {
                 {switchingAccount ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  t("auth.switchAccount") ?? "Entrar com outra conta"
+                  t("auth.switchAccount")
                 )}
               </Button>
             </div>
