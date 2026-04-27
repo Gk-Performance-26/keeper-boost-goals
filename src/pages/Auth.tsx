@@ -82,14 +82,14 @@ const Auth = () => {
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithProvider = async (provider: "google" | "apple") => {
     if (mode === "signup" && !acceptedPrivacy) {
       toast({ title: t("auth.checkDetails"), description: t("auth.mustAcceptPrivacy"), variant: "destructive" });
       return;
     }
     setSubmitting(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
+      const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: window.location.origin,
       });
       if (result.error) {
