@@ -305,6 +305,16 @@ const translations: Record<Lang, Dict> = {
     "auth.continueWithApple": "Continuar com Apple",
     "auth.or": "ou",
 
+    // Pricing (public)
+    "pricing.subtitle": "Treina como um profissional. Defende como uma lenda.",
+    "pricing.monthlyDesc": "Flexibilidade mês a mês.",
+    "pricing.whatYouGet": "O que está incluído",
+    "pricing.subscribeNow": "Subscrever agora",
+    "pricing.getStarted": "Criar conta",
+    "pricing.refundPolicy": "Política de Reembolso",
+    "pricing.disclosureTitle": "Informação de subscrição",
+    "pricing.disclosure": "As subscrições renovam-se automaticamente no final do período (10€/mês ou 96€/ano) salvo cancelamento prévio. Pode cancelar a qualquer momento. Pagamentos web processados pela Paddle.com (Comerciante Registado). Garantia de reembolso de 30 dias para compras web.",
+
     // Admin
     "admin.title": "Admin",
     "admin.subtitle": "Gerir treinos e vídeos",
