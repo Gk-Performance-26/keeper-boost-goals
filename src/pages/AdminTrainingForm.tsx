@@ -59,6 +59,7 @@ const AdminTrainingForm = () => {
   const [isPremium, setIsPremium] = useState(false);
   const [trainingGroup, setTrainingGroup] = useState<"fisico" | "tecnico" | "aquecimento" | "alongamento">("tecnico");
   const [warmupSubcategoryId, setWarmupSubcategoryId] = useState<string>("");
+  const [stretchingSubcategoryId, setStretchingSubcategoryId] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -77,6 +78,17 @@ const AdminTrainingForm = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("warmup_subcategories")
+        .select("*")
+        .order("sort_order");
+      return data ?? [];
+    },
+  });
+
+  const { data: stretchingSubs } = useQuery({
+    queryKey: ["stretching-subcategories-admin"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("stretching_subcategories")
         .select("*")
         .order("sort_order");
       return data ?? [];
@@ -124,6 +136,7 @@ const AdminTrainingForm = () => {
       setIsPremium((existing as any).is_premium ?? false);
       setTrainingGroup(((existing as any).training_group as any) ?? "tecnico");
       setWarmupSubcategoryId(((existing as any).warmup_subcategory_id as string) ?? "");
+      setStretchingSubcategoryId(((existing as any).stretching_subcategory_id as string) ?? "");
     }
   }, [existing]);
 
@@ -243,6 +256,7 @@ const AdminTrainingForm = () => {
       is_premium: isPremium,
       training_group: trainingGroup as any,
       warmup_subcategory_id: trainingGroup === "aquecimento" && warmupSubcategoryId ? warmupSubcategoryId : null,
+      stretching_subcategory_id: trainingGroup === "alongamento" && stretchingSubcategoryId ? stretchingSubcategoryId : null,
     };
 
     const { error } = isEdit
