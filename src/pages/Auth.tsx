@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate, Link } from "react-router-dom";
+import { Navigate, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,7 +19,7 @@ import { TermsContent } from "@/components/TermsContent";
 import { lovable } from "@/integrations/lovable";
 
 const Auth = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,9 +28,12 @@ const Auth = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [switchingAccount, setSwitchingAccount] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
+  const forceSwitch = searchParams.get("switch") === "1";
 
   const schema = z.object({
     email: z.string().trim().email(t("auth.email")).max(255),
@@ -38,7 +41,26 @@ const Auth = () => {
     displayName: z.string().trim().min(2).max(40).optional(),
   });
 
-  if (!loading && user) return <Navigate to="/" replace />;
+  // If a user is already signed in and they did NOT explicitly ask to switch
+  // accounts, show a small "continue or switch" screen instead of silently
+  // redirecting. This fixes the case where opening the app in a new tab to
+  // log in would auto-enter the previous account.
+  const showSwitchPrompt = !loading && user && !forceSwitch;
+
+  const handleSwitchAccount = async () => {
+    setSwitchingAccount(true);
+    try {
+      await signOut();
+    } finally {
+      setSwitchingAccount(false);
+    }
+  };
+
+  // After switching accounts via the prompt, send the user to "/" once a
+  // brand-new session is detected.
+  if (!loading && user && forceSwitch) {
+    // user explicitly came here to switch — keep showing the form
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +128,59 @@ const Auth = () => {
       setSubmitting(false);
     }
   };
+
+  if (showSwitchPrompt) {
+    return (
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
+        <div className="absolute right-4 top-4">
+          <LanguageSwitcher />
+        </div>
+        <div className="mb-6 flex flex-col items-center gap-3">
+          <div className="overflow-hidden rounded-2xl shadow-glow ring-1 ring-primary/30">
+            <img
+              src={gkLogo}
+              alt="GK Performance Hub logo"
+              className="h-32 w-32 object-cover"
+            />
+          </div>
+          <h1 className="font-display text-2xl text-center tracking-wide">
+            GK <span className="text-gradient-primary">PERFORMANCE</span> HUB
+          </h1>
+        </div>
+
+        <Card className="w-full gradient-card border-border/60 shadow-card">
+          <CardContent className="space-y-4 p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              {t("auth.alreadySignedInAs")}
+            </p>
+            <p className="font-display text-lg break-all">{user?.email}</p>
+            <div className="space-y-2 pt-2">
+              <Button
+                size="lg"
+                className="w-full shadow-glow"
+                onClick={() => navigate("/", { replace: true })}
+              >
+                {t("auth.continueAs")}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full"
+                onClick={handleSwitchAccount}
+                disabled={switchingAccount}
+              >
+                {switchingAccount ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("auth.switchAccount")
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
