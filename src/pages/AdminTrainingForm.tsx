@@ -57,6 +57,7 @@ const AdminTrainingForm = () => {
   const [drills, setDrills] = useState<Drill[]>([{ title: "", reps: "" }]);
   const [isPublished, setIsPublished] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const [trainingGroup, setTrainingGroup] = useState<"fisico" | "tecnico" | "aquecimento" | "alongamento">("tecnico");
   const [uploading, setUploading] = useState(false);
   const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -109,6 +110,7 @@ const AdminTrainingForm = () => {
       );
       setIsPublished(existing.is_published ?? true);
       setIsPremium((existing as any).is_premium ?? false);
+      setTrainingGroup(((existing as any).training_group as any) ?? "tecnico");
     }
   }, [existing]);
 
@@ -226,6 +228,7 @@ const AdminTrainingForm = () => {
         })) as any,
       is_published: isPublished,
       is_premium: isPremium,
+      training_group: trainingGroup as any,
     };
 
     const { error } = isEdit
