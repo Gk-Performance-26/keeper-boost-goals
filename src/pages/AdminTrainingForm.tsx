@@ -332,6 +332,26 @@ const AdminTrainingForm = () => {
               </Select>
             </div>
           )}
+          {trainingGroup === "alongamento" && (
+            <div className="space-y-1.5">
+              <Label>Sub-categoria de Alongamento</Label>
+              <Select value={stretchingSubcategoryId} onValueChange={setStretchingSubcategoryId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Escolhe uma sub-categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Alongamentos</div>
+                  {(stretchingSubs ?? []).filter((s) => s.parent === "alongamentos").map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                  <div className="mt-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Recuperação & Prevenção</div>
+                  {(stretchingSubs ?? []).filter((s) => s.parent === "recuperacao").map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>{t("adminForm.categoryLabel")}</Label>
