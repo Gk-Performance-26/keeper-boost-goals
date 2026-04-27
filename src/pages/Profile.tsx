@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { CreditCard, Crown, Flame, Loader2, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { CreditCard, Crown, Flame, Loader2, LogOut, MessageSquare, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -147,6 +148,13 @@ const Profile = () => {
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
           </Button>
         </Link>
+        <FeedbackDialog
+          trigger={
+            <Button variant="outline" className="w-full justify-start">
+              <MessageSquare className="h-4 w-4" /> {t("profile.feedback")}
+            </Button>
+          }
+        />
         {isAdmin && (
           <Link to="/admin">
             <Button variant="outline" className="w-full justify-start">
