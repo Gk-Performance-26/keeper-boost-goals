@@ -73,6 +73,13 @@ const Profile = () => {
     }
   }, [hasPaidSub, loadPortalUrl, openingPortal, portalUrl]);
 
+  const goToPaymentMethods = async () => {
+    const url = portalUrl ?? await loadPortalUrl();
+    if (url) {
+      window.top?.location.assign(url);
+    }
+  };
+
   if (!profile) return null;
 
   return (
@@ -127,17 +134,15 @@ const Profile = () => {
             {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
           </Button>
         </Link>
-        {hasPaidSub && portalUrl ? (
-          <Button asChild variant="outline" className="w-full justify-start">
-            <a href={portalUrl}>
-              <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
-            </a>
+        {hasPaidSub && (
+          <Button variant="outline" className="w-full justify-start" onClick={goToPaymentMethods} disabled={openingPortal}>
+            {openingPortal ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}</>
+            ) : (
+              <><CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}</>
+            )}
           </Button>
-        ) : hasPaidSub ? (
-          <Button variant="outline" className="w-full justify-start" onClick={loadPortalUrl} disabled={openingPortal}>
-            <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
-          </Button>
-        ) : null}
+        )}
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
