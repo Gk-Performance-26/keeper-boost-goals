@@ -129,7 +129,7 @@ const Profile = () => {
         </Link>
         {hasPaidSub && portalUrl ? (
           <Button asChild variant="outline" className="w-full justify-start">
-            <a href={portalUrl} target="_blank" rel="noopener noreferrer">
+            <a href={portalUrl}>
               <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
             </a>
           </Button>
