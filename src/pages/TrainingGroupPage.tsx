@@ -62,7 +62,7 @@ const TrainingGroupPage = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("trainings")
-        .select(`id, title, duration_minutes, is_premium, ${config.subFk}`)
+        .select(`*, categories(name, slug, icon, color_token)`)
         .eq("is_published", true)
         .eq("training_group", group);
       return data ?? [];
@@ -105,7 +105,12 @@ const TrainingGroupPage = () => {
                               key={tr.id}
                               id={tr.id}
                               title={tr.title}
+                              level={tr.level}
                               duration={tr.duration_minutes}
+                              xp={tr.xp_reward}
+                              categoryName={tr.categories?.name}
+                              categoryIcon={tr.categories?.icon}
+                              categoryColorToken={tr.categories?.color_token}
                               isPremium={tr.is_premium}
                               locked={tr.is_premium && !hasSub}
                             />
