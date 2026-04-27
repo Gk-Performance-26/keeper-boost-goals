@@ -1,19 +1,36 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Check, Crown, Loader2, Lock } from "lucide-react";
+import { ArrowLeft, Check, Crown, Loader2, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
-import { initializePaddle, getPaddlePriceId } from "@/lib/paddle";
+import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+type Plan = "monthly" | "yearly";
 
 const Subscription = () => {
   const { user } = useAuth();
-  const { hasPaidSub, isTrialActive, trialEndsAt, trialDaysLeft, subscription, isLoading } = useSubscription();
+  const { hasPaidSub, isTrialActive, trialEndsAt, trialDaysLeft, subscription, isLoading, refetch } =
+    useSubscription();
   const [opening, setOpening] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [plan, setPlan] = useState<Plan>("yearly");
   const { t, lang } = useLanguage();
 
   if (!user) return <Navigate to="/auth" replace />;
@@ -31,7 +48,8 @@ const Subscription = () => {
     setOpening(true);
     try {
       await initializePaddle();
-      const paddlePriceId = await getPaddlePriceId("premium_monthly");
+      const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
+      const paddlePriceId = await getPaddlePriceId(priceKey);
       window.Paddle.Checkout.open({
         items: [{ priceId: paddlePriceId, quantity: 1 }],
         customer: user.email ? { email: user.email } : undefined,
@@ -47,6 +65,22 @@ const Subscription = () => {
       toast.error(t("sub.checkoutError") + e.message);
     } finally {
       setOpening(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    setCancelling(true);
+    try {
+      const { error } = await supabase.functions.invoke("cancel-subscription", {
+        body: { environment: isTestMode() ? "sandbox" : "live" },
+      });
+      if (error) throw error;
+      toast.success(t("sub.cancelSuccess"));
+      await refetch();
+    } catch (e: any) {
+      toast.error(t("sub.cancelError") + (e.message ?? ""));
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -71,26 +105,60 @@ const Subscription = () => {
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : hasPaidSub ? (
-          <Card className="gradient-card border-primary/40 shadow-glow">
-            <CardContent className="space-y-3 p-5 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
-                <Check className="h-6 w-6 text-primary" />
-              </div>
-              <h2 className="font-display text-xl">{t("sub.activeTitle")}</h2>
-              <p className="text-sm text-muted-foreground">{t("sub.activeDesc")}</p>
-              {subscription?.current_period_end && (
-                <p className="text-xs text-muted-foreground">
-                  {t("sub.nextRenewal")}{" "}
-                  {new Date(subscription.current_period_end).toLocaleDateString(
-                    lang === "pt" ? "pt-PT" : "en-GB",
-                  )}
-                </p>
-              )}
-              {subscription?.cancel_at_period_end && (
-                <p className="text-xs text-amber-500">{t("sub.cancelAtEnd")}</p>
-              )}
-            </CardContent>
-          </Card>
+          <>
+            <Card className="gradient-card border-primary/40 shadow-glow">
+              <CardContent className="space-y-3 p-5 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+                  <Check className="h-6 w-6 text-primary" />
+                </div>
+                <h2 className="font-display text-xl">{t("sub.activeTitle")}</h2>
+                <p className="text-sm text-muted-foreground">{t("sub.activeDesc")}</p>
+                {subscription?.current_period_end && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("sub.nextRenewal")}{" "}
+                    {new Date(subscription.current_period_end).toLocaleDateString(
+                      lang === "pt" ? "pt-PT" : "en-GB",
+                    )}
+                  </p>
+                )}
+                {subscription?.cancel_at_period_end && (
+                  <p className="text-xs text-amber-500">{t("sub.cancelAtEnd")}</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {!subscription?.cancel_at_period_end && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="w-full text-destructive hover:text-destructive">
+                    <X className="h-4 w-4" /> {t("sub.cancelSub")}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t("sub.cancelSub")}</AlertDialogTitle>
+                    <AlertDialogDescription>{t("sub.cancelConfirm")}</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleCancel}
+                      disabled={cancelling}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {cancelling ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.canceling")}
+                        </>
+                      ) : (
+                        t("sub.cancelSub")
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </>
         ) : (
           <>
             {isTrialActive && (
@@ -121,15 +189,54 @@ const Subscription = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Plan toggle */}
+            <div className="space-y-2">
+              <p className="text-center text-xs uppercase tracking-wider text-muted-foreground">
+                {t("sub.choosePlan")}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPlan("monthly")}
+                  className={`rounded-xl border p-3 text-left transition ${
+                    plan === "monthly"
+                      ? "border-primary bg-primary/10 shadow-glow"
+                      : "border-border/60 bg-card/50 hover:border-border"
+                  }`}
+                >
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    {t("sub.monthlyPlan")}
+                  </p>
+                  <p className="mt-0.5 font-display text-lg">
+                    10€<span className="text-xs text-muted-foreground">{t("sub.month")}</span>
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPlan("yearly")}
+                  className={`relative rounded-xl border p-3 text-left transition ${
+                    plan === "yearly"
+                      ? "border-primary bg-primary/10 shadow-glow"
+                      : "border-border/60 bg-card/50 hover:border-border"
+                  }`}
+                >
+                  <span className="absolute -top-2 right-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
+                    {t("sub.savePercent")}
+                  </span>
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                    {t("sub.yearlyPlan")}
+                  </p>
+                  <p className="mt-0.5 font-display text-lg">
+                    96€<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
+                  </p>
+                  <p className="text-[10px] text-primary">{t("sub.perMonthEquivalent")}</p>
+                </button>
+              </div>
+            </div>
+
             <Card className="gradient-card border-primary/30 shadow-glow">
               <CardContent className="space-y-4 p-5">
-                <div className="text-center">
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">{t("sub.monthlyPlan")}</p>
-                  <p className="mt-1 font-display text-4xl">
-                    10€ <span className="text-base text-muted-foreground">{t("sub.month")}</span>
-                  </p>
-                </div>
-
                 <ul className="space-y-2.5">
                   {benefits.map((b) => (
                     <li key={b} className="flex items-start gap-2.5 text-sm">
@@ -151,7 +258,8 @@ const Subscription = () => {
                     </>
                   ) : (
                     <>
-                      <Lock className="h-4 w-4" /> {t("sub.subscribeBtn")}
+                      <Lock className="h-4 w-4" />{" "}
+                      {t("sub.subscribeBtn")} {plan === "yearly" ? "96€/ano" : "10€/mês"}
                     </>
                   )}
                 </Button>
