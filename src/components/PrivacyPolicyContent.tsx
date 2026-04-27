@@ -10,14 +10,16 @@ export function PrivacyPolicyContent() {
 
         <section>
           <h3 className="font-semibold text-base">1. Introduction</h3>
-          <p>This Privacy Policy describes how we collect, use and protect the personal data of users of our goalkeeper training application (“App”). By using the App, you agree to the terms described here.</p>
+          <p>
+            This Privacy Policy describes how <strong>Guilherme Fernandes</strong> (the “Seller”, “we”, “us”), trading as <strong>GK Performance Hub</strong>, collects, uses and protects the personal data of users of our goalkeeper training application (the “App”). The Seller is the <strong>data controller</strong> of personal data collected through the App. By using the App, you agree to the terms described here.
+          </p>
         </section>
 
         <section>
           <h3 className="font-semibold text-base">2. Data Collected</h3>
           <p><strong>2.1 Data provided by the user:</strong> full name, email address, phone number, date of birth, sports profile information (level, position, training history).</p>
           <p><strong>2.2 Usage data:</strong> training and performance history, interactions with the App, preferences and settings.</p>
-          <p><strong>2.3 Payment data:</strong> information needed to process payments (e.g., transaction ID, payment method). We do not directly store full bank card data. Payments are processed by secure external providers.</p>
+          <p><strong>2.3 Payment data:</strong> billing information needed to process payments (e.g., transaction ID, payment method, billing country) is collected and processed directly by our Merchant of Record, <strong>Paddle.com Market Limited</strong> (“Paddle”). We do not store full bank card data.</p>
           <p><strong>2.4 Technical data:</strong> IP address, device type, operating system, access logs.</p>
         </section>
 
@@ -26,7 +28,7 @@ export function PrivacyPolicyContent() {
           <ul className="list-disc pl-5 space-y-1">
             <li>Provide and improve training services</li>
             <li>Personalize training plans</li>
-            <li>Process payments and subscriptions</li>
+            <li>Process payments and subscriptions (via Paddle)</li>
             <li>Communicate with the user (support, notifications, updates)</li>
             <li>Ensure security and prevent fraud</li>
             <li>Comply with legal obligations</li>
@@ -34,43 +36,64 @@ export function PrivacyPolicyContent() {
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">4. Data Sharing</h3>
-          <p>We may share data with service providers (e.g., payment processing, cloud storage), legal authorities when required, and technical partners exclusively for App operation. We never sell your personal data.</p>
+          <h3 className="font-semibold text-base">4. Legal Basis for Processing</h3>
+          <p>We process your personal data on the following legal bases under the GDPR:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Performance of a contract</strong> (Art. 6(1)(b)) — to provide the App and the services you subscribe to (account creation, training delivery, subscription management).</li>
+            <li><strong>Legitimate interests</strong> (Art. 6(1)(f)) — to secure the App, prevent fraud and abuse, and improve the product.</li>
+            <li><strong>Consent</strong> (Art. 6(1)(a)) — for optional analytics, marketing communications and non-essential cookies, which you can withdraw at any time.</li>
+            <li><strong>Legal obligation</strong> (Art. 6(1)(c)) — to comply with tax, accounting and other applicable legal duties.</li>
+          </ul>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">5. Security</h3>
-          <p>We adopt appropriate technical and organizational measures including encryption of sensitive data, restricted access to personal information, and system monitoring. Despite this, no system is completely secure.</p>
+          <h3 className="font-semibold text-base">5. Data Sharing</h3>
+          <p>We share personal data with the following categories of recipients:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Merchant of Record — Paddle.com Market Limited:</strong> for the sale of the product, subscription management, payment processing, tax compliance, invoicing and refund handling. Paddle acts as an independent data controller for billing data. See Paddle's privacy notice at <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">paddle.com/legal/privacy</a>.</li>
+            <li><strong>Service providers / subprocessors:</strong> hosting and database (Supabase), authentication, email delivery, analytics and customer support tooling.</li>
+            <li><strong>Professional advisers:</strong> legal, accounting and tax advisers where strictly necessary.</li>
+            <li><strong>Authorities:</strong> regulators, courts or law enforcement where required by law.</li>
+          </ul>
+          <p>We never sell your personal data.</p>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">6. Data Retention</h3>
-          <p>Data will be kept only for the period necessary to fulfil the described purposes, legal obligations, and dispute resolution.</p>
+          <h3 className="font-semibold text-base">6. International Transfers</h3>
+          <p>Some of our service providers may process data outside the EEA/UK. Where this happens, we rely on appropriate safeguards such as the European Commission's Standard Contractual Clauses or adequacy decisions.</p>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">7. User Rights</h3>
-          <p>Under applicable law (e.g., GDPR), you have the right to access, rectify, request erasure (“right to be forgotten”), restrict or object to processing, and data portability. To exercise these rights, contact us at gkperformancehub.pt@gmail.com.</p>
+          <h3 className="font-semibold text-base">7. Security</h3>
+          <p>We adopt appropriate technical and organizational measures including encryption in transit, restricted access to personal information, and system monitoring. Despite this, no system is completely secure.</p>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">8. Payments and Subscriptions</h3>
-          <p>All payments are processed by secure third-party platforms. The App may offer auto-renewing subscription plans. You may cancel the subscription at any time through account settings.</p>
+          <h3 className="font-semibold text-base">8. Data Retention</h3>
+          <p>Data is kept only for the period necessary to fulfil the described purposes, legal obligations (e.g., tax records), and dispute resolution. When no longer needed, data is deleted or anonymised.</p>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">9. Cookies and Similar Technologies</h3>
-          <p>We may use cookies or similar technologies to improve user experience and analyze App usage. You can manage preferences on your device.</p>
+          <h3 className="font-semibold text-base">9. User Rights (GDPR)</h3>
+          <p>You have the right to access, rectify, request erasure (“right to be forgotten”), restrict or object to processing, data portability, and to withdraw consent at any time. You also have the right to lodge a complaint with a supervisory authority (in Portugal, the CNPD). To exercise these rights, contact us at gkperformancehub.pt@gmail.com — we will respond within one month.</p>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">10. Policy Changes</h3>
-          <p>We may update this Policy periodically. We will notify users of relevant changes.</p>
+          <h3 className="font-semibold text-base">10. Cookies and Similar Technologies</h3>
+          <p>We may use essential cookies for authentication and session management, and optional analytics cookies subject to your consent. You can manage preferences on your device or browser.</p>
         </section>
 
         <section>
-          <h3 className="font-semibold text-base">11. Contact</h3>
-          <p>Email: gkperformancehub.pt@gmail.com<br />Data controller: Guilherme Fernandes</p>
+          <h3 className="font-semibold text-base">11. Policy Changes</h3>
+          <p>We may update this Policy periodically. We will notify users of relevant changes through the App.</p>
+        </section>
+
+        <section>
+          <h3 className="font-semibold text-base">12. Contact</h3>
+          <p>
+            Data controller: <strong>Guilherme Fernandes</strong> (trading as GK Performance Hub)<br />
+            Email: gkperformancehub.pt@gmail.com
+          </p>
           <p className="italic text-muted-foreground">By using this App, you confirm that you have read and understood this Privacy Policy.</p>
         </section>
       </div>
