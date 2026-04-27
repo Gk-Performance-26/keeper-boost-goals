@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
+import { useSignedVideoUrl } from "@/hooks/useSignedVideoUrl";
 
 type VideoSource = "upload" | "youtube" | "vimeo";
 
 interface Props {
+  trainingId: string;
   url: string;
   type: VideoSource;
   thumbnail?: string | null;
@@ -11,6 +13,11 @@ interface Props {
   introType?: VideoSource | null;
   introLabel?: string;
   exerciseLabel?: string;
+  /** Optional drill index when used for a drill. */
+  drillIndex?: number;
+  /** Override the default field keys for non-main contexts (drills). */
+  mainField?: "main" | "drill_exercise";
+  introField?: "intro" | "drill_intro";
 }
 
 function buildAutoplayUrl(url: string, type: VideoSource): string {
@@ -26,23 +33,60 @@ function buildAutoplayUrl(url: string, type: VideoSource): string {
 }
 
 export function VideoPlayer({
+  trainingId,
   url,
   type,
   introUrl,
   introType,
   introLabel = "Explicação",
   exerciseLabel = "Exercício",
+  drillIndex,
+  mainField = "main",
+  introField = "intro",
 }: Props) {
   const hasIntro = !!introUrl;
   const [phase, setPhase] = useState<"intro" | "exercise">(hasIntro ? "intro" : "exercise");
   const introVideoRef = useRef<HTMLVideoElement>(null);
+
+  const main = useSignedVideoUrl({
+    trainingId,
+    field: mainField,
+    drillIndex,
+    type,
+    fallbackUrl: url,
+  });
+  const intro = useSignedVideoUrl({
+    trainingId,
+    field: introField,
+    drillIndex,
+    type: (introType ?? "upload") as VideoSource,
+    fallbackUrl: introUrl ?? null,
+    enabled: hasIntro,
+  });
 
   // Reset phase when intro changes (e.g. switching trainings)
   useEffect(() => {
     setPhase(hasIntro ? "intro" : "exercise");
   }, [introUrl, hasIntro]);
 
-  const renderPlayer = (vUrl: string, vType: VideoSource, autoplay = false, onEnded?: () => void) => {
+  const renderLoading = () => (
+    <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-black">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  );
+
+  const renderError = (msg?: string) => (
+    <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-black p-4 text-center text-sm text-muted-foreground">
+      {msg ?? "Could not load video"}
+    </div>
+  );
+
+  const renderPlayer = (
+    vUrl: string,
+    vType: VideoSource,
+    autoplay = false,
+    onEnded?: () => void,
+  ) => {
     if (vType === "upload") {
       return (
         <video
@@ -73,7 +117,9 @@ export function VideoPlayer({
   };
 
   if (!hasIntro) {
-    return renderPlayer(url, type);
+    if (main.isLoading) return renderLoading();
+    if (main.isError || !main.data) return renderError();
+    return renderPlayer(main.data, type);
   }
 
   return (
@@ -102,10 +148,18 @@ export function VideoPlayer({
       </div>
 
       {phase === "intro"
-        ? renderPlayer(introUrl!, (introType ?? "upload") as VideoSource, false, () =>
-            setPhase("exercise"),
-          )
-        : renderPlayer(url, type, true)}
+        ? intro.isLoading
+          ? renderLoading()
+          : intro.isError || !intro.data
+          ? renderError()
+          : renderPlayer(intro.data, (introType ?? "upload") as VideoSource, false, () =>
+              setPhase("exercise"),
+            )
+        : main.isLoading
+        ? renderLoading()
+        : main.isError || !main.data
+        ? renderError()
+        : renderPlayer(main.data, type, true)}
     </div>
   );
 }
