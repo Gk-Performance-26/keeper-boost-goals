@@ -151,6 +151,7 @@ const translations: Record<Lang, Dict> = {
     "profile.openingPortal": "A abrir portal...",
     "profile.portalError": "Não foi possível abrir o portal: ",
     "profile.feedback": "Enviar feedback",
+    "profile.privacy": "Política de Privacidade",
     "feedback.title": "Enviar feedback",
     "feedback.description": "Conta-nos o que achas. A tua opinião ajuda-nos a melhorar.",
     "feedback.category": "Categoria",
@@ -276,6 +277,9 @@ const translations: Record<Lang, Dict> = {
     "auth.welcomeDesc": "Vamos configurar o teu perfil.",
     "auth.error": "Erro de autenticação",
     "auth.somethingWrong": "Algo correu mal",
+    "auth.privacyPolicy": "Política de Privacidade",
+    "auth.acceptPrivacyPrefix": "Li e aceito a",
+    "auth.mustAcceptPrivacy": "Deves aceitar a Política de Privacidade para criar conta.",
 
     // Admin
     "admin.title": "Admin",
@@ -485,6 +489,7 @@ const translations: Record<Lang, Dict> = {
     "profile.openingPortal": "Opening portal...",
     "profile.portalError": "Could not open portal: ",
     "profile.feedback": "Send feedback",
+    "profile.privacy": "Privacy Policy",
     "feedback.title": "Send feedback",
     "feedback.description": "Tell us what you think. Your input helps us improve.",
     "feedback.category": "Category",
@@ -604,6 +609,9 @@ const translations: Record<Lang, Dict> = {
     "auth.welcomeDesc": "Let's set up your profile.",
     "auth.error": "Auth error",
     "auth.somethingWrong": "Something went wrong",
+    "auth.privacyPolicy": "Privacy Policy",
+    "auth.acceptPrivacyPrefix": "I have read and accept the",
+    "auth.mustAcceptPrivacy": "You must accept the Privacy Policy to create an account.",
 
     "admin.title": "Admin",
     "admin.subtitle": "Manage trainings and videos",
