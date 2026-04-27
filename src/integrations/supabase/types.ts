@@ -634,6 +634,15 @@ export type Database = {
     }
     Functions: {
       award_badge: { Args: { _badge_slug: string }; Returns: boolean }
+      complete_session: {
+        Args: {
+          _notes?: string
+          _rating?: number
+          _skill_scores?: Json
+          _training_id: string
+        }
+        Returns: Json
+      }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
