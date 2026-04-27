@@ -633,6 +633,7 @@ export type Database = {
       }
     }
     Functions: {
+      award_badge: { Args: { _badge_slug: string }; Returns: boolean }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
