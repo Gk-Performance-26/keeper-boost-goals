@@ -171,6 +171,7 @@ export function VideoPlayer({
           loop={loop}
           muted={loop}
           playsInline
+          preload="auto"
           onEnded={onEnded}
           className="aspect-video w-full rounded-2xl bg-black object-cover"
         >
