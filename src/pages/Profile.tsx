@@ -148,13 +148,11 @@ const Profile = () => {
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
           </Button>
         </Link>
-        <FeedbackDialog
-          trigger={
-            <Button variant="outline" className="w-full justify-start">
-              <MessageSquare className="h-4 w-4" /> {t("profile.feedback")}
-            </Button>
-          }
-        />
+        <FeedbackDialog>
+          <Button variant="outline" className="w-full justify-start">
+            <MessageSquare className="h-4 w-4" /> {t("profile.feedback")}
+          </Button>
+        </FeedbackDialog>
         {isAdmin && (
           <Link to="/admin">
             <Button variant="outline" className="w-full justify-start">

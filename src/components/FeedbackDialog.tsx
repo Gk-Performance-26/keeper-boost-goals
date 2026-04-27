@@ -21,10 +21,10 @@ const feedbackSchema = z.object({
 });
 
 interface FeedbackDialogProps {
-  trigger: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
+export function FeedbackDialog({ children }: FeedbackDialogProps) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -67,7 +67,7 @@ export function FeedbackDialog({ trigger }: FeedbackDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
