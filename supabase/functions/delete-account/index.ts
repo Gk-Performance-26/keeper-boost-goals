@@ -77,12 +77,12 @@ Deno.serve(async (req) => {
     const { error: delErr } = await admin.auth.admin.deleteUser(user.id);
     if (delErr) {
       console.error("delete-account: auth delete failed:", delErr);
-      return new Response(JSON.stringify({ error: delErr.message }), { status: 500, headers: corsHeaders });
+      return new Response(JSON.stringify({ error: "Failed to delete account" }), { status: 500, headers: corsHeaders });
     }
 
     return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
   } catch (e) {
     console.error("delete-account error:", e);
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "An internal error occurred" }), { status: 500, headers: corsHeaders });
   }
 });

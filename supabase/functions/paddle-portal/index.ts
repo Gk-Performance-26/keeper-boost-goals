@@ -56,6 +56,6 @@ Deno.serve(async (req) => {
     );
   } catch (e) {
     console.error("paddle-portal error:", e);
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "An internal error occurred" }), { status: 500, headers: corsHeaders });
   }
 });
