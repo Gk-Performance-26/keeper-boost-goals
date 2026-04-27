@@ -5,8 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { CreditCard, Crown, Flame, Loader2, LogOut, MessageSquare, Settings, Shield, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { CreditCard, Crown, FileText, Flame, Loader2, LogOut, MessageSquare, RotateCw, Settings, Shield, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
+import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -20,10 +21,23 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
-  const { isActive: hasSub, hasPaidSub } = useSubscription();
+  const { isActive: hasSub, hasPaidSub, refetch: refetchSub } = useSubscription();
   const { t } = useLanguage();
   const [openingPortal, setOpeningPortal] = useState(false);
   const [portalUrl, setPortalUrl] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState(false);
+
+  const handleRestorePurchases = async () => {
+    setRestoring(true);
+    try {
+      await refetchSub();
+      toast.success(t("profile.restoreSuccess"));
+    } catch (e: any) {
+      toast.error(t("profile.restoreError") + (e.message ?? ""));
+    } finally {
+      setRestoring(false);
+    }
+  };
 
   const loadPortalUrl = useCallback(async () => {
     setOpeningPortal(true);
@@ -153,9 +167,23 @@ const Profile = () => {
             <MessageSquare className="h-4 w-4" /> {t("profile.feedback")}
           </Button>
         </FeedbackDialog>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={handleRestorePurchases}
+          disabled={restoring}
+        >
+          {restoring ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCw className="h-4 w-4" />}
+          {t("profile.restorePurchases")}
+        </Button>
         <Link to="/privacy">
           <Button variant="outline" className="w-full justify-start">
             <Shield className="h-4 w-4" /> {t("profile.privacy")}
+          </Button>
+        </Link>
+        <Link to="/terms">
+          <Button variant="outline" className="w-full justify-start">
+            <FileText className="h-4 w-4" /> {t("profile.terms")}
           </Button>
         </Link>
         {isAdmin && (
@@ -168,6 +196,7 @@ const Profile = () => {
         <Button variant="outline" className="w-full justify-start text-destructive" onClick={signOut}>
           <LogOut className="h-4 w-4" /> {t("profile.signOut")}
         </Button>
+        <DeleteAccountDialog />
       </div>
 
       <p className="text-center text-xs text-muted-foreground">{user?.email}</p>
