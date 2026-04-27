@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
 import { CreditCard, Crown, Flame, Loader2, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
@@ -12,6 +12,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { isTestMode } from "@/lib/paddle";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const Profile = () => {
@@ -73,13 +74,6 @@ const Profile = () => {
     }
   }, [hasPaidSub, loadPortalUrl, openingPortal, portalUrl]);
 
-  const goToPaymentMethods = async () => {
-    const url = portalUrl ?? await loadPortalUrl();
-    if (url) {
-      window.top?.location.assign(url);
-    }
-  };
-
   if (!profile) return null;
 
   return (
@@ -134,15 +128,20 @@ const Profile = () => {
             {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
           </Button>
         </Link>
-        {hasPaidSub && (
-          <Button variant="outline" className="w-full justify-start" onClick={goToPaymentMethods} disabled={openingPortal}>
-            {openingPortal ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}</>
-            ) : (
-              <><CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}</>
-            )}
+        {hasPaidSub && portalUrl ? (
+          <a
+            href={portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full justify-start")}
+          >
+            <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
+          </a>
+        ) : hasPaidSub ? (
+          <Button variant="outline" className="w-full justify-start" onClick={loadPortalUrl} disabled={openingPortal}>
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
           </Button>
-        )}
+        ) : null}
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
