@@ -150,6 +150,39 @@ const Subscription = () => {
             {!subscription?.cancel_at_period_end && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    <ArrowRightLeft className="h-4 w-4" />{" "}
+                    {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {isYearly ? t("sub.switchConfirmMonthly") : t("sub.switchConfirmYearly")}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleSwitchPlan} disabled={switching}>
+                      {switching ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.switching")}
+                        </>
+                      ) : (
+                        t("sub.confirm")
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
+            {!subscription?.cancel_at_period_end && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
                   <Button variant="outline" className="w-full text-destructive hover:text-destructive">
                     <X className="h-4 w-4" /> {t("sub.cancelSub")}
                   </Button>
