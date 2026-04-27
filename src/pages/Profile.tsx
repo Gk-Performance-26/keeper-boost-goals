@@ -186,6 +186,11 @@ const Profile = () => {
             <FileText className="h-4 w-4" /> {t("profile.terms")}
           </Button>
         </Link>
+        <Link to="/refund">
+          <Button variant="outline" className="w-full justify-start">
+            <FileText className="h-4 w-4" /> {t("pricing.refundPolicy")}
+          </Button>
+        </Link>
         {isAdmin && (
           <Link to="/admin">
             <Button variant="outline" className="w-full justify-start">
