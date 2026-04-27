@@ -118,125 +118,30 @@ const Trainings = () => {
         {groups.map((g) => {
           const items = filtered.filter((tr) => (tr as any).training_group === g.key);
 
-          // Special rendering for warmup: split into Geral / GK with subcategory blocks
-          if (g.key === "aquecimento") {
-            const subs = warmupSubs ?? [];
-            const subsGeral = subs.filter((s) => s.parent === "geral");
-            const subsGk = subs.filter((s) => s.parent === "gk");
-            const renderTrainingCard = (tr: any) => (
-              <TrainingCard
-                key={tr.id}
-                id={tr.id}
-                title={tr.title}
-                level={tr.level}
-                duration={tr.duration_minutes}
-                xp={tr.xp_reward}
-                categoryName={tr.categories?.name}
-                categoryIcon={tr.categories?.icon}
-                categoryColorToken={tr.categories?.color_token}
-                isPremium={tr.is_premium}
-                locked={tr.is_premium && !hasSub}
-              />
-            );
-
-            const renderSubBlock = (sub: any) => {
-              const subItems = items.filter((tr) => (tr as any).warmup_subcategory_id === sub.id);
-              return (
-                <div key={sub.id} className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <CategoryIcon name={sub.icon} className="h-4 w-4 text-primary" />
-                    <h4 className="text-sm font-semibold">{sub.name}</h4>
-                    <span className="ml-auto text-[11px] text-muted-foreground">{subItems.length}</span>
-                  </div>
-                  {subItems.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-border/60 bg-muted/20 py-3 text-center text-[11px] text-muted-foreground">
-                      {t("trainings.emptyGroup")}
-                    </p>
-                  ) : (
-                    <div className="space-y-2">{subItems.map(renderTrainingCard)}</div>
-                  )}
-                </div>
-              );
-            };
-
+          // Aquecimento and Alongamento are clickable cards that lead to a dedicated page
+          if (g.key === "aquecimento" || g.key === "alongamento") {
+            const emoji = g.key === "aquecimento" ? "🔥" : "🧘";
             return (
-              <section key={g.key} className="space-y-4">
-                <div className="flex items-baseline justify-between">
-                  <h2 className="font-display text-xl">{g.label}</h2>
-                  <span className="text-xs text-muted-foreground">{items.length}</span>
-                </div>
-
-                <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
-                  <h3 className="font-display text-base">Aquecimento Geral</h3>
-                  <div className="space-y-4">{subsGeral.map(renderSubBlock)}</div>
-                </div>
-
-                <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
-                  <h3 className="font-display text-base">Aquecimento Específico GK</h3>
-                  <div className="space-y-4">{subsGk.map(renderSubBlock)}</div>
-                </div>
-              </section>
-            );
-          }
-
-          // Special rendering for stretching: split into Alongamentos / Recuperação & Prevenção
-          if (g.key === "alongamento") {
-            const subs = stretchingSubs ?? [];
-            const subsAlong = subs.filter((s) => s.parent === "alongamentos");
-            const subsRecup = subs.filter((s) => s.parent === "recuperacao");
-            const renderTrainingCard = (tr: any) => (
-              <TrainingCard
-                key={tr.id}
-                id={tr.id}
-                title={tr.title}
-                level={tr.level}
-                duration={tr.duration_minutes}
-                xp={tr.xp_reward}
-                categoryName={tr.categories?.name}
-                categoryIcon={tr.categories?.icon}
-                categoryColorToken={tr.categories?.color_token}
-                isPremium={tr.is_premium}
-                locked={tr.is_premium && !hasSub}
-              />
-            );
-
-            const renderSubBlock = (sub: any) => {
-              const subItems = items.filter((tr) => (tr as any).stretching_subcategory_id === sub.id);
-              return (
-                <div key={sub.id} className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <CategoryIcon name={sub.icon} className="h-4 w-4 text-primary" />
-                    <h4 className="text-sm font-semibold">{sub.name}</h4>
-                    <span className="ml-auto text-[11px] text-muted-foreground">{subItems.length}</span>
+              <Link
+                key={g.key}
+                to={`/trainings/group/${g.key}`}
+                className="group block rounded-2xl border border-border/60 bg-gradient-to-br from-primary/10 to-primary/5 p-5 transition hover:border-primary/40 hover:from-primary/15 hover:to-primary/10"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl" aria-hidden>
+                      {emoji}
+                    </span>
+                    <div>
+                      <h2 className="font-display text-xl">{g.label}</h2>
+                      <p className="text-xs text-muted-foreground">
+                        {items.length} {items.length === 1 ? "treino" : "treinos"}
+                      </p>
+                    </div>
                   </div>
-                  {subItems.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-border/60 bg-muted/20 py-3 text-center text-[11px] text-muted-foreground">
-                      {t("trainings.emptyGroup")}
-                    </p>
-                  ) : (
-                    <div className="space-y-2">{subItems.map(renderTrainingCard)}</div>
-                  )}
+                  <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
                 </div>
-              );
-            };
-
-            return (
-              <section key={g.key} className="space-y-4">
-                <div className="flex items-baseline justify-between">
-                  <h2 className="font-display text-xl">🧘 {g.label}</h2>
-                  <span className="text-xs text-muted-foreground">{items.length}</span>
-                </div>
-
-                <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
-                  <h3 className="font-display text-base">Alongamentos</h3>
-                  <div className="space-y-4">{subsAlong.map(renderSubBlock)}</div>
-                </div>
-
-                <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
-                  <h3 className="font-display text-base">Recuperação & Prevenção</h3>
-                  <div className="space-y-4">{subsRecup.map(renderSubBlock)}</div>
-                </div>
-              </section>
+              </Link>
             );
           }
 
