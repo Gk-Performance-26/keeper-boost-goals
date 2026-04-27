@@ -23,6 +23,9 @@ const Profile = () => {
   const [openingPortal, setOpeningPortal] = useState(false);
 
   const openPortal = async () => {
+    // Open window synchronously on click to avoid the browser pop-up blocker;
+    // we'll set the URL once the edge function responds.
+    const win = window.open("about:blank", "_blank", "noopener,noreferrer");
     setOpeningPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke("paddle-portal", {
@@ -31,8 +34,13 @@ const Profile = () => {
       if (error) throw error;
       const url = data?.subscriptionUrls?.[0]?.updatePaymentMethod ?? data?.overviewUrl;
       if (!url) throw new Error("No portal URL");
-      window.open(url, "_blank", "noopener,noreferrer");
+      if (win && !win.closed) {
+        win.location.href = url;
+      } else {
+        window.location.href = url;
+      }
     } catch (e: any) {
+      win?.close();
       toast.error(t("profile.portalError") + (e.message ?? ""));
     } finally {
       setOpeningPortal(false);
