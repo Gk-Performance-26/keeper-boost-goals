@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { Crown, Flame, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { CreditCard, Crown, Flame, Loader2, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { isTestMode } from "@/lib/paddle";
+import { toast } from "sonner";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
