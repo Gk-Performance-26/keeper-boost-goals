@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import gkLogo from "@/assets/gk-logo.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PrivacyPolicyContent } from "@/components/PrivacyPolicyContent";
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -19,6 +22,8 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -41,6 +46,10 @@ const Auth = () => {
     });
     if (!parsed.success) {
       toast({ title: t("auth.checkDetails"), description: parsed.error.errors[0].message, variant: "destructive" });
+      return;
+    }
+    if (mode === "signup" && !acceptedPrivacy) {
+      toast({ title: t("auth.checkDetails"), description: t("auth.mustAcceptPrivacy"), variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -150,9 +159,31 @@ const Auth = () => {
                 maxLength={72}
               />
             </div>
+
+            {mode === "signup" && (
+              <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/30 p-3">
+                <Checkbox
+                  id="privacy"
+                  checked={acceptedPrivacy}
+                  onCheckedChange={(v) => setAcceptedPrivacy(v === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="privacy" className="text-xs leading-snug font-normal cursor-pointer">
+                  {t("auth.acceptPrivacyPrefix")}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setPrivacyOpen(true)}
+                    className="text-primary underline underline-offset-2 hover:text-primary/80"
+                  >
+                    {t("auth.privacyPolicy")}
+                  </button>
+                </Label>
+              </div>
+            )}
+
             <Button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || (mode === "signup" && !acceptedPrivacy)}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow"
               size="lg"
             >
@@ -167,6 +198,15 @@ const Auth = () => {
           </form>
         </CardContent>
       </Card>
+
+      <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t("auth.privacyPolicy")}</DialogTitle>
+          </DialogHeader>
+          <PrivacyPolicyContent />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
