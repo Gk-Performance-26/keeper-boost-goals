@@ -58,6 +58,7 @@ const AdminTrainingForm = () => {
   const [isPublished, setIsPublished] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const [trainingGroup, setTrainingGroup] = useState<"fisico" | "tecnico" | "aquecimento" | "alongamento">("tecnico");
+  const [warmupSubcategoryId, setWarmupSubcategoryId] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [uploadingIntro, setUploadingIntro] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -67,6 +68,17 @@ const AdminTrainingForm = () => {
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await supabase.from("categories").select("*").order("sort_order");
+      return data ?? [];
+    },
+  });
+
+  const { data: warmupSubs } = useQuery({
+    queryKey: ["warmup-subcategories-admin"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("warmup_subcategories")
+        .select("*")
+        .order("sort_order");
       return data ?? [];
     },
   });
@@ -111,6 +123,7 @@ const AdminTrainingForm = () => {
       setIsPublished(existing.is_published ?? true);
       setIsPremium((existing as any).is_premium ?? false);
       setTrainingGroup(((existing as any).training_group as any) ?? "tecnico");
+      setWarmupSubcategoryId(((existing as any).warmup_subcategory_id as string) ?? "");
     }
   }, [existing]);
 
@@ -229,6 +242,7 @@ const AdminTrainingForm = () => {
       is_published: isPublished,
       is_premium: isPremium,
       training_group: trainingGroup as any,
+      warmup_subcategory_id: trainingGroup === "aquecimento" && warmupSubcategoryId ? warmupSubcategoryId : null,
     };
 
     const { error } = isEdit
@@ -284,6 +298,26 @@ const AdminTrainingForm = () => {
               </SelectContent>
             </Select>
           </div>
+          {trainingGroup === "aquecimento" && (
+            <div className="space-y-1.5">
+              <Label>Sub-categoria de Aquecimento</Label>
+              <Select value={warmupSubcategoryId} onValueChange={setWarmupSubcategoryId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Escolhe uma sub-categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Aquecimento Geral</div>
+                  {(warmupSubs ?? []).filter((s) => s.parent === "geral").map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                  <div className="mt-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Aquecimento Específico GK</div>
+                  {(warmupSubs ?? []).filter((s) => s.parent === "gk").map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>{t("adminForm.categoryLabel")}</Label>
