@@ -367,6 +367,7 @@ export type Database = {
           level: Database["public"]["Enums"]["experience_level"]
           thumbnail_url: string | null
           title: string
+          training_group: Database["public"]["Enums"]["training_group"]
           updated_at: string
           video_type: Database["public"]["Enums"]["video_source_type"]
           video_url: string
@@ -389,6 +390,7 @@ export type Database = {
           level?: Database["public"]["Enums"]["experience_level"]
           thumbnail_url?: string | null
           title: string
+          training_group?: Database["public"]["Enums"]["training_group"]
           updated_at?: string
           video_type?: Database["public"]["Enums"]["video_source_type"]
           video_url: string
@@ -411,6 +413,7 @@ export type Database = {
           level?: Database["public"]["Enums"]["experience_level"]
           thumbnail_url?: string | null
           title?: string
+          training_group?: Database["public"]["Enums"]["training_group"]
           updated_at?: string
           video_type?: Database["public"]["Enums"]["video_source_type"]
           video_url?: string
@@ -656,6 +659,7 @@ export type Database = {
       app_role: "admin" | "user"
       dominant_hand: "left" | "right" | "both"
       experience_level: "beginner" | "intermediate" | "advanced" | "pro"
+      training_group: "fisico" | "tecnico" | "aquecimento" | "alongamento"
       video_source_type: "upload" | "youtube" | "vimeo"
     }
     CompositeTypes: {
@@ -787,6 +791,7 @@ export const Constants = {
       app_role: ["admin", "user"],
       dominant_hand: ["left", "right", "both"],
       experience_level: ["beginner", "intermediate", "advanced", "pro"],
+      training_group: ["fisico", "tecnico", "aquecimento", "alongamento"],
       video_source_type: ["upload", "youtube", "vimeo"],
     },
   },
