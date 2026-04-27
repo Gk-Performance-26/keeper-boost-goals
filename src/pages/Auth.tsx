@@ -150,19 +150,35 @@ const Auth = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={signInWithGoogle}
-            disabled={submitting || (mode === "signup" && !acceptedPrivacy)}
-            className="w-full bg-card hover:bg-muted"
-            size="lg"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="#EA4335" d="M12 10.2v3.84h5.36c-.23 1.4-1.66 4.12-5.36 4.12-3.22 0-5.86-2.67-5.86-5.96s2.64-5.96 5.86-5.96c1.84 0 3.07.78 3.77 1.45l2.57-2.48C16.78 3.7 14.6 2.7 12 2.7 6.93 2.7 2.83 6.8 2.83 11.86s4.1 9.16 9.17 9.16c5.29 0 8.79-3.72 8.79-8.95 0-.6-.07-1.06-.16-1.52H12z"/>
-            </svg>
-            {t("auth.continueWithGoogle")}
-          </Button>
+          <div className="space-y-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => signInWithProvider("google")}
+              disabled={submitting || (mode === "signup" && !acceptedPrivacy)}
+              className="w-full bg-card hover:bg-muted"
+              size="lg"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#EA4335" d="M12 10.2v3.84h5.36c-.23 1.4-1.66 4.12-5.36 4.12-3.22 0-5.86-2.67-5.86-5.96s2.64-5.96 5.86-5.96c1.84 0 3.07.78 3.77 1.45l2.57-2.48C16.78 3.7 14.6 2.7 12 2.7 6.93 2.7 2.83 6.8 2.83 11.86s4.1 9.16 9.17 9.16c5.29 0 8.79-3.72 8.79-8.95 0-.6-.07-1.06-.16-1.52H12z"/>
+              </svg>
+              {t("auth.continueWithGoogle")}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => signInWithProvider("apple")}
+              disabled={submitting || (mode === "signup" && !acceptedPrivacy)}
+              className="w-full bg-card hover:bg-muted"
+              size="lg"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+              </svg>
+              {t("auth.continueWithApple")}
+            </Button>
+          </div>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
