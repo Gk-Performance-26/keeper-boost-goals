@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TrainingCard } from "@/components/TrainingCard";
-import { CategoryIcon } from "@/components/CategoryIcon";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,7 +13,6 @@ const GROUP_CONFIG: Record<
   GroupKey,
   {
     title: string;
-    emoji: string;
     subTable: "warmup_subcategories" | "stretching_subcategories";
     subFk: "warmup_subcategory_id" | "stretching_subcategory_id";
     parents: { value: string; label: string }[];
@@ -22,22 +20,20 @@ const GROUP_CONFIG: Record<
 > = {
   aquecimento: {
     title: "Aquecimento",
-    emoji: "🔥",
     subTable: "warmup_subcategories",
     subFk: "warmup_subcategory_id",
     parents: [
-      { value: "geral", label: "Aquecimento Geral" },
-      { value: "gk", label: "Aquecimento Específico GK" },
+      { value: "geral", label: "Geral" },
+      { value: "gk", label: "Específico GK" },
     ],
   },
   alongamento: {
     title: "Alongamentos",
-    emoji: "🧘",
     subTable: "stretching_subcategories",
     subFk: "stretching_subcategory_id",
     parents: [
       { value: "alongamentos", label: "Alongamentos" },
-      { value: "recuperacao", label: "Recuperação & Prevenção" },
+      { value: "recuperacao", label: "Recuperação" },
     ],
   },
 };
@@ -66,7 +62,7 @@ const TrainingGroupPage = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("trainings")
-        .select("*, categories(name, slug, icon, color_token)")
+        .select(`id, title, duration_minutes, is_premium, ${config.subFk}`)
         .eq("is_published", true)
         .eq("training_group", group);
       return data ?? [];
@@ -81,23 +77,15 @@ const TrainingGroupPage = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <div>
-          <h1 className="font-display text-2xl">
-            {config.emoji} {config.title}
-          </h1>
-          <p className="text-xs text-muted-foreground">{(trainings ?? []).length} treinos</p>
-        </div>
+        <h1 className="font-display text-2xl">{config.title}</h1>
       </header>
 
       <div className="space-y-5">
         {config.parents.map((parent) => {
           const parentSubs = (subs ?? []).filter((s: any) => s.parent === parent.value);
           return (
-            <div
-              key={parent.value}
-              className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4"
-            >
-              <h2 className="font-display text-base">{parent.label}</h2>
+            <div key={parent.value} className="space-y-3">
+              <h2 className="font-display text-base text-muted-foreground">{parent.label}</h2>
               <div className="space-y-4">
                 {parentSubs.map((sub: any) => {
                   const subItems = (trainings ?? []).filter(
@@ -105,13 +93,7 @@ const TrainingGroupPage = () => {
                   );
                   return (
                     <div key={sub.id} className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <CategoryIcon name={sub.icon} className="h-4 w-4 text-primary" />
-                        <h3 className="text-sm font-semibold">{sub.name}</h3>
-                        <span className="ml-auto text-[11px] text-muted-foreground">
-                          {subItems.length}
-                        </span>
-                      </div>
+                      <h3 className="text-sm font-semibold">{sub.name}</h3>
                       {subItems.length === 0 ? (
                         <p className="rounded-lg border border-dashed border-border/60 bg-muted/20 py-3 text-center text-[11px] text-muted-foreground">
                           {t("trainings.emptyGroup")}
@@ -123,12 +105,7 @@ const TrainingGroupPage = () => {
                               key={tr.id}
                               id={tr.id}
                               title={tr.title}
-                              level={tr.level}
                               duration={tr.duration_minutes}
-                              xp={tr.xp_reward}
-                              categoryName={tr.categories?.name}
-                              categoryIcon={tr.categories?.icon}
-                              categoryColorToken={tr.categories?.color_token}
                               isPremium={tr.is_premium}
                               locked={tr.is_premium && !hasSub}
                             />

@@ -45,7 +45,7 @@ const translations: Record<Lang, Dict> = {
     "trainings.group.fisico": "Físico",
     "trainings.group.tecnico": "Técnico",
     "trainings.group.aquecimento": "Aquecimento",
-    "trainings.group.alongamento": "Alongamento",
+    "trainings.group.alongamento": "Alongamentos",
 
     // Training detail
     "training.equipment": "Equipamento",
