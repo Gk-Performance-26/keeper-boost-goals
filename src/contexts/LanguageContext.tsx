@@ -301,6 +301,8 @@ const translations: Record<Lang, Dict> = {
     "auth.acceptPrefix": "Li e aceito os",
     "auth.acceptPrivacyPrefix": "Li e aceito a",
     "auth.mustAcceptPrivacy": "Tens de aceitar os Termos e a Política de Privacidade para criar conta.",
+    "auth.continueWithGoogle": "Continuar com Google",
+    "auth.or": "ou",
 
     // Admin
     "admin.title": "Admin",
@@ -654,6 +656,8 @@ const translations: Record<Lang, Dict> = {
     "auth.acceptPrefix": "I have read and accept the",
     "auth.acceptPrivacyPrefix": "I have read and accept the",
     "auth.mustAcceptPrivacy": "You must accept the Terms and Privacy Policy to create an account.",
+    "auth.continueWithGoogle": "Continue with Google",
+    "auth.or": "or",
 
     "admin.title": "Admin",
     "admin.subtitle": "Manage trainings and videos",
