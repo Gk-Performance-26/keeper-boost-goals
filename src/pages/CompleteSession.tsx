@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Star, Sparkles, Trophy } from "lucide-react";
-import { differenceInCalendarDays } from "date-fns";
+
 import { generateFeedback } from "@/lib/gamification";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
