@@ -33,8 +33,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <LanguageProvider>
+        <LanguageProvider>
+          <AuthProvider>
             <Routes>
               <Route path="/auth" element={<Auth />} />
               {/* Public legal & pricing pages — must remain accessible without authentication for Paddle compliance */}
@@ -58,8 +58,8 @@ const App = () => (
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </LanguageProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
