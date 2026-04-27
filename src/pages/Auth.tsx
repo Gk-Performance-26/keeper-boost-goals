@@ -274,6 +274,24 @@ const Auth = () => {
         </CardContent>
       </Card>
 
+      <nav className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+        <Link to="/pricing" className="font-semibold text-primary underline-offset-2 hover:underline">
+          {t("auth.seePricing")}
+        </Link>
+        <span aria-hidden="true">·</span>
+        <Link to="/terms" className="hover:text-foreground hover:underline">
+          {t("auth.terms")}
+        </Link>
+        <span aria-hidden="true">·</span>
+        <Link to="/privacy" className="hover:text-foreground hover:underline">
+          {t("auth.privacyPolicy")}
+        </Link>
+        <span aria-hidden="true">·</span>
+        <Link to="/refund" className="hover:text-foreground hover:underline">
+          {t("pricing.refundPolicy")}
+        </Link>
+      </nav>
+
       <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
         <DialogContent className="max-h-[85vh] overflow-y-auto max-w-2xl">
           <DialogHeader>

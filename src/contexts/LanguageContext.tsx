@@ -304,6 +304,7 @@ const translations: Record<Lang, Dict> = {
     "auth.continueWithGoogle": "Continuar com Google",
     "auth.continueWithApple": "Continuar com Apple",
     "auth.or": "ou",
+    "auth.seePricing": "Ver planos e preços",
 
     // Pricing (public)
     "pricing.subtitle": "Treina como um profissional. Defende como uma lenda.",
@@ -670,6 +671,7 @@ const translations: Record<Lang, Dict> = {
     "auth.continueWithGoogle": "Continue with Google",
     "auth.continueWithApple": "Continue with Apple",
     "auth.or": "or",
+    "auth.seePricing": "See plans & pricing",
 
     // Pricing (public)
     "pricing.subtitle": "Train like a pro. Save like a legend.",
