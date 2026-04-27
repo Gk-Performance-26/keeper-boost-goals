@@ -371,6 +371,7 @@ export type Database = {
           updated_at: string
           video_type: Database["public"]["Enums"]["video_source_type"]
           video_url: string
+          warmup_subcategory_id: string | null
           xp_reward: number
         }
         Insert: {
@@ -394,6 +395,7 @@ export type Database = {
           updated_at?: string
           video_type?: Database["public"]["Enums"]["video_source_type"]
           video_url: string
+          warmup_subcategory_id?: string | null
           xp_reward?: number
         }
         Update: {
@@ -417,6 +419,7 @@ export type Database = {
           updated_at?: string
           video_type?: Database["public"]["Enums"]["video_source_type"]
           video_url?: string
+          warmup_subcategory_id?: string | null
           xp_reward?: number
         }
         Relationships: [
@@ -425,6 +428,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trainings_warmup_subcategory_id_fkey"
+            columns: ["warmup_subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "warmup_subcategories"
             referencedColumns: ["id"]
           },
         ]
@@ -552,6 +562,39 @@ export type Database = {
         }
         Relationships: []
       }
+      warmup_subcategories: {
+        Row: {
+          color_token: string
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          parent: Database["public"]["Enums"]["warmup_parent"]
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          color_token?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          parent: Database["public"]["Enums"]["warmup_parent"]
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          color_token?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          parent?: Database["public"]["Enums"]["warmup_parent"]
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       weekly_challenges: {
         Row: {
           category_id: string | null
@@ -661,6 +704,7 @@ export type Database = {
       experience_level: "beginner" | "intermediate" | "advanced" | "pro"
       training_group: "fisico" | "tecnico" | "aquecimento" | "alongamento"
       video_source_type: "upload" | "youtube" | "vimeo"
+      warmup_parent: "geral" | "gk"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -793,6 +837,7 @@ export const Constants = {
       experience_level: ["beginner", "intermediate", "advanced", "pro"],
       training_group: ["fisico", "tecnico", "aquecimento", "alongamento"],
       video_source_type: ["upload", "youtube", "vimeo"],
+      warmup_parent: ["geral", "gk"],
     },
   },
 } as const
