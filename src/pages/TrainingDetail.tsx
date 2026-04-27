@@ -119,6 +119,7 @@ const TrainingDetail = () => {
         </Card>
       ) : (
         <VideoPlayer
+          trainingId={training.id}
           url={training.video_url}
           type={training.video_type}
           introUrl={(training as any).intro_video_url}
