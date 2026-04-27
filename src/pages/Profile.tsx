@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LevelBar } from "@/components/LevelBar";
 import { CreditCard, Crown, Flame, Loader2, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -23,11 +22,8 @@ const Profile = () => {
   const { t } = useLanguage();
   const [openingPortal, setOpeningPortal] = useState(false);
   const [portalUrl, setPortalUrl] = useState<string | null>(null);
-  const [portalDialogOpen, setPortalDialogOpen] = useState(false);
 
-  const openPortal = async () => {
-    setPortalDialogOpen(true);
-    setPortalUrl(null);
+  const loadPortalUrl = useCallback(async () => {
     setOpeningPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke("paddle-portal", {
@@ -60,14 +56,22 @@ const Profile = () => {
       if (!parsed.pathname || parsed.pathname === "/") {
         throw new Error("Incomplete portal URL");
       }
-      setPortalUrl(parsed.toString());
+      const validUrl = parsed.toString();
+      setPortalUrl(validUrl);
+      return validUrl;
     } catch (e: any) {
-      setPortalDialogOpen(false);
       toast.error(t("profile.portalError") + (e.message ?? ""));
+      return null;
     } finally {
       setOpeningPortal(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    if (hasPaidSub && !portalUrl && !openingPortal) {
+      void loadPortalUrl();
+    }
+  }, [hasPaidSub, loadPortalUrl, openingPortal, portalUrl]);
 
   if (!profile) return null;
 
@@ -123,24 +127,17 @@ const Profile = () => {
             {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
           </Button>
         </Link>
-        {hasPaidSub && (
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={openPortal}
-            disabled={openingPortal}
-          >
-            {openingPortal ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
-              </>
-            ) : (
-              <>
-                <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
-              </>
-            )}
+        {hasPaidSub && portalUrl ? (
+          <Button asChild variant="outline" className="w-full justify-start">
+            <a href={portalUrl} target="_blank" rel="noopener noreferrer">
+              <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
+            </a>
           </Button>
-        )}
+        ) : hasPaidSub ? (
+          <Button variant="outline" className="w-full justify-start" onClick={loadPortalUrl} disabled={openingPortal}>
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
+          </Button>
+        ) : null}
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
@@ -157,26 +154,6 @@ const Profile = () => {
           <LogOut className="h-4 w-4" /> {t("profile.signOut")}
         </Button>
       </div>
-
-      <Dialog open={portalDialogOpen} onOpenChange={setPortalDialogOpen}>
-        <DialogContent className="mx-4 w-[calc(100%-2rem)] rounded-lg">
-          <DialogHeader>
-            <DialogTitle>{t("profile.paymentMethods")}</DialogTitle>
-            <DialogDescription>{t("profile.paymentMethodsDesc")}</DialogDescription>
-          </DialogHeader>
-          {openingPortal ? (
-            <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
-            </div>
-          ) : portalUrl ? (
-            <Button asChild className="w-full">
-              <a href={portalUrl} target="_top">
-                <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
-              </a>
-            </Button>
-          ) : null}
-        </DialogContent>
-      </Dialog>
 
       <p className="text-center text-xs text-muted-foreground">{user?.email}</p>
     </div>
