@@ -60,60 +60,23 @@ const CompleteSession = () => {
     if (!user || !training || !profile) return;
     setSubmitting(true);
     try {
-      const { data: sessionRow, error: sessionErr } = await supabase
-        .from("completed_sessions")
-        .insert({
-          user_id: user.id,
-          training_id: training.id,
-          notes: notes || null,
-          rating,
-          duration_minutes: training.duration_minutes,
-          xp_earned: training.xp_reward,
-        })
-        .select()
-        .single();
-      if (sessionErr) throw sessionErr;
-
-      const skillRows = Object.entries(scores).map(([category_id, score]) => ({
-        user_id: user.id,
-        session_id: sessionRow.id,
+      const skillScores = Object.entries(scores).map(([category_id, score]) => ({
         category_id,
         score,
       }));
-      if (skillRows.length) {
-        const { error: skillErr } = await supabase.from("skill_scores").insert(skillRows);
-        if (skillErr) throw skillErr;
-      }
 
-      const today = new Date();
-      const last = profile.last_training_date ? new Date(profile.last_training_date) : null;
-      let newStreak = profile.current_streak;
-      if (!last) newStreak = 1;
-      else {
-        const diff = differenceInCalendarDays(today, last);
-        if (diff === 0) newStreak = profile.current_streak;
-        else if (diff === 1) newStreak = profile.current_streak + 1;
-        else if (diff === 2 && profile.freeze_tokens > 0) newStreak = profile.current_streak + 1;
-        else newStreak = 1;
-      }
-      const newTotalXp = profile.total_xp + training.xp_reward;
-      const longest = Math.max(profile.longest_streak, newStreak);
-      const usedFreeze =
-        last && differenceInCalendarDays(today, last) === 2 && profile.freeze_tokens > 0
-          ? profile.freeze_tokens - 1
-          : profile.freeze_tokens;
+      const { data, error } = await supabase.rpc("complete_session", {
+        _training_id: training.id,
+        _rating: rating,
+        _notes: notes || null,
+        _skill_scores: skillScores,
+      });
+      if (error) throw error;
 
-      const { error: profErr } = await supabase
-        .from("profiles")
-        .update({
-          total_xp: newTotalXp,
-          current_streak: newStreak,
-          longest_streak: longest,
-          last_training_date: today.toISOString().slice(0, 10),
-          freeze_tokens: usedFreeze,
-        })
-        .eq("user_id", user.id);
-      if (profErr) throw profErr;
+      const result = data as {
+        xp_earned: number;
+        current_streak: number;
+      } | null;
 
       const tips = generateFeedback(
         Object.fromEntries(
@@ -124,11 +87,11 @@ const CompleteSession = () => {
         ),
       );
       setFeedback(tips);
-      setXpGained(training.xp_reward);
+      setXpGained(result?.xp_earned ?? training.xp_reward);
       invalidateProfile();
       toast({
-        title: `+${training.xp_reward} ${t("complete.xpEarned")} 🔥`,
-        description: `${t("complete.streakDays")}: ${newStreak}d`,
+        title: `+${result?.xp_earned ?? training.xp_reward} ${t("complete.xpEarned")} 🔥`,
+        description: `${t("complete.streakDays")}: ${result?.current_streak ?? profile.current_streak}d`,
       });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t("complete.couldNotSave");
