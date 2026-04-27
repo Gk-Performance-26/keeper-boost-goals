@@ -48,6 +48,6 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
   } catch (e) {
     console.error("cancel-subscription error:", e);
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "An internal error occurred" }), { status: 500, headers: corsHeaders });
   }
 });
