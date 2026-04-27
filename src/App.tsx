@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import AdminTrainingForm from "./pages/AdminTrainingForm";
 import Subscription from "./pages/Subscription";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/trainings/:id" element={<AdminTrainingForm />} />
                 <Route path="/subscription" element={<Subscription />} />
+                <Route path="/privacy" element={<Privacy />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
