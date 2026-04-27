@@ -128,6 +128,59 @@ const Auth = () => {
     }
   };
 
+  if (showSwitchPrompt) {
+    return (
+      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
+        <div className="absolute right-4 top-4">
+          <LanguageSwitcher />
+        </div>
+        <div className="mb-6 flex flex-col items-center gap-3">
+          <div className="overflow-hidden rounded-2xl shadow-glow ring-1 ring-primary/30">
+            <img
+              src={gkLogo}
+              alt="GK Performance Hub logo"
+              className="h-32 w-32 object-cover"
+            />
+          </div>
+          <h1 className="font-display text-2xl text-center tracking-wide">
+            GK <span className="text-gradient-primary">PERFORMANCE</span> HUB
+          </h1>
+        </div>
+
+        <Card className="w-full gradient-card border-border/60 shadow-card">
+          <CardContent className="space-y-4 p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              {t("auth.alreadySignedInAs") /* fallback below */ ?? "Já tens sessão ativa como"}
+            </p>
+            <p className="font-display text-lg break-all">{user?.email}</p>
+            <div className="space-y-2 pt-2">
+              <Button
+                size="lg"
+                className="w-full shadow-glow"
+                onClick={() => navigate("/", { replace: true })}
+              >
+                {t("auth.continueAs") ?? "Continuar"}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full"
+                onClick={handleSwitchAccount}
+                disabled={switchingAccount}
+              >
+                {switchingAccount ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("auth.switchAccount") ?? "Entrar com outra conta"
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-5 py-10">
       <div className="absolute right-4 top-4">
