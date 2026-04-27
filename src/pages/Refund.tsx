@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TermsContent } from "@/components/TermsContent";
+import { RefundPolicyContent } from "@/components/RefundPolicyContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-const Terms = () => {
+const Refund = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   return (
@@ -16,10 +16,10 @@ const Terms = () => {
             <ArrowLeft className="h-4 w-4" /> {t("common.back")}
           </Button>
         </Link>
-        <TermsContent />
+        <RefundPolicyContent />
       </div>
     </div>
   );
 };
 
-export default Terms;
+export default Refund;

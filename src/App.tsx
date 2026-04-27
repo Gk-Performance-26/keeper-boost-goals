@@ -20,6 +20,8 @@ import AdminTrainingForm from "./pages/AdminTrainingForm";
 import Subscription from "./pages/Subscription";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import Refund from "./pages/Refund";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,11 @@ const App = () => (
           <LanguageProvider>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              {/* Public legal & pricing pages — must remain accessible without authentication for Paddle compliance */}
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/refund" element={<Refund />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route element={<AppShell />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/onboarding" element={<Onboarding />} />
@@ -46,8 +53,6 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/trainings/:id" element={<AdminTrainingForm />} />
                 <Route path="/subscription" element={<Subscription />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
