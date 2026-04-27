@@ -152,7 +152,7 @@ const Home = () => {
               </svg>
             </a>
             <a
-              href="https://www.youtube.com/@gkperformancehub"
+              href="https://www.youtube.com/channel/UCRFTMlmJ3_ctrbBCcfTRD7Q"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
