@@ -25,17 +25,26 @@ const Home = () => {
   const { isActive: hasSub, isTrialActive, hasPaidSub, trialDaysLeft } = useSubscription();
   const { t, lang } = useLanguage();
 
-  // Trial welcome banner: only shown once after signup, then dismissed forever
+  // Trial welcome banner: shown once per user (per device) on first Home visit,
+  // then dismissed forever. Independent of trial status so it always shows the
+  // first time after signup / login (Google, Apple, email).
   const trialBannerKey = user ? `trial-welcome-dismissed-${user.id}` : null;
   const [showTrialBanner, setShowTrialBanner] = useState(false);
 
   useEffect(() => {
-    if (!trialBannerKey || !isTrialActive || hasPaidSub) {
+    // Wait for the user and the paid-sub check to settle.
+    if (!trialBannerKey || !user) {
       setShowTrialBanner(false);
       return;
     }
-    setShowTrialBanner(localStorage.getItem(trialBannerKey) !== "1");
-  }, [trialBannerKey, isTrialActive, hasPaidSub]);
+    // Don't show to users who already pay — they don't need a trial pitch.
+    if (hasPaidSub) {
+      setShowTrialBanner(false);
+      return;
+    }
+    const alreadyDismissed = localStorage.getItem(trialBannerKey) === "1";
+    setShowTrialBanner(!alreadyDismissed);
+  }, [trialBannerKey, user, hasPaidSub]);
 
   const dismissTrialBanner = () => {
     if (trialBannerKey) localStorage.setItem(trialBannerKey, "1");
