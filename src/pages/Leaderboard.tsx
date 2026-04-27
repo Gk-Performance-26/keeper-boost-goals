@@ -31,14 +31,25 @@ const Leaderboard = () => {
     queryKey: ["leaderboard", scope, me?.experience_level],
     enabled: scope === "global" || !!me,
     queryFn: async () => {
-      let q = supabase
-        .from("profiles")
+      // Use the safe public_profiles view (only exposes leaderboard-safe columns)
+      let q = (supabase as unknown as {
+        from: (t: string) => ReturnType<typeof supabase.from>;
+      })
+        .from("public_profiles")
         .select("user_id, display_name, avatar_url, total_xp, current_streak, current_level, experience_level")
         .order("total_xp", { ascending: false })
         .limit(50);
       if (scope === "level" && me) q = q.eq("experience_level", me.experience_level);
       const { data } = await q;
-      return data ?? [];
+      return (data ?? []) as Array<{
+        user_id: string;
+        display_name: string | null;
+        avatar_url: string | null;
+        total_xp: number;
+        current_streak: number;
+        current_level: number;
+        experience_level: string;
+      }>;
     },
   });
 
