@@ -310,6 +310,39 @@ export type Database = {
           },
         ]
       }
+      stretching_subcategories: {
+        Row: {
+          color_token: string
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          parent: Database["public"]["Enums"]["stretching_parent"]
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          color_token?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          parent: Database["public"]["Enums"]["stretching_parent"]
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          color_token?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          parent?: Database["public"]["Enums"]["stretching_parent"]
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean
@@ -365,6 +398,7 @@ export type Database = {
           is_premium: boolean
           is_published: boolean
           level: Database["public"]["Enums"]["experience_level"]
+          stretching_subcategory_id: string | null
           thumbnail_url: string | null
           title: string
           training_group: Database["public"]["Enums"]["training_group"]
@@ -389,6 +423,7 @@ export type Database = {
           is_premium?: boolean
           is_published?: boolean
           level?: Database["public"]["Enums"]["experience_level"]
+          stretching_subcategory_id?: string | null
           thumbnail_url?: string | null
           title: string
           training_group?: Database["public"]["Enums"]["training_group"]
@@ -413,6 +448,7 @@ export type Database = {
           is_premium?: boolean
           is_published?: boolean
           level?: Database["public"]["Enums"]["experience_level"]
+          stretching_subcategory_id?: string | null
           thumbnail_url?: string | null
           title?: string
           training_group?: Database["public"]["Enums"]["training_group"]
@@ -428,6 +464,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trainings_stretching_subcategory_id_fkey"
+            columns: ["stretching_subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "stretching_subcategories"
             referencedColumns: ["id"]
           },
           {
@@ -702,6 +745,7 @@ export type Database = {
       app_role: "admin" | "user"
       dominant_hand: "left" | "right" | "both"
       experience_level: "beginner" | "intermediate" | "advanced" | "pro"
+      stretching_parent: "alongamentos" | "recuperacao"
       training_group: "fisico" | "tecnico" | "aquecimento" | "alongamento"
       video_source_type: "upload" | "youtube" | "vimeo"
       warmup_parent: "geral" | "gk"
@@ -835,6 +879,7 @@ export const Constants = {
       app_role: ["admin", "user"],
       dominant_hand: ["left", "right", "both"],
       experience_level: ["beginner", "intermediate", "advanced", "pro"],
+      stretching_parent: ["alongamentos", "recuperacao"],
       training_group: ["fisico", "tecnico", "aquecimento", "alongamento"],
       video_source_type: ["upload", "youtube", "vimeo"],
       warmup_parent: ["geral", "gk"],
