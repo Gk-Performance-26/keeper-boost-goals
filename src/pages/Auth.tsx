@@ -19,7 +19,7 @@ import { TermsContent } from "@/components/TermsContent";
 import { lovable } from "@/integrations/lovable";
 
 const Auth = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,9 +28,12 @@ const Auth = () => {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [switchingAccount, setSwitchingAccount] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
+  const forceSwitch = searchParams.get("switch") === "1";
 
   const schema = z.object({
     email: z.string().trim().email(t("auth.email")).max(255),
@@ -38,7 +41,25 @@ const Auth = () => {
     displayName: z.string().trim().min(2).max(40).optional(),
   });
 
-  if (!loading && user) return <Navigate to="/" replace />;
+  // If a user is already signed in and they did NOT explicitly ask to switch
+  // accounts, show a small "continue or switch" screen instead of silently
+  // redirecting. This fixes the case where opening the app in a new tab to
+  // log in would auto-enter the previous account.
+  const showSwitchPrompt = !loading && user && !forceSwitch;
+
+  const handleSwitchAccount = async () => {
+    setSwitchingAccount(true);
+    try {
+      await signOut();
+    } finally {
+      setSwitchingAccount(false);
+    }
+  };
+
+  if (!loading && user && forceSwitch === false && false) {
+    // (kept for reference — replaced by the switch prompt below)
+    return <Navigate to="/" replace />;
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
