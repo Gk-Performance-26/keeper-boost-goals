@@ -119,6 +119,7 @@ const TrainingDetail = () => {
         </Card>
       ) : (
         <VideoPlayer
+          trainingId={training.id}
           url={training.video_url}
           type={training.video_type}
           introUrl={(training as any).intro_video_url}
@@ -245,6 +246,10 @@ const TrainingDetail = () => {
                     {isOpen && hasDrillVideo && (
                       <div className="px-3 pb-3">
                         <VideoPlayer
+                          trainingId={training.id}
+                          drillIndex={i}
+                          mainField="drill_exercise"
+                          introField="drill_intro"
                           url={d.exercise_video_url || d.intro_video_url || ""}
                           type={(d.exercise_video_type || d.intro_video_type || "upload") as VideoSrc}
                           introUrl={d.intro_video_url}
