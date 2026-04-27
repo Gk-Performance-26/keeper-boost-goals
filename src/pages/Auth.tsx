@@ -15,6 +15,7 @@ import gkLogo from "@/assets/gk-logo.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PrivacyPolicyContent } from "@/components/PrivacyPolicyContent";
+import { TermsContent } from "@/components/TermsContent";
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -24,6 +25,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -169,7 +171,15 @@ const Auth = () => {
                   className="mt-0.5"
                 />
                 <Label htmlFor="privacy" className="text-xs leading-snug font-normal cursor-pointer">
-                  {t("auth.acceptPrivacyPrefix")}{" "}
+                  {t("auth.acceptPrefix")}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setTermsOpen(true)}
+                    className="text-primary underline underline-offset-2 hover:text-primary/80"
+                  >
+                    {t("auth.terms")}
+                  </button>{" "}
+                  {t("auth.and")}{" "}
                   <button
                     type="button"
                     onClick={() => setPrivacyOpen(true)}
@@ -205,6 +215,15 @@ const Auth = () => {
             <DialogTitle>{t("auth.privacyPolicy")}</DialogTitle>
           </DialogHeader>
           <PrivacyPolicyContent />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t("auth.terms")}</DialogTitle>
+          </DialogHeader>
+          <TermsContent />
         </DialogContent>
       </Dialog>
     </div>
