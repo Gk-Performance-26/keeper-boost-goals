@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Check, Crown, Loader2, Lock, X } from "lucide-react";
+import { ArrowLeft, ArrowRightLeft, Check, Crown, Loader2, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -30,8 +30,11 @@ const Subscription = () => {
     useSubscription();
   const [opening, setOpening] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [switching, setSwitching] = useState(false);
   const [plan, setPlan] = useState<Plan>("yearly");
   const { t, lang } = useLanguage();
+
+  const isYearly = subscription?.price_id === "premium_yearly";
 
   if (!user) return <Navigate to="/auth" replace />;
 
@@ -81,6 +84,23 @@ const Subscription = () => {
       toast.error(t("sub.cancelError") + (e.message ?? ""));
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleSwitchPlan = async () => {
+    const targetPriceId = isYearly ? "premium_monthly" : "premium_yearly";
+    setSwitching(true);
+    try {
+      const { error } = await supabase.functions.invoke("change-subscription-plan", {
+        body: { environment: isTestMode() ? "sandbox" : "live", priceId: targetPriceId },
+      });
+      if (error) throw error;
+      toast.success(t("sub.switchSuccess"));
+      await refetch();
+    } catch (e: any) {
+      toast.error(t("sub.switchError") + (e.message ?? ""));
+    } finally {
+      setSwitching(false);
     }
   };
 
