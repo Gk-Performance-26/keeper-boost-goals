@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LevelBar } from "@/components/LevelBar";
-import { CreditCard, Crown, ExternalLink, Flame, Loader2, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { CreditCard, Crown, Flame, Loader2, LogOut, Settings, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -146,8 +146,8 @@ const Profile = () => {
             </div>
           ) : portalUrl ? (
             <Button asChild className="w-full">
-              <a href={portalUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4" /> {t("profile.paymentMethods")}
+              <a href={portalUrl} target="_top">
+                <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
               </a>
             </Button>
           ) : null}
