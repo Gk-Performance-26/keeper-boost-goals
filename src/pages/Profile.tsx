@@ -144,15 +144,14 @@ const Profile = () => {
       )}
 
       <div className="space-y-2">
-        <Link to="/subscription">
-          <Button
-            variant="outline"
-            className={`w-full justify-start ${hasSub ? "" : "border-primary/40 text-primary hover:bg-primary/10"}`}
-          >
-            <Crown className="h-4 w-4" />
-            {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
-          </Button>
-        </Link>
+        {hasSub && (
+          <Link to="/subscription">
+            <Button variant="outline" className="w-full justify-start">
+              <Crown className="h-4 w-4" />
+              {t("profile.managePremium")}
+            </Button>
+          </Link>
+        )}
         {hasPaidSub && portalUrl ? (
           <a
             href={portalUrl}
