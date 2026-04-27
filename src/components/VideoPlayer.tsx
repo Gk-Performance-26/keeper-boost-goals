@@ -63,13 +63,6 @@ export function VideoPlayer({
   const [secondsLeft, setSecondsLeft] = useState(DRILL_DURATION_SECONDS);
   const [timerDone, setTimerDone] = useState(false);
 
-  const main = useSignedVideoUrl({
-    trainingId,
-    field: mainField,
-    drillIndex,
-    type,
-    fallbackUrl: url,
-  });
   const intro = useSignedVideoUrl({
     trainingId,
     field: introField,
@@ -78,6 +71,25 @@ export function VideoPlayer({
     fallbackUrl: introUrl ?? null,
     enabled: hasIntro,
   });
+  const mainSigned = useSignedVideoUrl({
+    trainingId,
+    field: mainField,
+    drillIndex,
+    type,
+    fallbackUrl: url,
+    // For drills with an intro, reuse the intro video as the exercise loop
+    enabled: !(isDrill && hasIntro),
+  });
+  // For drills with intro: exercise = same intro video (looped 20s)
+  const main = isDrill && hasIntro
+    ? {
+        data: intro.data,
+        isLoading: intro.isLoading,
+        isError: intro.isError,
+      }
+    : mainSigned;
+  const exerciseType: VideoSource =
+    isDrill && hasIntro ? ((introType ?? "upload") as VideoSource) : type;
 
   // Reset phase when intro changes (e.g. switching trainings)
   useEffect(() => {
@@ -261,7 +273,7 @@ export function VideoPlayer({
         ? renderLoading()
         : main.isError || !main.data
         ? renderError()
-        : renderPlayer(main.data, type, true, undefined, {
+        : renderPlayer(main.data, exerciseType, true, undefined, {
             loop: isDrill,
             isExercise: isDrill,
           })}
