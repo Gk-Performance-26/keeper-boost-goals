@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { verifyWebhook, EventName, type PaddleEnv } from '../_shared/paddle.ts';
+import { verifyWebhookAutoEnv, EventName, type PaddleEnv } from '../_shared/paddle.ts';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -11,11 +11,12 @@ Deno.serve(async (req) => {
     return new Response('Method not allowed', { status: 405 });
   }
 
-  const url = new URL(req.url);
-  const env = (url.searchParams.get('env') || 'sandbox') as PaddleEnv;
-
   try {
-    const event = await verifyWebhook(req, env);
+    // SECURITY: Determine the environment by which webhook secret successfully
+    // verifies the signature — never trust a caller-supplied query parameter.
+    // An attacker who only has the sandbox secret can therefore never have
+    // their event accepted as a live event.
+    const { event, env } = await verifyWebhookAutoEnv(req);
     console.log('Received event:', event.eventType, 'env:', env);
 
     switch (event.eventType) {

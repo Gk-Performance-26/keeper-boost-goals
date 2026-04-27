@@ -57,3 +57,43 @@ export async function verifyWebhook(req: Request, env: PaddleEnv) {
   const paddle = getPaddleClient(env);
   return await paddle.webhooks.unmarshal(body, secret, signature);
 }
+
+/**
+ * Verify a Paddle webhook by trying both environment secrets and returning
+ * the verified event together with the environment whose secret matched.
+ *
+ * This is the safe alternative to trusting a caller-supplied `?env=` parameter
+ * to pick the HMAC secret. An attacker who knows only the sandbox secret can
+ * therefore never have their event treated as a live event, regardless of any
+ * query string they send.
+ */
+export async function verifyWebhookAutoEnv(
+  req: Request,
+): Promise<{ event: Awaited<ReturnType<Paddle['webhooks']['unmarshal']>>; env: PaddleEnv }> {
+  const signature = req.headers.get('paddle-signature');
+  const body = await req.text();
+
+  if (!signature || !body) {
+    throw new Error('Missing signature or body');
+  }
+
+  const envs: PaddleEnv[] = ['live', 'sandbox'];
+  let lastError: unknown = null;
+
+  for (const env of envs) {
+    const secret = Deno.env.get(
+      env === 'sandbox' ? 'PAYMENTS_SANDBOX_WEBHOOK_SECRET' : 'PAYMENTS_LIVE_WEBHOOK_SECRET',
+    );
+    if (!secret) continue;
+    try {
+      const paddle = getPaddleClient(env);
+      const event = await paddle.webhooks.unmarshal(body, secret, signature);
+      return { event, env };
+    } catch (e) {
+      lastError = e;
+      // Try the next env.
+    }
+  }
+
+  throw lastError ?? new Error('Webhook signature did not match any configured environment secret');
+}
