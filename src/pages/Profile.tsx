@@ -36,7 +36,31 @@ const Profile = () => {
       if (error) throw error;
       const url = data?.subscriptionUrls?.[0]?.updateSubscriptionPaymentMethod ?? data?.overviewUrl;
       if (!url) throw new Error("No portal URL");
-      setPortalUrl(url);
+
+      // Validate URL: must be a complete, well-formed Paddle portal URL
+      let parsed: URL;
+      try {
+        parsed = new URL(url);
+      } catch {
+        throw new Error("Invalid portal URL");
+      }
+      if (parsed.protocol !== "https:") {
+        throw new Error("Insecure portal URL");
+      }
+      const allowedHosts = [
+        "customer-portal.paddle.com",
+        "sandbox-customer-portal.paddle.com",
+      ];
+      const isAllowedHost = allowedHosts.some(
+        (h) => parsed.hostname === h || parsed.hostname.endsWith("." + h),
+      );
+      if (!isAllowedHost) {
+        throw new Error("Unexpected portal domain: " + parsed.hostname);
+      }
+      if (!parsed.pathname || parsed.pathname === "/") {
+        throw new Error("Incomplete portal URL");
+      }
+      setPortalUrl(parsed.toString());
     } catch (e: any) {
       setPortalDialogOpen(false);
       toast.error(t("profile.portalError") + (e.message ?? ""));
