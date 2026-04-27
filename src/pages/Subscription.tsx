@@ -317,6 +317,23 @@ const Subscription = () => {
                   )}
                 </Button>
                 <p className="text-center text-[11px] text-muted-foreground">{t("sub.cancelAnytime")}</p>
+
+                {/* Apple App Store required subscription disclosure */}
+                <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5">
+                  <p className="font-semibold text-foreground">{t("sub.disclosureTitle")}</p>
+                  <p>{t("sub.disclosurePrice")}</p>
+                  <p>{t("sub.disclosureRenewal")}</p>
+                  <p>{t("sub.disclosureCancel")}</p>
+                  <p className="pt-1">
+                    <Link to="/terms" className="underline hover:text-foreground">
+                      {t("profile.terms")}
+                    </Link>
+                    {" · "}
+                    <Link to="/privacy" className="underline hover:text-foreground">
+                      {t("profile.privacy")}
+                    </Link>
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </>
