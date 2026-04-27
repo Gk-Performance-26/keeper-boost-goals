@@ -56,9 +56,10 @@ const Auth = () => {
     }
   };
 
-  if (!loading && user && forceSwitch === false && false) {
-    // (kept for reference — replaced by the switch prompt below)
-    return <Navigate to="/" replace />;
+  // After switching accounts via the prompt, send the user to "/" once a
+  // brand-new session is detected.
+  if (!loading && user && forceSwitch) {
+    // user explicitly came here to switch — keep showing the form
   }
 
   const submit = async (e: React.FormEvent) => {
