@@ -42,6 +42,13 @@ const Trainings = () => {
     });
   }, [trainings, categorySlug, level]);
 
+  const groups: { key: "fisico" | "tecnico" | "aquecimento" | "alongamento"; label: string }[] = [
+    { key: "fisico", label: t("trainings.group.fisico") },
+    { key: "tecnico", label: t("trainings.group.tecnico") },
+    { key: "aquecimento", label: t("trainings.group.aquecimento") },
+    { key: "alongamento", label: t("trainings.group.alongamento") },
+  ];
+
   const translatedCategoryNames = useTranslatedTexts((categories ?? []).map((c) => c.name));
 
   return (
@@ -84,25 +91,42 @@ const Trainings = () => {
         ))}
       </div>
 
-      <div className="space-y-3">
-        {filtered.map((tr) => (
-          <TrainingCard
-            key={tr.id}
-            id={tr.id}
-            title={tr.title}
-            level={tr.level}
-            duration={tr.duration_minutes}
-            xp={tr.xp_reward}
-            categoryName={tr.categories?.name}
-            categoryIcon={tr.categories?.icon}
-            categoryColorToken={tr.categories?.color_token}
-            isPremium={(tr as any).is_premium}
-            locked={(tr as any).is_premium && !hasSub}
-          />
-        ))}
-        {filtered.length === 0 && (
-          <p className="py-10 text-center text-sm text-muted-foreground">{t("trainings.empty")}</p>
-        )}
+      {/* Grouped sections */}
+      <div className="space-y-8">
+        {groups.map((g) => {
+          const items = filtered.filter((tr) => (tr as any).training_group === g.key);
+          return (
+            <section key={g.key} className="space-y-3">
+              <div className="flex items-baseline justify-between">
+                <h2 className="font-display text-xl">{g.label}</h2>
+                <span className="text-xs text-muted-foreground">{items.length}</span>
+              </div>
+              {items.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-border/60 bg-muted/20 py-6 text-center text-xs text-muted-foreground">
+                  {t("trainings.emptyGroup")}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {items.map((tr) => (
+                    <TrainingCard
+                      key={tr.id}
+                      id={tr.id}
+                      title={tr.title}
+                      level={tr.level}
+                      duration={tr.duration_minutes}
+                      xp={tr.xp_reward}
+                      categoryName={tr.categories?.name}
+                      categoryIcon={tr.categories?.icon}
+                      categoryColorToken={tr.categories?.color_token}
+                      isPremium={(tr as any).is_premium}
+                      locked={(tr as any).is_premium && !hasSub}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        })}
       </div>
     </div>
   );
