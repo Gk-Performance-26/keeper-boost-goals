@@ -45,6 +45,17 @@ const Trainings = () => {
     },
   });
 
+  const { data: stretchingSubs } = useQuery({
+    queryKey: ["stretching-subcategories"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("stretching_subcategories")
+        .select("*")
+        .order("sort_order");
+      return data ?? [];
+    },
+  });
+
   const filtered = useMemo(() => {
     return (trainings ?? []).filter((tr) => {
       if (categorySlug && tr.categories?.slug !== categorySlug) return false;
@@ -163,6 +174,67 @@ const Trainings = () => {
                 <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
                   <h3 className="font-display text-base">Aquecimento Específico GK</h3>
                   <div className="space-y-4">{subsGk.map(renderSubBlock)}</div>
+                </div>
+              </section>
+            );
+          }
+
+          // Special rendering for stretching: split into Alongamentos / Recuperação & Prevenção
+          if (g.key === "alongamento") {
+            const subs = stretchingSubs ?? [];
+            const subsAlong = subs.filter((s) => s.parent === "alongamentos");
+            const subsRecup = subs.filter((s) => s.parent === "recuperacao");
+            const renderTrainingCard = (tr: any) => (
+              <TrainingCard
+                key={tr.id}
+                id={tr.id}
+                title={tr.title}
+                level={tr.level}
+                duration={tr.duration_minutes}
+                xp={tr.xp_reward}
+                categoryName={tr.categories?.name}
+                categoryIcon={tr.categories?.icon}
+                categoryColorToken={tr.categories?.color_token}
+                isPremium={tr.is_premium}
+                locked={tr.is_premium && !hasSub}
+              />
+            );
+
+            const renderSubBlock = (sub: any) => {
+              const subItems = items.filter((tr) => (tr as any).stretching_subcategory_id === sub.id);
+              return (
+                <div key={sub.id} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CategoryIcon name={sub.icon} className="h-4 w-4 text-primary" />
+                    <h4 className="text-sm font-semibold">{sub.name}</h4>
+                    <span className="ml-auto text-[11px] text-muted-foreground">{subItems.length}</span>
+                  </div>
+                  {subItems.length === 0 ? (
+                    <p className="rounded-lg border border-dashed border-border/60 bg-muted/20 py-3 text-center text-[11px] text-muted-foreground">
+                      {t("trainings.emptyGroup")}
+                    </p>
+                  ) : (
+                    <div className="space-y-2">{subItems.map(renderTrainingCard)}</div>
+                  )}
+                </div>
+              );
+            };
+
+            return (
+              <section key={g.key} className="space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <h2 className="font-display text-xl">🧘 {g.label}</h2>
+                  <span className="text-xs text-muted-foreground">{items.length}</span>
+                </div>
+
+                <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
+                  <h3 className="font-display text-base">Alongamentos</h3>
+                  <div className="space-y-4">{subsAlong.map(renderSubBlock)}</div>
+                </div>
+
+                <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/10 p-4">
+                  <h3 className="font-display text-base">Recuperação & Prevenção</h3>
+                  <div className="space-y-4">{subsRecup.map(renderSubBlock)}</div>
                 </div>
               </section>
             );
