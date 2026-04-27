@@ -23,9 +23,22 @@ const Profile = () => {
   const [openingPortal, setOpeningPortal] = useState(false);
 
   const openPortal = async () => {
-    // Open window synchronously on click to avoid the browser pop-up blocker;
-    // we'll set the URL once the edge function responds.
-    const win = window.open("about:blank", "_blank", "noopener,noreferrer");
+    const width = Math.min(520, window.screen.availWidth || 520);
+    const height = Math.min(760, window.screen.availHeight || 760);
+    const left = Math.max(0, ((window.screen.availWidth || width) - width) / 2);
+    const top = Math.max(0, ((window.screen.availHeight || height) - height) / 2);
+    const win = window.open(
+      "",
+      "payment-methods-portal",
+      `popup=yes,width=${width},height=${height},left=${left},top=${top}`,
+    );
+
+    if (!win) {
+      toast.error(t("profile.portalError"));
+      return;
+    }
+
+    win.document.write("<title>Payment methods</title><body style='font-family: system-ui; padding: 24px;'>A abrir métodos de pagamento...</body>");
     setOpeningPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke("paddle-portal", {
@@ -35,9 +48,7 @@ const Profile = () => {
       const url = data?.subscriptionUrls?.[0]?.updatePaymentMethod ?? data?.overviewUrl;
       if (!url) throw new Error("No portal URL");
       if (win && !win.closed) {
-        win.location.href = url;
-      } else {
-        window.location.href = url;
+        win.location.replace(url);
       }
     } catch (e: any) {
       win?.close();
