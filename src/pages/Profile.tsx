@@ -100,15 +100,25 @@ const Profile = () => {
             {(profile.display_name ?? user?.email ?? "?").slice(0, 1).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        <div>
+        <div className="flex flex-col items-center gap-2">
           <h1 className="font-display text-2xl">{profile.display_name ?? t("profile.fallbackName")}</h1>
           <p className="text-sm text-muted-foreground capitalize">
             {t(`level.${profile.experience_level}`)} · {profile.age_group ?? "—"}
           </p>
-          {hasSub && (
-            <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
+          {hasSub ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
               <Crown className="h-3 w-3" /> {t("trainings.premium")}
             </span>
+          ) : (
+            <Link to="/subscription" className="mt-1">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow hover:from-primary/90 hover:to-primary/70 px-6"
+              >
+                <Crown className="h-4 w-4" />
+                {t("profile.becomePremium")}
+              </Button>
+            </Link>
           )}
         </div>
       </header>
@@ -134,15 +144,14 @@ const Profile = () => {
       )}
 
       <div className="space-y-2">
-        <Link to="/subscription">
-          <Button
-            variant="outline"
-            className={`w-full justify-start ${hasSub ? "" : "border-primary/40 text-primary hover:bg-primary/10"}`}
-          >
-            <Crown className="h-4 w-4" />
-            {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
-          </Button>
-        </Link>
+        {hasSub && (
+          <Link to="/subscription">
+            <Button variant="outline" className="w-full justify-start">
+              <Crown className="h-4 w-4" />
+              {t("profile.managePremium")}
+            </Button>
+          </Link>
+        )}
         {hasPaidSub && portalUrl ? (
           <a
             href={portalUrl}
