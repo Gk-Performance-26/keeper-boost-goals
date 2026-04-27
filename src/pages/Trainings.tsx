@@ -1,4 +1,6 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrainingCard } from "@/components/TrainingCard";
