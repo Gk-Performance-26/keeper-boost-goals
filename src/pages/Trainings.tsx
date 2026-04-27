@@ -45,6 +45,17 @@ const Trainings = () => {
     },
   });
 
+  const { data: stretchingSubs } = useQuery({
+    queryKey: ["stretching-subcategories"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("stretching_subcategories")
+        .select("*")
+        .order("sort_order");
+      return data ?? [];
+    },
+  });
+
   const filtered = useMemo(() => {
     return (trainings ?? []).filter((tr) => {
       if (categorySlug && tr.categories?.slug !== categorySlug) return false;
