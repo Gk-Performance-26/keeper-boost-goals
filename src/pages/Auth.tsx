@@ -16,6 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PrivacyPolicyContent } from "@/components/PrivacyPolicyContent";
 import { TermsContent } from "@/components/TermsContent";
+import { lovable } from "@/integrations/lovable";
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -77,6 +78,31 @@ const Auth = () => {
       const msg = err instanceof Error ? err.message : t("auth.somethingWrong");
       toast({ title: t("auth.error"), description: msg, variant: "destructive" });
     } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    if (mode === "signup" && !acceptedPrivacy) {
+      toast({ title: t("auth.checkDetails"), description: t("auth.mustAcceptPrivacy"), variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        const msg = result.error instanceof Error ? result.error.message : t("auth.somethingWrong");
+        toast({ title: t("auth.error"), description: msg, variant: "destructive" });
+        setSubmitting(false);
+        return;
+      }
+      if (result.redirected) return;
+      navigate("/");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t("auth.somethingWrong");
+      toast({ title: t("auth.error"), description: msg, variant: "destructive" });
       setSubmitting(false);
     }
   };
