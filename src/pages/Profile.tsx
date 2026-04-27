@@ -93,6 +93,24 @@ const Profile = () => {
             {hasSub ? t("profile.managePremium") : t("profile.becomePremium")}
           </Button>
         </Link>
+        {hasPaidSub && (
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={openPortal}
+            disabled={openingPortal}
+          >
+            {openingPortal ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
+              </>
+            )}
+          </Button>
+        )}
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
