@@ -36,27 +36,6 @@ const Trainings = () => {
     },
   });
 
-  const { data: warmupSubs } = useQuery({
-    queryKey: ["warmup-subcategories"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("warmup_subcategories")
-        .select("*")
-        .order("sort_order");
-      return data ?? [];
-    },
-  });
-
-  const { data: stretchingSubs } = useQuery({
-    queryKey: ["stretching-subcategories"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("stretching_subcategories")
-        .select("*")
-        .order("sort_order");
-      return data ?? [];
-    },
-  });
 
   const filtered = useMemo(() => {
     return (trainings ?? []).filter((tr) => {
