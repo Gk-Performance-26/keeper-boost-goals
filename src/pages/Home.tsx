@@ -38,13 +38,15 @@ const Home = () => {
       return;
     }
     // Don't show to users who already pay — they don't need a trial pitch.
-    if (hasPaidSub) {
+    // Also don't show if the trial has already ended — only new users in their
+    // active 5-day trial window should see the welcome modal.
+    if (hasPaidSub || !isTrialActive) {
       setShowTrialBanner(false);
       return;
     }
     const alreadyDismissed = localStorage.getItem(trialBannerKey) === "1";
     setShowTrialBanner(!alreadyDismissed);
-  }, [trialBannerKey, user, hasPaidSub]);
+  }, [trialBannerKey, user, hasPaidSub, isTrialActive]);
 
   const dismissTrialBanner = () => {
     if (trialBannerKey) localStorage.setItem(trialBannerKey, "1");
