@@ -267,7 +267,7 @@ export function VideoPlayer({
           ? renderLoading()
           : intro.isError || !intro.data
           ? renderError()
-          : renderPlayer(intro.data, (introType ?? "upload") as VideoSource, false, () =>
+          : renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () =>
               setPhase("exercise"),
             )
         : main.isLoading
