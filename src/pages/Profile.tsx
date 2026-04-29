@@ -167,8 +167,8 @@ const Profile = () => {
           >
             <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
           </a>
-        ) : hasPaidSub ? (
-          <Button variant="outline" className="w-full justify-start" onClick={loadPortalUrl} disabled={openingPortal}>
+        ) : hasPaidSub && openingPortal ? (
+          <Button variant="outline" className="w-full justify-start" disabled>
             <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
           </Button>
         ) : null}
