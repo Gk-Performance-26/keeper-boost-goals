@@ -1,0 +1,1 @@
+UPDATE public.subscriptions SET price_id = 'premium_yearly', updated_at = now() WHERE paddle_subscription_id = 'sub_01kq74rwnn0nseycx4m159hm9f';
