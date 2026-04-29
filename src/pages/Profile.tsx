@@ -1,24 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { CreditCard, Crown, FileText, Flame, Loader2, LogOut, MessageSquare, RotateCw, Settings, Shield, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { Crown, FileText, Flame, Loader2, LogOut, MessageSquare, RotateCw, Settings, Shield, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { supabase } from "@/integrations/supabase/client";
-import { isTestMode } from "@/lib/paddle";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const Profile = () => {
-  const { user, session, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
   const { isActive: hasSub, hasPaidSub, refetch: refetchSub } = useSubscription();
