@@ -32,8 +32,8 @@ const Profile = () => {
     try {
       await refetchSub();
       toast.success(t("profile.restoreSuccess"));
-    } catch (e: any) {
-      toast.error(t("profile.restoreError") + (e.message ?? ""));
+    } catch (e) {
+      toast.error(t("profile.restoreError") + (e instanceof Error ? e.message : ""));
     } finally {
       setRestoring(false);
     }
@@ -84,7 +84,7 @@ const Profile = () => {
       const validUrl = parsed.toString();
       setPortalUrl(validUrl);
       return validUrl;
-    } catch (e: any) {
+    } catch (e) {
       console.error("portal error:", e);
       return null;
     } finally {
