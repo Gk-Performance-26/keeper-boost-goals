@@ -12,30 +12,40 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Missing auth" }), { status: 401, headers: corsHeaders });
     }
 
     const token = authHeader.replace(/^Bearer\s+/i, "");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !user) {
-      console.error("auth error:", userError);
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      console.error("auth claims error:", claimsError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     }
+    const userId = claimsData.claims.sub;
+
+    const serviceSupabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
 
     const body = await req.json().catch(() => ({}));
     const env = ((body.environment as string) || "sandbox") as PaddleEnv;
 
-    const { data: sub } = await supabase
+    const { data: sub } = await serviceSupabase
       .from("subscriptions")
       .select("paddle_customer_id, paddle_subscription_id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
+      .eq("environment", env)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (!sub?.paddle_customer_id) {
@@ -63,10 +73,11 @@ Deno.serve(async (req) => {
             customerId = fresh.customerId;
             portal = await paddle.customerPortalSessions.create(customerId, [sub.paddle_subscription_id]);
             // Persist the corrected customer id for future calls
-            await supabase
+            await serviceSupabase
               .from("subscriptions")
               .update({ paddle_customer_id: customerId, updated_at: new Date().toISOString() })
-              .eq("user_id", user.id);
+              .eq("user_id", userId)
+              .eq("environment", env);
           }
         } catch (recoverErr) {
           console.error("paddle-portal recovery failed:", recoverErr);
