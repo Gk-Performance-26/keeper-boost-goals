@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const Profile = () => {
-  const { user, signOut } = useAuth();
+  const { user, session, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
   const { isActive: hasSub, hasPaidSub, refetch: refetchSub } = useSubscription();
@@ -40,10 +40,13 @@ const Profile = () => {
   };
 
   const loadPortalUrl = useCallback(async () => {
+    if (!session?.access_token) return null;
+
     setOpeningPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke("paddle-portal", {
         body: { environment: isTestMode() ? "sandbox" : "live" },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
       // Edge function may return 200 with { error } when portal is unavailable
@@ -87,13 +90,13 @@ const Profile = () => {
     } finally {
       setOpeningPortal(false);
     }
-  }, []);
+  }, [session?.access_token]);
 
   useEffect(() => {
-    if (hasPaidSub && !portalUrl && !openingPortal) {
+    if (hasPaidSub && session?.access_token && !portalUrl && !openingPortal) {
       void loadPortalUrl();
     }
-  }, [hasPaidSub, loadPortalUrl, openingPortal, portalUrl]);
+  }, [hasPaidSub, loadPortalUrl, openingPortal, portalUrl, session?.access_token]);
 
   if (!profile) return null;
 
