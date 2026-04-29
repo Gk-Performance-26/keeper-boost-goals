@@ -1,30 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LevelBar } from "@/components/LevelBar";
-import { CreditCard, Crown, FileText, Flame, Loader2, LogOut, MessageSquare, RotateCw, Settings, Shield, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { Crown, FileText, Flame, Loader2, LogOut, MessageSquare, RotateCw, Settings, Shield, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
 import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
 import { Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { supabase } from "@/integrations/supabase/client";
-import { isTestMode } from "@/lib/paddle";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const Profile = () => {
-  const { user, session, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
   const { isActive: hasSub, hasPaidSub, refetch: refetchSub } = useSubscription();
   const { t } = useLanguage();
-  const [openingPortal, setOpeningPortal] = useState(false);
-  const [portalUrl, setPortalUrl] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(false);
 
   const handleRestorePurchases = async () => {
@@ -38,65 +33,6 @@ const Profile = () => {
       setRestoring(false);
     }
   };
-
-  const loadPortalUrl = useCallback(async () => {
-    if (!session?.access_token) return null;
-
-    setOpeningPortal(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("paddle-portal", {
-        body: { environment: isTestMode() ? "sandbox" : "live" },
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (error) throw error;
-      // Edge function may return 200 with { error } when portal is unavailable
-      // (e.g. customer recreated on Paddle's side). Treat as soft failure.
-      if (data?.error || (!data?.subscriptionUrls?.length && !data?.overviewUrl)) {
-        console.warn("Portal unavailable:", data?.error, data?.detail);
-        return null;
-      }
-      const url = data?.subscriptionUrls?.[0]?.updateSubscriptionPaymentMethod ?? data?.overviewUrl;
-      if (!url) return null;
-
-      // Validate URL: must be a complete, well-formed Paddle portal URL
-      let parsed: URL;
-      try {
-        parsed = new URL(url);
-      } catch {
-        throw new Error("Invalid portal URL");
-      }
-      if (parsed.protocol !== "https:") {
-        throw new Error("Insecure portal URL");
-      }
-      const allowedHosts = [
-        "customer-portal.paddle.com",
-        "sandbox-customer-portal.paddle.com",
-      ];
-      const isAllowedHost = allowedHosts.some(
-        (h) => parsed.hostname === h || parsed.hostname.endsWith("." + h),
-      );
-      if (!isAllowedHost) {
-        throw new Error("Unexpected portal domain: " + parsed.hostname);
-      }
-      if (!parsed.pathname || parsed.pathname === "/") {
-        throw new Error("Incomplete portal URL");
-      }
-      const validUrl = parsed.toString();
-      setPortalUrl(validUrl);
-      return validUrl;
-    } catch (e) {
-      console.error("portal error:", e);
-      return null;
-    } finally {
-      setOpeningPortal(false);
-    }
-  }, [session?.access_token]);
-
-  useEffect(() => {
-    if (hasPaidSub && session?.access_token && !portalUrl && !openingPortal) {
-      void loadPortalUrl();
-    }
-  }, [hasPaidSub, loadPortalUrl, openingPortal, portalUrl, session?.access_token]);
 
   if (!profile) return null;
 
@@ -161,20 +97,6 @@ const Profile = () => {
             </Button>
           </Link>
         )}
-        {hasPaidSub && portalUrl ? (
-          <a
-            href={portalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(buttonVariants({ variant: "outline" }), "w-full justify-start")}
-          >
-            <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
-          </a>
-        ) : hasPaidSub && openingPortal ? (
-          <Button variant="outline" className="w-full justify-start" disabled>
-            <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
-          </Button>
-        ) : null}
         <Link to="/onboarding">
           <Button variant="outline" className="w-full justify-start">
             <Settings className="h-4 w-4" /> {t("profile.editProfile")}
