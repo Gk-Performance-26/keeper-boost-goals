@@ -1,0 +1,1 @@
+REVOKE SELECT (paddle_customer_id, paddle_subscription_id) ON public.subscriptions FROM anon, authenticated;
