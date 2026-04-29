@@ -42,10 +42,45 @@ Deno.serve(async (req) => {
     }
 
     const paddle = getPaddleClient(env);
-    const portal = await paddle.customerPortalSessions.create(
-      sub.paddle_customer_id,
-      sub.paddle_subscription_id ? [sub.paddle_subscription_id] : [],
-    );
+
+    // Try with stored customer id first; if Paddle says "not found", try to
+    // recover the real customer id from the subscription itself (handles
+    // env mismatches or customers recreated on Paddle's side).
+    let customerId = sub.paddle_customer_id;
+    let portal;
+    try {
+      portal = await paddle.customerPortalSessions.create(
+        customerId,
+        sub.paddle_subscription_id ? [sub.paddle_subscription_id] : [],
+      );
+    } catch (err: any) {
+      const notFound = err?.code === "not_found" || /not found/i.test(err?.detail ?? err?.message ?? "");
+      if (notFound && sub.paddle_subscription_id) {
+        try {
+          const fresh = await paddle.subscriptions.get(sub.paddle_subscription_id);
+          if (fresh?.customerId && fresh.customerId !== customerId) {
+            customerId = fresh.customerId;
+            portal = await paddle.customerPortalSessions.create(customerId, [sub.paddle_subscription_id]);
+            // Persist the corrected customer id for future calls
+            await supabase
+              .from("subscriptions")
+              .update({ paddle_customer_id: customerId, updated_at: new Date().toISOString() })
+              .eq("user_id", user.id);
+          }
+        } catch (recoverErr) {
+          console.error("paddle-portal recovery failed:", recoverErr);
+        }
+      }
+      if (!portal) {
+        return new Response(
+          JSON.stringify({
+            error: "Portal unavailable",
+            detail: err?.detail ?? err?.message ?? "unknown",
+          }),
+          { status: 200, headers: corsHeaders },
+        );
+      }
+    }
 
     return new Response(
       JSON.stringify({
