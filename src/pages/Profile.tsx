@@ -46,8 +46,14 @@ const Profile = () => {
         body: { environment: isTestMode() ? "sandbox" : "live" },
       });
       if (error) throw error;
+      // Edge function may return 200 with { error } when portal is unavailable
+      // (e.g. customer recreated on Paddle's side). Treat as soft failure.
+      if (data?.error || (!data?.subscriptionUrls?.length && !data?.overviewUrl)) {
+        console.warn("Portal unavailable:", data?.error, data?.detail);
+        return null;
+      }
       const url = data?.subscriptionUrls?.[0]?.updateSubscriptionPaymentMethod ?? data?.overviewUrl;
-      if (!url) throw new Error("No portal URL");
+      if (!url) return null;
 
       // Validate URL: must be a complete, well-formed Paddle portal URL
       let parsed: URL;
@@ -76,12 +82,12 @@ const Profile = () => {
       setPortalUrl(validUrl);
       return validUrl;
     } catch (e: any) {
-      toast.error(t("profile.portalError") + (e.message ?? ""));
+      console.error("portal error:", e);
       return null;
     } finally {
       setOpeningPortal(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     if (hasPaidSub && !portalUrl && !openingPortal) {
@@ -161,8 +167,8 @@ const Profile = () => {
           >
             <CreditCard className="h-4 w-4" /> {t("profile.paymentMethods")}
           </a>
-        ) : hasPaidSub ? (
-          <Button variant="outline" className="w-full justify-start" onClick={loadPortalUrl} disabled={openingPortal}>
+        ) : hasPaidSub && openingPortal ? (
+          <Button variant="outline" className="w-full justify-start" disabled>
             <Loader2 className="h-4 w-4 animate-spin" /> {t("profile.openingPortal")}
           </Button>
         ) : null}

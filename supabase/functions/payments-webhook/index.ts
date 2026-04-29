@@ -75,15 +75,22 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
 }
 
 async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
-  const { id, status, currentBillingPeriod, scheduledChange } = data;
+  const { id, customerId, items, status, currentBillingPeriod, scheduledChange } = data;
+
+  const item = items?.[0];
+  const priceId = item?.price?.importMeta?.externalId || item?.price?.id;
+
+  const update: Record<string, unknown> = {
+    status: status,
+    current_period_end: currentBillingPeriod?.endsAt,
+    cancel_at_period_end: scheduledChange?.action === 'cancel',
+    updated_at: new Date().toISOString(),
+  };
+  if (priceId) update.price_id = priceId;
+  if (customerId) update.paddle_customer_id = customerId;
 
   await supabase.from('subscriptions')
-    .update({
-      status: status,
-      current_period_end: currentBillingPeriod?.endsAt,
-      cancel_at_period_end: scheduledChange?.action === 'cancel',
-      updated_at: new Date().toISOString(),
-    })
+    .update(update)
     .eq('paddle_subscription_id', id);
 }
 
