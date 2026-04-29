@@ -17,14 +17,15 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing auth" }), { status: 401, headers: corsHeaders });
     }
 
+    const token = authHeader.replace(/^Bearer\s+/i, "");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } },
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    if (userError || !user) {
+      console.error("auth error:", userError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     }
 
