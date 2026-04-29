@@ -104,7 +104,7 @@ const Progress = () => {
   if (!profile) return null;
 
   return (
-    <div className="space-y-10 px-5 pt-8 pb-10">
+    <div className="space-y-10 px-5 pt-14 pb-10">
       <header className="flex items-start justify-between">
         <div>
           <h1 className="font-display text-3xl">{t("progress.title")}</h1>
