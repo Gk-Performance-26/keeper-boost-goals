@@ -1,6 +1,15 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getPaddleClient, type PaddleEnv } from "../_shared/paddle.ts";
 
+const getErrorText = (err: unknown) => {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object") {
+    const maybe = err as { detail?: unknown; message?: unknown; code?: unknown };
+    return String(maybe.detail ?? maybe.message ?? maybe.code ?? "unknown");
+  }
+  return String(err ?? "unknown");
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -64,8 +73,9 @@ Deno.serve(async (req) => {
         customerId,
         sub.paddle_subscription_id ? [sub.paddle_subscription_id] : [],
       );
-    } catch (err: any) {
-      const notFound = err?.code === "not_found" || /not found/i.test(err?.detail ?? err?.message ?? "");
+    } catch (err) {
+      const errorText = getErrorText(err);
+      const notFound = errorText === "not_found" || /not found/i.test(errorText);
       if (notFound && sub.paddle_subscription_id) {
         try {
           const fresh = await paddle.subscriptions.get(sub.paddle_subscription_id);
@@ -87,7 +97,7 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({
             error: "Portal unavailable",
-            detail: err?.detail ?? err?.message ?? "unknown",
+              detail: errorText,
           }),
           { status: 200, headers: corsHeaders },
         );
