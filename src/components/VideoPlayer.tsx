@@ -122,6 +122,7 @@ export function VideoPlayer({
         if (v) {
           v.pause();
         }
+        onAllEnded?.();
       }
     }, 250);
     return () => clearInterval(interval);
