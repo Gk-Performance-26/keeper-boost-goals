@@ -20,6 +20,8 @@ interface Props {
   introField?: "intro" | "drill_intro";
   /** Called when the exercise video finishes (or drill timer ends). */
   onAllEnded?: () => void;
+  /** If true, when the intro ends jump straight to the exercise (no countdown). */
+  skipCountdown?: boolean;
 }
 
 const DRILL_DURATION_SECONDS = 20;
@@ -55,6 +57,7 @@ export function VideoPlayer({
   mainField = "main",
   introField = "intro",
   onAllEnded,
+  skipCountdown = false,
 }: Props) {
   const hasIntro = !!introUrl;
   const isDrill = mainField === "drill_exercise";
@@ -296,9 +299,13 @@ export function VideoPlayer({
         ) : intro.isError || !intro.data ? (
           renderError()
         ) : (
-          renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () =>
-            setPhase("countdown"),
-          )
+          renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () => {
+            if (skipCountdown) {
+              onAllEnded?.();
+            } else {
+              setPhase("countdown");
+            }
+          })
         )
       ) : phase === "countdown" ? (
         <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 via-black to-black text-center">
