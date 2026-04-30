@@ -230,6 +230,7 @@ const TrainingDetail = () => {
                 return (
                   <div
                     key={i}
+                    id={`drill-${i}`}
                     className={cn(
                       "rounded-xl border transition",
                       done.has(i)
