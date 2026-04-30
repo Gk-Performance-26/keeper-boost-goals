@@ -18,6 +18,8 @@ interface Props {
   /** Override the default field keys for non-main contexts (drills). */
   mainField?: "main" | "drill_exercise";
   introField?: "intro" | "drill_intro";
+  /** Called when the exercise video finishes (or drill timer ends). */
+  onAllEnded?: () => void;
 }
 
 const DRILL_DURATION_SECONDS = 20;
