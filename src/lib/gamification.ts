@@ -42,15 +42,34 @@ export const PLAYING_STYLES = [
 
 export type PlayingStyle = (typeof PLAYING_STYLES)[number]["value"];
 
-export function generateFeedback(scores: Record<string, number>): string[] {
+export function generateFeedback(
+  scores: Record<string, number>,
+  lang: "pt" | "en" = "pt",
+): string[] {
   const tips: string[] = [];
+  const isPt = lang === "pt";
   Object.entries(scores).forEach(([slug, score]) => {
+    const label = slug.replace(/_/g, " ");
     if (score <= 4) {
-      tips.push(`Your ${slug.replace("_", " ")} score is low — try a beginner ${slug} drill next.`);
+      tips.push(
+        isPt
+          ? `A tua pontuação em ${label} está baixa — experimenta um exercício de ${label} para iniciantes.`
+          : `Your ${label} score is low — try a beginner ${label} drill next.`,
+      );
     } else if (score >= 8) {
-      tips.push(`Strong ${slug.replace("_", " ")} performance! Try the advanced level next.`);
+      tips.push(
+        isPt
+          ? `Excelente desempenho em ${label}! Tenta o nível avançado a seguir.`
+          : `Strong ${label} performance! Try the advanced level next.`,
+      );
     }
   });
-  if (tips.length === 0) tips.push("Solid balanced session — keep stacking those reps!");
+  if (tips.length === 0) {
+    tips.push(
+      isPt
+        ? "Sessão sólida e equilibrada — continua a somar repetições!"
+        : "Solid balanced session — keep stacking those reps!",
+    );
+  }
   return tips;
 }

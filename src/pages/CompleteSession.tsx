@@ -23,7 +23,7 @@ const CompleteSession = () => {
   const invalidateProfile = useInvalidateProfile();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const [notes, setNotes] = useState("");
   const [rating, setRating] = useState(4);
@@ -85,6 +85,7 @@ const CompleteSession = () => {
             return [cat?.slug || cid, s];
           }),
         ),
+        lang,
       );
       setFeedback(tips);
       setXpGained(result?.xp_earned ?? training.xp_reward);

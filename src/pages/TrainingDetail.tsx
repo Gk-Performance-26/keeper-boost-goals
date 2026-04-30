@@ -157,6 +157,7 @@ const TrainingDetail = () => {
           introType={(training as any).intro_video_type}
           introLabel={t("training.introVideo")}
           exerciseLabel={t("training.exerciseVideo")}
+          skipCountdown
           onAllEnded={() => goToNextDrill(null)}
         />
       )}
@@ -304,13 +305,13 @@ const TrainingDetail = () => {
             )}
           </section>
 
-          <Link to={`/trainings/${training.id}/complete`}>
-            <Button size="lg" disabled={!allDone} className="w-full shadow-glow">
-              {allDone
-                ? t("training.finish")
-                : `${t("training.tickAll")} (${done.size}/${accessibleDrills.length})`}
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            className="w-full shadow-glow"
+            onClick={() => setShowCompleteDialog(true)}
+          >
+            {t("training.finish")}
+          </Button>
         </>
       )}
 
