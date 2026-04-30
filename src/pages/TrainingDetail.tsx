@@ -32,6 +32,8 @@ const TrainingDetail = () => {
   const { t } = useLanguage();
   const [done, setDone] = useState<Set<number>>(new Set());
   const [openDrill, setOpenDrill] = useState<number | null>(null);
+  const [showCompleteDialog, setShowCompleteDialog] = useState(false);
+  const [completeShown, setCompleteShown] = useState(false);
 
   const { data: training, isLoading } = useQuery({
     queryKey: ["training", id],
