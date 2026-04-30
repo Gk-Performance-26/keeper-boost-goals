@@ -313,6 +313,46 @@ const TrainingDetail = () => {
           </Link>
         </>
       )}
+
+      <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
+        <DialogContent className="max-w-sm gradient-card border-primary/40 shadow-glow p-0 overflow-hidden">
+          <div className="space-y-5 p-6 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 shadow-glow">
+              <Trophy className="h-8 w-8 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                Treino concluído
+              </p>
+              <h2 className="font-display text-2xl leading-tight">
+                Bom trabalho!
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Objetivo cumprido.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="lg"
+                className="w-full shadow-glow"
+                onClick={() => {
+                  setShowCompleteDialog(false);
+                  navigate(`/trainings/${training.id}/complete`);
+                }}
+              >
+                {t("training.finish")}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowCompleteDialog(false)}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
