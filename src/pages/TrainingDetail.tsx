@@ -281,6 +281,7 @@ const TrainingDetail = () => {
                           introType={d.intro_video_type}
                           introLabel={t("training.introVideo")}
                           exerciseLabel={t("training.exerciseVideo")}
+                          onAllEnded={() => handleDrillEnded(i)}
                         />
                       </div>
                     )}
