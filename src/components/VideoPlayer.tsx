@@ -290,22 +290,42 @@ export function VideoPlayer({
         </button>
       </div>
 
-      {phase === "intro"
-        ? intro.isLoading
-          ? renderLoading()
-          : intro.isError || !intro.data
-          ? renderError()
-          : renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () =>
-              setPhase("exercise"),
-            )
-        : main.isLoading
-        ? renderLoading()
-        : main.isError || !main.data
-        ? renderError()
-        : renderPlayer(main.data, exerciseType, true, isDrill ? undefined : onAllEnded, {
-            loop: isDrill,
-            isExercise: isDrill,
-          })}
+      {phase === "intro" ? (
+        intro.isLoading ? (
+          renderLoading()
+        ) : intro.isError || !intro.data ? (
+          renderError()
+        ) : (
+          renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () =>
+            setPhase("countdown"),
+          )
+        )
+      ) : phase === "countdown" ? (
+        <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-2xl bg-black text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            {exerciseLabel}
+          </p>
+          <p className="font-display text-7xl tabular-nums text-primary-foreground drop-shadow-[0_0_20px_hsl(var(--primary))]">
+            {countdown}
+          </p>
+          <button
+            type="button"
+            onClick={() => setPhase("exercise")}
+            className="mt-1 rounded-full bg-primary/20 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary/30"
+          >
+            ▶ {t_skip()}
+          </button>
+        </div>
+      ) : main.isLoading ? (
+        renderLoading()
+      ) : main.isError || !main.data ? (
+        renderError()
+      ) : (
+        renderPlayer(main.data, exerciseType, true, isDrill ? undefined : onAllEnded, {
+          loop: isDrill,
+          isExercise: isDrill,
+        })
+      )}
 
       {renderTimerBadge()}
     </div>
