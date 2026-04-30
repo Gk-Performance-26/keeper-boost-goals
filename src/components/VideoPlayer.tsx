@@ -58,9 +58,15 @@ export function VideoPlayer({
 }: Props) {
   const hasIntro = !!introUrl;
   const isDrill = mainField === "drill_exercise";
-  const [phase, setPhase] = useState<"intro" | "exercise">(hasIntro ? "intro" : "exercise");
+  const [phase, setPhase] = useState<"intro" | "countdown" | "exercise">(
+    hasIntro ? "intro" : "exercise",
+  );
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const exerciseVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Countdown between intro and exercise
+  const COUNTDOWN_SECONDS = 5;
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
 
   // Drill timer state (only active when isDrill && phase === 'exercise')
   const [secondsLeft, setSecondsLeft] = useState(DRILL_DURATION_SECONDS);
@@ -97,7 +103,25 @@ export function VideoPlayer({
   // Reset phase when intro changes (e.g. switching trainings)
   useEffect(() => {
     setPhase(hasIntro ? "intro" : "exercise");
+    setCountdown(COUNTDOWN_SECONDS);
   }, [introUrl, hasIntro]);
+
+  // Run countdown between intro and exercise
+  useEffect(() => {
+    if (phase !== "countdown") return;
+    setCountdown(COUNTDOWN_SECONDS);
+    const startedAt = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      const left = Math.max(0, COUNTDOWN_SECONDS - elapsed);
+      setCountdown(left);
+      if (left <= 0) {
+        clearInterval(interval);
+        setPhase("exercise");
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [phase]);
 
   // Reset & run countdown when entering exercise phase on a drill
   useEffect(() => {
@@ -266,22 +290,42 @@ export function VideoPlayer({
         </button>
       </div>
 
-      {phase === "intro"
-        ? intro.isLoading
-          ? renderLoading()
-          : intro.isError || !intro.data
-          ? renderError()
-          : renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () =>
-              setPhase("exercise"),
-            )
-        : main.isLoading
-        ? renderLoading()
-        : main.isError || !main.data
-        ? renderError()
-        : renderPlayer(main.data, exerciseType, true, isDrill ? undefined : onAllEnded, {
-            loop: isDrill,
-            isExercise: isDrill,
-          })}
+      {phase === "intro" ? (
+        intro.isLoading ? (
+          renderLoading()
+        ) : intro.isError || !intro.data ? (
+          renderError()
+        ) : (
+          renderPlayer(intro.data, (introType ?? "upload") as VideoSource, true, () =>
+            setPhase("countdown"),
+          )
+        )
+      ) : phase === "countdown" ? (
+        <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-2xl bg-black text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            {exerciseLabel}
+          </p>
+          <p className="font-display text-7xl tabular-nums text-primary-foreground drop-shadow-[0_0_20px_hsl(var(--primary))]">
+            {countdown}
+          </p>
+          <button
+            type="button"
+            onClick={() => setPhase("exercise")}
+            className="mt-1 rounded-full bg-primary/20 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary/30"
+          >
+            ▶ Saltar
+          </button>
+        </div>
+      ) : main.isLoading ? (
+        renderLoading()
+      ) : main.isError || !main.data ? (
+        renderError()
+      ) : (
+        renderPlayer(main.data, exerciseType, true, isDrill ? undefined : onAllEnded, {
+          loop: isDrill,
+          isExercise: isDrill,
+        })
+      )}
 
       {renderTimerBadge()}
     </div>
