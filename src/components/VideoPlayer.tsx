@@ -232,7 +232,7 @@ export function VideoPlayer({
     if (main.isError || !main.data) return renderError();
     return (
       <div className="space-y-2">
-        {renderPlayer(main.data, type, isDrill, undefined, {
+        {renderPlayer(main.data, type, isDrill, isDrill ? undefined : onAllEnded, {
           loop: isDrill,
           isExercise: isDrill,
         })}
