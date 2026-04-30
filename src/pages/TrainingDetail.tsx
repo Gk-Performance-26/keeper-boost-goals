@@ -111,6 +111,11 @@ const TrainingDetail = () => {
       if (s.has(i)) return s;
       const n = new Set(s);
       n.add(i);
+      // If this completes all accessible drills, show the congrats dialog
+      if (n.size === accessibleDrills.length && !completeShown) {
+        setShowCompleteDialog(true);
+        setCompleteShown(true);
+      }
       return n;
     });
     goToNextDrill(i);
