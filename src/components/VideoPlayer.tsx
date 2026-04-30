@@ -54,6 +54,7 @@ export function VideoPlayer({
   drillIndex,
   mainField = "main",
   introField = "intro",
+  onAllEnded,
 }: Props) {
   const hasIntro = !!introUrl;
   const isDrill = mainField === "drill_exercise";
