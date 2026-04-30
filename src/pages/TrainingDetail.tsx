@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Check, Clock, Crown, Loader2, Lock, Sparkles } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ArrowLeft, Check, Clock, Crown, Loader2, Lock, Sparkles, Trophy } from "lucide-react";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -31,6 +32,8 @@ const TrainingDetail = () => {
   const { t } = useLanguage();
   const [done, setDone] = useState<Set<number>>(new Set());
   const [openDrill, setOpenDrill] = useState<number | null>(null);
+  const [showCompleteDialog, setShowCompleteDialog] = useState(false);
+  const [completeShown, setCompleteShown] = useState(false);
 
   const { data: training, isLoading } = useQuery({
     queryKey: ["training", id],
@@ -108,6 +111,11 @@ const TrainingDetail = () => {
       if (s.has(i)) return s;
       const n = new Set(s);
       n.add(i);
+      // If this completes all accessible drills, show the congrats dialog
+      if (n.size === accessibleDrills.length && !completeShown) {
+        setShowCompleteDialog(true);
+        setCompleteShown(true);
+      }
       return n;
     });
     goToNextDrill(i);
@@ -305,6 +313,46 @@ const TrainingDetail = () => {
           </Link>
         </>
       )}
+
+      <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
+        <DialogContent className="max-w-sm gradient-card border-primary/40 shadow-glow p-0 overflow-hidden">
+          <div className="space-y-5 p-6 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 shadow-glow">
+              <Trophy className="h-8 w-8 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                Treino concluído
+              </p>
+              <h2 className="font-display text-2xl leading-tight">
+                Bom trabalho!
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Objetivo cumprido.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="lg"
+                className="w-full shadow-glow"
+                onClick={() => {
+                  setShowCompleteDialog(false);
+                  navigate(`/trainings/${training.id}/complete`);
+                }}
+              >
+                {t("training.finish")}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowCompleteDialog(false)}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
