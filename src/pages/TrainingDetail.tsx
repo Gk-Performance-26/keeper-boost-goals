@@ -149,6 +149,7 @@ const TrainingDetail = () => {
           introType={(training as any).intro_video_type}
           introLabel={t("training.introVideo")}
           exerciseLabel={t("training.exerciseVideo")}
+          onAllEnded={() => goToNextDrill(null)}
         />
       )}
 
