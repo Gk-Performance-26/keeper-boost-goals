@@ -278,7 +278,7 @@ export function VideoPlayer({
         ? renderLoading()
         : main.isError || !main.data
         ? renderError()
-        : renderPlayer(main.data, exerciseType, true, undefined, {
+        : renderPlayer(main.data, exerciseType, true, isDrill ? undefined : onAllEnded, {
             loop: isDrill,
             isExercise: isDrill,
           })}
