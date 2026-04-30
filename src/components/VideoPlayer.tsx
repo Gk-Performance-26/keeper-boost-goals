@@ -308,26 +308,23 @@ export function VideoPlayer({
           })
         )
       ) : phase === "countdown" ? (
-        <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 via-black to-black text-center">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.35),transparent_60%)]" />
-          <p className="relative z-10 text-sm font-bold uppercase tracking-[0.3em] text-primary">
+        <div className="relative flex aspect-video w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-black to-black text-center">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.25),transparent_60%)]" />
+          <p className="relative z-10 text-[10px] font-bold uppercase tracking-[0.25em] text-primary">
             {exerciseLabel}
           </p>
           <div
             key={countdown}
-            className="relative z-10 flex h-40 w-40 items-center justify-center rounded-full border-4 border-primary bg-primary/10 shadow-[0_0_60px_hsl(var(--primary)/0.7)] animate-in zoom-in-50 duration-300"
+            className="relative z-10 flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary bg-primary/10 shadow-[0_0_30px_hsl(var(--primary)/0.5)] animate-in zoom-in-50 duration-300"
           >
-            <span className="font-display text-[8rem] leading-none tabular-nums text-primary drop-shadow-[0_0_30px_hsl(var(--primary))]">
+            <span className="font-display text-4xl leading-none tabular-nums text-primary drop-shadow-[0_0_15px_hsl(var(--primary))]">
               {countdown}
             </span>
           </div>
-          <p className="relative z-10 text-base font-semibold text-foreground">
-            Prepara-te...
-          </p>
           <button
             type="button"
             onClick={() => setPhase("exercise")}
-            className="relative z-10 mt-1 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground shadow-glow hover:opacity-90"
+            className="relative z-10 mt-1 rounded-full bg-primary/90 px-3 py-1 text-[11px] font-semibold text-primary-foreground shadow-glow hover:opacity-90"
           >
             ▶ Saltar
           </button>
