@@ -313,7 +313,7 @@ export function VideoPlayer({
             onClick={() => setPhase("exercise")}
             className="mt-1 rounded-full bg-primary/20 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary/30"
           >
-            ▶ {t_skip()}
+            ▶ Saltar
           </button>
         </div>
       ) : main.isLoading ? (
