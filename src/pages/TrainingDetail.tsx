@@ -77,6 +77,13 @@ const TrainingDetail = () => {
   const allDone = accessibleDrills.length > 0 && done.size === accessibleDrills.length;
   const isLocked = (training as any).is_premium && !hasSub;
 
+  useEffect(() => {
+    if (allDone && !completeShown) {
+      setShowCompleteDialog(true);
+      setCompleteShown(true);
+    }
+  }, [allDone, completeShown]);
+
   const tTitle = translated[0] || training.title;
   const tDesc = translated[1] || training.description;
   const tCategory = translated[2] || training.categories?.name;
