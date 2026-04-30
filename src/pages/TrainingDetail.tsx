@@ -90,6 +90,29 @@ const TrainingDetail = () => {
     });
   };
 
+  const accessibleIndices = accessibleDrills.map((d) => d._idx);
+  const goToNextDrill = (currentIdx: number | null) => {
+    const pos = currentIdx === null ? -1 : accessibleIndices.indexOf(currentIdx);
+    const next = accessibleIndices[pos + 1];
+    if (next !== undefined) {
+      setOpenDrill(next);
+      setTimeout(() => {
+        document
+          .getElementById(`drill-${next}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  };
+  const handleDrillEnded = (i: number) => {
+    setDone((s) => {
+      if (s.has(i)) return s;
+      const n = new Set(s);
+      n.add(i);
+      return n;
+    });
+    goToNextDrill(i);
+  };
+
   return (
     <div className="space-y-5 px-5 pt-6 pb-6">
       <button
@@ -126,6 +149,7 @@ const TrainingDetail = () => {
           introType={(training as any).intro_video_type}
           introLabel={t("training.introVideo")}
           exerciseLabel={t("training.exerciseVideo")}
+          onAllEnded={() => goToNextDrill(null)}
         />
       )}
 
@@ -206,6 +230,7 @@ const TrainingDetail = () => {
                 return (
                   <div
                     key={i}
+                    id={`drill-${i}`}
                     className={cn(
                       "rounded-xl border transition",
                       done.has(i)
@@ -256,6 +281,7 @@ const TrainingDetail = () => {
                           introType={d.intro_video_type}
                           introLabel={t("training.introVideo")}
                           exerciseLabel={t("training.exerciseVideo")}
+                          onAllEnded={() => handleDrillEnded(i)}
                         />
                       </div>
                     )}

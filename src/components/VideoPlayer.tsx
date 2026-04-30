@@ -18,6 +18,8 @@ interface Props {
   /** Override the default field keys for non-main contexts (drills). */
   mainField?: "main" | "drill_exercise";
   introField?: "intro" | "drill_intro";
+  /** Called when the exercise video finishes (or drill timer ends). */
+  onAllEnded?: () => void;
 }
 
 const DRILL_DURATION_SECONDS = 20;
@@ -52,6 +54,7 @@ export function VideoPlayer({
   drillIndex,
   mainField = "main",
   introField = "intro",
+  onAllEnded,
 }: Props) {
   const hasIntro = !!introUrl;
   const isDrill = mainField === "drill_exercise";
@@ -119,6 +122,7 @@ export function VideoPlayer({
         if (v) {
           v.pause();
         }
+        onAllEnded?.();
       }
     }, 250);
     return () => clearInterval(interval);
@@ -228,7 +232,7 @@ export function VideoPlayer({
     if (main.isError || !main.data) return renderError();
     return (
       <div className="space-y-2">
-        {renderPlayer(main.data, type, isDrill, undefined, {
+        {renderPlayer(main.data, type, isDrill, isDrill ? undefined : onAllEnded, {
           loop: isDrill,
           isExercise: isDrill,
         })}
@@ -274,7 +278,7 @@ export function VideoPlayer({
         ? renderLoading()
         : main.isError || !main.data
         ? renderError()
-        : renderPlayer(main.data, exerciseType, true, undefined, {
+        : renderPlayer(main.data, exerciseType, true, isDrill ? undefined : onAllEnded, {
             loop: isDrill,
             isExercise: isDrill,
           })}
