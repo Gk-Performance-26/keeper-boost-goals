@@ -58,9 +58,15 @@ export function VideoPlayer({
 }: Props) {
   const hasIntro = !!introUrl;
   const isDrill = mainField === "drill_exercise";
-  const [phase, setPhase] = useState<"intro" | "exercise">(hasIntro ? "intro" : "exercise");
+  const [phase, setPhase] = useState<"intro" | "countdown" | "exercise">(
+    hasIntro ? "intro" : "exercise",
+  );
   const introVideoRef = useRef<HTMLVideoElement>(null);
   const exerciseVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Countdown between intro and exercise
+  const COUNTDOWN_SECONDS = 5;
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
 
   // Drill timer state (only active when isDrill && phase === 'exercise')
   const [secondsLeft, setSecondsLeft] = useState(DRILL_DURATION_SECONDS);
