@@ -103,7 +103,25 @@ export function VideoPlayer({
   // Reset phase when intro changes (e.g. switching trainings)
   useEffect(() => {
     setPhase(hasIntro ? "intro" : "exercise");
+    setCountdown(COUNTDOWN_SECONDS);
   }, [introUrl, hasIntro]);
+
+  // Run countdown between intro and exercise
+  useEffect(() => {
+    if (phase !== "countdown") return;
+    setCountdown(COUNTDOWN_SECONDS);
+    const startedAt = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      const left = Math.max(0, COUNTDOWN_SECONDS - elapsed);
+      setCountdown(left);
+      if (left <= 0) {
+        clearInterval(interval);
+        setPhase("exercise");
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [phase]);
 
   // Reset & run countdown when entering exercise phase on a drill
   useEffect(() => {
