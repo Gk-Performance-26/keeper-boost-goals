@@ -5,42 +5,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Crown, Flame, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import leaderboardBg from "@/assets/leaderboard-bg.jpg";
 
 const Leaderboard = () => {
   const { user } = useAuth();
-  const [scope, setScope] = useState<"global" | "level">("global");
   const { t } = useLanguage();
 
-  const { data: me } = useQuery({
-    queryKey: ["me-profile-min", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("experience_level")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return data;
-    },
-  });
-
   const { data: rows } = useQuery({
-    queryKey: ["leaderboard", scope, me?.experience_level],
-    enabled: scope === "global" || !!me,
+    queryKey: ["leaderboard", "global"],
     queryFn: async () => {
-      // Use the safe public_profiles view (only exposes leaderboard-safe columns)
-      let q = (supabase as unknown as {
-        from: (t: string) => ReturnType<typeof supabase.from>;
-      })
-        .from("public_profiles")
-        .select("user_id, display_name, avatar_url, total_xp, current_streak, current_level, experience_level")
-        .order("total_xp", { ascending: false })
-        .limit(50);
-      if (scope === "level" && me) q = q.eq("experience_level", me.experience_level);
-      const { data } = await q;
+      const { data, error } = await (supabase as unknown as {
+        rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      }).rpc("get_leaderboard", { _limit: 50 });
+      if (error) throw error as Error;
       return (data ?? []) as Array<{
         user_id: string;
         display_name: string | null;
