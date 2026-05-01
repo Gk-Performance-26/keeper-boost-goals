@@ -23,6 +23,11 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } },
     );
 
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
@@ -42,12 +47,50 @@ Deno.serve(async (req) => {
     }
 
     const paddle = getPaddleClient(env);
-    // Cancel at end of period (default behaviour). User keeps access until current_period_end.
-    await paddle.subscriptions.cancel(sub.paddle_subscription_id, { effectiveFrom: "next_billing_period" });
+    try {
+      await paddle.subscriptions.cancel(sub.paddle_subscription_id, { effectiveFrom: "next_billing_period" });
+    } catch (paddleErr: any) {
+      console.error("Paddle cancel error:", paddleErr);
+      const code = paddleErr?.code || paddleErr?.type;
+      const detail: string = paddleErr?.detail || paddleErr?.message || "";
+      const isNotFound = code === "not_found" || /not found/i.test(detail);
+      if (isNotFound) {
+        // Subscription no longer exists in Paddle — sync our DB to reflect that.
+        await admin
+          .from("subscriptions")
+          .update({
+            status: "canceled",
+            cancel_at_period_end: false,
+            current_period_end: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", user.id);
+
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            synced: true,
+            message:
+              "A tua subscrição já não existia no sistema de pagamentos. O teu estado foi atualizado.",
+          }),
+          { status: 200, headers: corsHeaders },
+        );
+      }
+      return new Response(
+        JSON.stringify({
+          error: "PADDLE_CANCEL_FAILED",
+          message: detail || "Não foi possível cancelar a subscrição. Tenta novamente mais tarde.",
+        }),
+        { status: 200, headers: corsHeaders },
+      );
+    }
 
     return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
   } catch (e) {
     console.error("cancel-subscription error:", e);
-    return new Response(JSON.stringify({ error: "An internal error occurred" }), { status: 500, headers: corsHeaders });
+    return new Response(
+      JSON.stringify({ error: "INTERNAL_ERROR", message: "Ocorreu um erro interno. Tenta novamente." }),
+      { status: 200, headers: corsHeaders },
+    );
   }
 });
