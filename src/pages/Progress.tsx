@@ -110,7 +110,9 @@ const Progress = () => {
           <h1 className="font-display text-3xl">{t("progress.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("progress.subtitle")}</p>
         </div>
-        <StreakBadge streak={profile.current_streak} />
+        <div className="mt-3">
+          <StreakBadge streak={profile.current_streak} />
+        </div>
       </header>
 
       {/* Goals (admin can create, users can activate) */}
