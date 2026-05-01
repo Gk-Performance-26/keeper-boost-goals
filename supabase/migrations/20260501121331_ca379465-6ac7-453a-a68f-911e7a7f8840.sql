@@ -1,0 +1,1 @@
+UPDATE public.subscriptions SET status = 'canceled', cancel_at_period_end = false, current_period_end = now(), updated_at = now() WHERE paddle_subscription_id = 'sub_01kq74rwnn0nseycx4m159hm9f';
