@@ -732,6 +732,18 @@ export type Database = {
         }
         Returns: Json
       }
+      get_leaderboard: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          current_level: number
+          current_streak: number
+          display_name: string
+          experience_level: Database["public"]["Enums"]["experience_level"]
+          total_xp: number
+          user_id: string
+        }[]
+      }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
