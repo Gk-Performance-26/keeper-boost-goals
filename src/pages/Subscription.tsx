@@ -91,10 +91,14 @@ const Subscription = () => {
     const targetPriceId = isYearly ? "premium_monthly" : "premium_yearly";
     setSwitching(true);
     try {
-      const { error } = await supabase.functions.invoke("change-subscription-plan", {
+      const { data, error } = await supabase.functions.invoke("change-subscription-plan", {
         body: { environment: isTestMode() ? "sandbox" : "live", priceId: targetPriceId },
       });
       if (error) throw error;
+      if (data?.error) {
+        toast.error(data.message || t("sub.switchError"));
+        return;
+      }
       toast.success(t("sub.switchSuccess"));
       await refetch();
     } catch (e: any) {
