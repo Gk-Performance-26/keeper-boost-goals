@@ -54,8 +54,8 @@ const Trainings = () => {
   const translatedCategoryNames = useTranslatedTexts((categories ?? []).map((c) => c.name));
 
   return (
-    <div className="space-y-5 px-5 pt-8 pb-10">
-      <header>
+    <div className="space-y-5 px-5 pt-16 pb-10">
+      <header className="pt-4">
         <h1 className="font-display text-3xl">{t("trainings.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("trainings.subtitle")}</p>
       </header>
