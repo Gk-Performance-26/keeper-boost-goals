@@ -71,6 +71,21 @@ Deno.serve(async (req) => {
         code === "not_found" ||
         /not found/i.test(detail);
       if (isNotFound) {
+        // Sync DB so the user is no longer shown as having an active subscription.
+        const admin = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        await admin
+          .from("subscriptions")
+          .update({
+            status: "canceled",
+            cancel_at_period_end: false,
+            current_period_end: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", user.id);
+
         return new Response(
           JSON.stringify({
             error: "SUBSCRIPTION_NOT_FOUND",
