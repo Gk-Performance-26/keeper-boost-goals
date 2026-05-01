@@ -26,7 +26,7 @@ export function AppShell() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col">
-      <div className="pointer-events-none fixed left-0 right-0 top-0 z-40 mx-auto flex max-w-md justify-end px-4 pt-8">
+      <div className="pointer-events-none fixed left-0 right-0 top-0 z-40 mx-auto flex max-w-md justify-end px-4 pt-12">
         <div className="pointer-events-auto">
           <LanguageSwitcher />
         </div>
