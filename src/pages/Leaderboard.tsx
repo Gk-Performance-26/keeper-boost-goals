@@ -51,20 +51,6 @@ const Leaderboard = () => {
         <p className="text-sm text-muted-foreground">{t("leaderboard.subtitle")}</p>
       </header>
 
-      <div className="flex rounded-xl bg-muted p-1">
-        {(["global", "level"] as const).map((s) => (
-          <button
-            key={s}
-            onClick={() => setScope(s)}
-            className={cn(
-              "flex-1 rounded-lg py-2 text-sm font-semibold transition",
-              scope === s ? "bg-card shadow" : "text-muted-foreground",
-            )}
-          >
-            {s === "global" ? t("leaderboard.global") : t("leaderboard.myLevel")}
-          </button>
-        ))}
-      </div>
 
       <div className="space-y-2">
         {(rows ?? []).map((r, i) => {
