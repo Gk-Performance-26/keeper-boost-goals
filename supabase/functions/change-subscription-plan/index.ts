@@ -58,14 +58,43 @@ Deno.serve(async (req) => {
     const paddlePriceId = priceData.data[0].id;
 
     const paddle = getPaddleClient(env);
-    await paddle.subscriptions.update(sub.paddle_subscription_id, {
-      items: [{ priceId: paddlePriceId, quantity: 1 }],
-      prorationBillingMode: "prorated_immediately",
-    });
+    try {
+      await paddle.subscriptions.update(sub.paddle_subscription_id, {
+        items: [{ priceId: paddlePriceId, quantity: 1 }],
+        prorationBillingMode: "prorated_immediately",
+      });
+    } catch (paddleErr: any) {
+      console.error("Paddle update error:", paddleErr);
+      const code = paddleErr?.code || paddleErr?.type;
+      const detail: string = paddleErr?.detail || paddleErr?.message || "";
+      const isNotFound =
+        code === "not_found" ||
+        /not found/i.test(detail);
+      if (isNotFound) {
+        return new Response(
+          JSON.stringify({
+            error: "SUBSCRIPTION_NOT_FOUND",
+            message:
+              "A subscrição associada à tua conta já não existe no sistema de pagamentos. Por favor, subscreve novamente o plano pretendido.",
+          }),
+          { status: 200, headers: corsHeaders },
+        );
+      }
+      return new Response(
+        JSON.stringify({
+          error: "PADDLE_UPDATE_FAILED",
+          message: detail || "Não foi possível atualizar o plano. Tenta novamente mais tarde.",
+        }),
+        { status: 200, headers: corsHeaders },
+      );
+    }
 
     return new Response(JSON.stringify({ ok: true }), { headers: corsHeaders });
   } catch (e) {
     console.error("change-subscription-plan error:", e);
-    return new Response(JSON.stringify({ error: "An internal error occurred" }), { status: 500, headers: corsHeaders });
+    return new Response(
+      JSON.stringify({ error: "INTERNAL_ERROR", message: "Ocorreu um erro interno. Tenta novamente." }),
+      { status: 200, headers: corsHeaders },
+    );
   }
 });
