@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    return jsonResponse({ url: signed.signedUrl, type: "upload" });
+    return jsonResponse({ url: signed.signedUrl, type: sourceType });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return jsonResponse({ error: msg }, 500);
