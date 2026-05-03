@@ -13,7 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
-type VideoSrc = "upload" | "youtube" | "vimeo";
+type VideoSrc = "upload" | "youtube" | "vimeo" | "image";
 
 interface Drill {
   title: string;
