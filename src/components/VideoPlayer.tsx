@@ -185,6 +185,15 @@ export function VideoPlayer({
     opts?: { loop?: boolean; isExercise?: boolean },
   ) => {
     const loop = !!opts?.loop;
+    if (vType === "image") {
+      return (
+        <img
+          src={vUrl}
+          alt=""
+          className="aspect-video w-full rounded-2xl bg-black object-cover"
+        />
+      );
+    }
     if (vType === "upload") {
       return (
         <video
