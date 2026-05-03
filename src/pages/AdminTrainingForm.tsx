@@ -150,16 +150,17 @@ const AdminTrainingForm = () => {
   }
   if (!isAdmin) return <Navigate to="/admin" replace />;
 
-  const uploadVideoFile = async (file: File, target: "main" | "intro") => {
+  const uploadVideoFile = async (file: File, target: "main" | "intro", asImage = false) => {
     if (!file) return;
-    if (file.size > 200 * 1024 * 1024) {
+    const maxSize = asImage ? 10 * 1024 * 1024 : 200 * 1024 * 1024;
+    if (file.size > maxSize) {
       toast.error(t("adminForm.fileTooBig"));
       return;
     }
     if (target === "main") setUploading(true);
     else setUploadingIntro(true);
     const ext = file.name.split(".").pop();
-    const path = `${user.id}/${target === "intro" ? "intro-" : ""}${Date.now()}.${ext}`;
+    const path = `${user.id}/${target === "intro" ? "intro-" : ""}${asImage ? "img-" : ""}${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
       .from("training-videos")
       .upload(path, file, { contentType: file.type, upsert: false });
@@ -172,7 +173,7 @@ const AdminTrainingForm = () => {
     const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
     if (target === "main") {
       setVideoUrl(pub.publicUrl);
-      setVideoType("upload");
+      setVideoType(asImage ? "image" : "upload");
       setUploading(false);
     } else {
       setIntroVideoUrl(pub.publicUrl);
@@ -182,7 +183,7 @@ const AdminTrainingForm = () => {
     toast.success(t("adminForm.videoLoaded"));
   };
 
-  const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
+  const handleVideoFile = (file: File) => uploadVideoFile(file, "main", videoType === "image");
   const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
 
