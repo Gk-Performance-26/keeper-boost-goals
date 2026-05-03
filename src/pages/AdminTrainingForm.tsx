@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { EXPERIENCE_LEVELS } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
 
-type VideoType = "upload" | "youtube" | "vimeo";
+type VideoType = "upload" | "youtube" | "vimeo" | "image";
 
 interface Drill {
   title: string;
