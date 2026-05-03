@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Sparkles, Timer } from "lucide-react";
 import { useSignedVideoUrl } from "@/hooks/useSignedVideoUrl";
 
-type VideoSource = "upload" | "youtube" | "vimeo";
+type VideoSource = "upload" | "youtube" | "vimeo" | "image";
 
 interface Props {
   trainingId: string;
