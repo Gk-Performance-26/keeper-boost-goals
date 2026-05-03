@@ -411,12 +411,12 @@ const AdminTrainingForm = () => {
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("adminForm.video")}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
+          <div className="grid grid-cols-4 gap-2">
+            {(["upload", "image", "youtube", "vimeo"] as VideoType[]).map((v) => (
               <button
                 key={v}
                 onClick={() => setVideoType(v)}
-                className={`rounded-lg border px-3 py-2 text-xs font-semibold capitalize transition ${
+                className={`rounded-lg border px-2 py-2 text-xs font-semibold capitalize transition ${
                   videoType === v
                     ? "border-primary bg-primary/15 text-primary"
                     : "border-border bg-muted/30 text-muted-foreground"
@@ -427,7 +427,7 @@ const AdminTrainingForm = () => {
             ))}
           </div>
 
-          {videoType === "upload" ? (
+          {videoType === "upload" || videoType === "image" ? (
             <div className="space-y-2">
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground transition hover:bg-muted/40">
                 {uploading ? (
@@ -441,7 +441,7 @@ const AdminTrainingForm = () => {
                 )}
                 <input
                   type="file"
-                  accept="video/*"
+                  accept={videoType === "image" ? "image/*" : "video/*"}
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
@@ -450,6 +450,9 @@ const AdminTrainingForm = () => {
                   disabled={uploading}
                 />
               </label>
+              {videoUrl && videoType === "image" && (
+                <img src={videoUrl} alt="" className="aspect-video w-full rounded-xl object-cover" />
+              )}
               {videoUrl && (
                 <p className="break-all text-xs text-muted-foreground">URL: {videoUrl}</p>
               )}
