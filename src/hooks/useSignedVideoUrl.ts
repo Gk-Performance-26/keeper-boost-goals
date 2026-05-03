@@ -45,7 +45,7 @@ export function useSignedVideoUrl({
     enabled: !!trainingId && !!fallbackUrl && enabled,
     staleTime: 50 * 60 * 1000, // signed URL is valid for 60 minutes
     queryFn: async () => {
-      if (type !== "upload") {
+      if (type !== "upload" && type !== "image") {
         return fallbackUrl ?? null;
       }
       const { data, error } = await supabase.functions.invoke(
