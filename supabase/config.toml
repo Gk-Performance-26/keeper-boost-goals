@@ -1,1 +1,4 @@
 project_id = "gmxdpofqobkussndolze"
+
+[functions.sign-training-video]
+verify_jwt = false
