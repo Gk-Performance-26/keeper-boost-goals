@@ -68,17 +68,17 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Missing Authorization" }, 401);
     }
 
-    // Validate JWT using getClaims (signing-keys compatible)
+    // Validate JWT by fetching the user with the provided token
     const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
     const token = authHeader.replace(/^[Bb]earer\s+/, "");
-    const { data: claimsData, error: claimsErr } =
-      await userClient.auth.getClaims(token);
-    if (claimsErr || !claimsData?.claims?.sub) {
+    const { data: userData, error: userErr } =
+      await userClient.auth.getUser(token);
+    if (userErr || !userData?.user?.id) {
       return jsonResponse({ error: "Unauthorized" }, 401);
     }
-    const userId = claimsData.claims.sub as string;
+    const userId = userData.user.id;
 
     const body = await req.json().catch(() => null);
     const trainingId: string | undefined = body?.training_id;
