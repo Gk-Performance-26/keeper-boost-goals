@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { EXPERIENCE_LEVELS } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
 
-type VideoType = "upload" | "youtube" | "vimeo";
+type VideoType = "upload" | "youtube" | "vimeo" | "image";
 
 interface Drill {
   title: string;
@@ -150,16 +150,17 @@ const AdminTrainingForm = () => {
   }
   if (!isAdmin) return <Navigate to="/admin" replace />;
 
-  const uploadVideoFile = async (file: File, target: "main" | "intro") => {
+  const uploadVideoFile = async (file: File, target: "main" | "intro", asImage = false) => {
     if (!file) return;
-    if (file.size > 200 * 1024 * 1024) {
+    const maxSize = asImage ? 10 * 1024 * 1024 : 200 * 1024 * 1024;
+    if (file.size > maxSize) {
       toast.error(t("adminForm.fileTooBig"));
       return;
     }
     if (target === "main") setUploading(true);
     else setUploadingIntro(true);
     const ext = file.name.split(".").pop();
-    const path = `${user.id}/${target === "intro" ? "intro-" : ""}${Date.now()}.${ext}`;
+    const path = `${user.id}/${target === "intro" ? "intro-" : ""}${asImage ? "img-" : ""}${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
       .from("training-videos")
       .upload(path, file, { contentType: file.type, upsert: false });
@@ -172,7 +173,7 @@ const AdminTrainingForm = () => {
     const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
     if (target === "main") {
       setVideoUrl(pub.publicUrl);
-      setVideoType("upload");
+      setVideoType(asImage ? "image" : "upload");
       setUploading(false);
     } else {
       setIntroVideoUrl(pub.publicUrl);
@@ -182,7 +183,7 @@ const AdminTrainingForm = () => {
     toast.success(t("adminForm.videoLoaded"));
   };
 
-  const handleVideoFile = (file: File) => uploadVideoFile(file, "main");
+  const handleVideoFile = (file: File) => uploadVideoFile(file, "main", videoType === "image");
   const handleIntroVideoFile = (file: File) => uploadVideoFile(file, "intro");
 
 
@@ -410,12 +411,12 @@ const AdminTrainingForm = () => {
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-4 p-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("adminForm.video")}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {(["upload", "youtube", "vimeo"] as VideoType[]).map((v) => (
+          <div className="grid grid-cols-4 gap-2">
+            {(["upload", "image", "youtube", "vimeo"] as VideoType[]).map((v) => (
               <button
                 key={v}
                 onClick={() => setVideoType(v)}
-                className={`rounded-lg border px-3 py-2 text-xs font-semibold capitalize transition ${
+                className={`rounded-lg border px-2 py-2 text-xs font-semibold capitalize transition ${
                   videoType === v
                     ? "border-primary bg-primary/15 text-primary"
                     : "border-border bg-muted/30 text-muted-foreground"
@@ -426,7 +427,7 @@ const AdminTrainingForm = () => {
             ))}
           </div>
 
-          {videoType === "upload" ? (
+          {videoType === "upload" || videoType === "image" ? (
             <div className="space-y-2">
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground transition hover:bg-muted/40">
                 {uploading ? (
@@ -440,7 +441,7 @@ const AdminTrainingForm = () => {
                 )}
                 <input
                   type="file"
-                  accept="video/*"
+                  accept={videoType === "image" ? "image/*" : "video/*"}
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
@@ -449,6 +450,9 @@ const AdminTrainingForm = () => {
                   disabled={uploading}
                 />
               </label>
+              {videoUrl && videoType === "image" && (
+                <img src={videoUrl} alt="" className="aspect-video w-full rounded-xl object-cover" />
+              )}
               {videoUrl && (
                 <p className="break-all text-xs text-muted-foreground">URL: {videoUrl}</p>
               )}

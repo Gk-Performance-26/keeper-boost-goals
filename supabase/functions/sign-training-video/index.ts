@@ -154,8 +154,8 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "No video for this field" }, 404);
     }
 
-    // Only sign uploaded files. YouTube/Vimeo URLs are returned as-is.
-    if (sourceType !== "upload") {
+    // Only sign uploaded files (videos or images). YouTube/Vimeo URLs are returned as-is.
+    if (sourceType !== "upload" && sourceType !== "image") {
       return jsonResponse({ url: sourceUrl, type: sourceType });
     }
 
@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    return jsonResponse({ url: signed.signedUrl, type: "upload" });
+    return jsonResponse({ url: signed.signedUrl, type: sourceType });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     return jsonResponse({ error: msg }, 500);

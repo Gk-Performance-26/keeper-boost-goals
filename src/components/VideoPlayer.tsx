@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Sparkles, Timer } from "lucide-react";
 import { useSignedVideoUrl } from "@/hooks/useSignedVideoUrl";
 
-type VideoSource = "upload" | "youtube" | "vimeo";
+type VideoSource = "upload" | "youtube" | "vimeo" | "image";
 
 interface Props {
   trainingId: string;
@@ -185,6 +185,15 @@ export function VideoPlayer({
     opts?: { loop?: boolean; isExercise?: boolean },
   ) => {
     const loop = !!opts?.loop;
+    if (vType === "image") {
+      return (
+        <img
+          src={vUrl}
+          alt=""
+          className="aspect-video w-full rounded-2xl bg-black object-cover"
+        />
+      );
+    }
     if (vType === "upload") {
       return (
         <video

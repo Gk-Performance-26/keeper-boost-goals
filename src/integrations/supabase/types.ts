@@ -759,7 +759,7 @@ export type Database = {
       experience_level: "beginner" | "intermediate" | "advanced" | "pro"
       stretching_parent: "alongamentos" | "recuperacao"
       training_group: "fisico" | "tecnico" | "aquecimento" | "alongamento"
-      video_source_type: "upload" | "youtube" | "vimeo"
+      video_source_type: "upload" | "youtube" | "vimeo" | "image"
       warmup_parent: "geral" | "gk"
     }
     CompositeTypes: {
@@ -893,7 +893,7 @@ export const Constants = {
       experience_level: ["beginner", "intermediate", "advanced", "pro"],
       stretching_parent: ["alongamentos", "recuperacao"],
       training_group: ["fisico", "tecnico", "aquecimento", "alongamento"],
-      video_source_type: ["upload", "youtube", "vimeo"],
+      video_source_type: ["upload", "youtube", "vimeo", "image"],
       warmup_parent: ["geral", "gk"],
     },
   },

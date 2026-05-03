@@ -12,7 +12,7 @@ interface Args {
   field: VideoFieldKey;
   drillIndex?: number;
   /** Only call the function for "upload" videos. YouTube/Vimeo are returned untouched. */
-  type: "upload" | "youtube" | "vimeo" | null | undefined;
+  type: "upload" | "youtube" | "vimeo" | "image" | null | undefined;
   /** Original URL (used directly when type !== "upload"). */
   fallbackUrl: string | null | undefined;
   enabled?: boolean;
@@ -45,7 +45,7 @@ export function useSignedVideoUrl({
     enabled: !!trainingId && !!fallbackUrl && enabled,
     staleTime: 50 * 60 * 1000, // signed URL is valid for 60 minutes
     queryFn: async () => {
-      if (type !== "upload") {
+      if (type !== "upload" && type !== "image") {
         return fallbackUrl ?? null;
       }
       const { data, error } = await supabase.functions.invoke(
