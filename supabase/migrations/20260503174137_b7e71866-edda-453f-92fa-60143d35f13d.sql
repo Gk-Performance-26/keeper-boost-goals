@@ -1,0 +1,1 @@
+DELETE FROM warmup_subcategories WHERE id='935b1ce3-993c-4c8d-aa43-58c85156f2f9';
