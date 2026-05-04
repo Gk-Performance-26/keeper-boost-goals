@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, ArrowRightLeft, Check, Crown, Loader2, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,36 @@ const Subscription = () => {
   const { t, lang } = useLanguage();
 
   const isYearly = subscription?.price_id === "premium_yearly";
+
+  // On the web, if we receive ?checkout=premium_yearly&uid=...&email=..., auto-open Paddle
+  // (this is the entry point used when the iOS app opens the web checkout in Safari).
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) return;
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    const uid = params.get("uid");
+    const email = params.get("email");
+    if (!checkout || !uid) return;
+    (async () => {
+      try {
+        await initializePaddle();
+        const paddlePriceId = await getPaddlePriceId(checkout);
+        window.Paddle.Checkout.open({
+          items: [{ priceId: paddlePriceId, quantity: 1 }],
+          customer: email ? { email } : undefined,
+          customData: { userId: uid },
+          settings: {
+            displayMode: "overlay",
+            successUrl: `${window.location.origin}/subscription?success=1`,
+            allowLogout: false,
+            variant: "one-page",
+          },
+        });
+      } catch (e: any) {
+        toast.error(e.message);
+      }
+    })();
+  }, []);
 
   if (!user) return <Navigate to="/auth" replace />;
 
