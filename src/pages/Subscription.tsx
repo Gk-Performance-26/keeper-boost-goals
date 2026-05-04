@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, ArrowRightLeft, Check, Crown, Loader2, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +38,36 @@ const Subscription = () => {
 
   const isYearly = subscription?.price_id === "premium_yearly";
 
+  // On the web, if we receive ?checkout=premium_yearly&uid=...&email=..., auto-open Paddle
+  // (this is the entry point used when the iOS app opens the web checkout in Safari).
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) return;
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    const uid = params.get("uid");
+    const email = params.get("email");
+    if (!checkout || !uid) return;
+    (async () => {
+      try {
+        await initializePaddle();
+        const paddlePriceId = await getPaddlePriceId(checkout);
+        window.Paddle.Checkout.open({
+          items: [{ priceId: paddlePriceId, quantity: 1 }],
+          customer: email ? { email } : undefined,
+          customData: { userId: uid },
+          settings: {
+            displayMode: "overlay",
+            successUrl: `${window.location.origin}/subscription?success=1`,
+            allowLogout: false,
+            variant: "one-page",
+          },
+        });
+      } catch (e: any) {
+        toast.error(e.message);
+      }
+    })();
+  }, []);
+
   if (!user) return <Navigate to="/auth" replace />;
 
   const benefits = [
@@ -50,6 +82,15 @@ const Subscription = () => {
   const openCheckout = async () => {
     setOpening(true);
     try {
+      // On native apps (iOS/Android), Paddle.js cannot run inside the
+      // capacitor:// WebView — open the hosted web checkout in the system browser.
+      if (Capacitor.isNativePlatform()) {
+        const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
+        const url = `https://gkperformancehub.com/subscription?checkout=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
+        await Browser.open({ url });
+        return;
+      }
+
       await initializePaddle();
       const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
       const paddlePriceId = await getPaddlePriceId(priceKey);
@@ -59,9 +100,7 @@ const Subscription = () => {
         customData: { userId: user.id },
         settings: {
           displayMode: "overlay",
-          successUrl: (window.location.protocol.startsWith("http")
-            ? `${window.location.origin}/subscription?success=1`
-            : `https://gkperformancehub.com/subscription?success=1`),
+          successUrl: `${window.location.origin}/subscription?success=1`,
           allowLogout: false,
           variant: "one-page",
         },
