@@ -86,7 +86,7 @@ const Subscription = () => {
       if (Capacitor.isNativePlatform()) {
         const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
         const url = `https://gkperformancehub.com/subscription?checkout=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
-        await Browser.open({ url });
+        window.open(url, "_system");
         return;
       }
 
