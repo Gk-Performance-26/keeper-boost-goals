@@ -59,7 +59,9 @@ const Subscription = () => {
         customData: { userId: user.id },
         settings: {
           displayMode: "overlay",
-          successUrl: `${window.location.origin}/subscription?success=1`,
+          successUrl: (window.location.protocol.startsWith("http")
+            ? `${window.location.origin}/subscription?success=1`
+            : `https://gkperformancehub.com/subscription?success=1`),
           allowLogout: false,
           variant: "one-page",
         },
