@@ -18,7 +18,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
 import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
