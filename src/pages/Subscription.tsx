@@ -17,6 +17,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +52,15 @@ const Subscription = () => {
   const openCheckout = async () => {
     setOpening(true);
     try {
+      // On native apps (iOS/Android), Paddle.js cannot run inside the
+      // capacitor:// WebView — open the hosted web checkout in the system browser.
+      if (Capacitor.isNativePlatform()) {
+        const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
+        const url = `https://gkperformancehub.com/subscription?checkout=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
+        await Browser.open({ url });
+        return;
+      }
+
       await initializePaddle();
       const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
       const paddlePriceId = await getPaddlePriceId(priceKey);
@@ -59,9 +70,7 @@ const Subscription = () => {
         customData: { userId: user.id },
         settings: {
           displayMode: "overlay",
-          successUrl: (window.location.protocol.startsWith("http")
-            ? `${window.location.origin}/subscription?success=1`
-            : `https://gkperformancehub.com/subscription?success=1`),
+          successUrl: `${window.location.origin}/subscription?success=1`,
           allowLogout: false,
           variant: "one-page",
         },
