@@ -18,7 +18,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
 import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,7 +86,7 @@ const Subscription = () => {
       if (Capacitor.isNativePlatform()) {
         const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
         const url = `https://gkperformancehub.com/subscription?checkout=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
-        await Browser.open({ url });
+        window.open(url, "_system");
         return;
       }
 
