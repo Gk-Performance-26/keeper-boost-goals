@@ -63,9 +63,12 @@ export function VideoPlayer({
   onAllEnded,
   skipCountdown = false,
   exerciseDurationSeconds,
+  loopExercise = false,
 }: Props) {
   const hasIntro = !!introUrl;
-  const isDrill = mainField === "drill_exercise";
+  const isDrillField = mainField === "drill_exercise";
+  // Treat as drill (looped + timer) if it's a drill field OR caller asked for loopExercise
+  const isDrill = isDrillField || loopExercise;
   const DRILL_DURATION_SECONDS = exerciseDurationSeconds ?? DEFAULT_DRILL_DURATION_SECONDS;
   const [phase, setPhase] = useState<"intro" | "countdown" | "exercise">(
     hasIntro ? "intro" : "exercise",
