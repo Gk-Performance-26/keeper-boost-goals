@@ -24,6 +24,8 @@ interface Props {
   skipCountdown?: boolean;
   /** Duration of the drill timer in seconds. Defaults to 20s. */
   exerciseDurationSeconds?: number;
+  /** If true, treat the main exercise video as a loopable timed drill (for non-drill players). */
+  loopExercise?: boolean;
 }
 
 const DEFAULT_DRILL_DURATION_SECONDS = 20;
