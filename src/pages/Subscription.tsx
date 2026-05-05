@@ -85,7 +85,7 @@ const Subscription = () => {
       // capacitor:// WebView — open the hosted web checkout in the system browser.
       if (Capacitor.isNativePlatform()) {
         const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
-        const url = `https://gkperformancehub.com/subscription?checkout=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
+        const url = `https://gkperformancehub.com/checkout?price=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
         window.open(url, "_system");
         return;
       }
