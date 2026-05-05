@@ -75,6 +75,29 @@ Deno.serve(async (req) => {
         code === "not_found" ||
         /not found/i.test(detail);
       if (isNotFound) {
+        // Verify the subscription doesn't exist in the OTHER Paddle env before
+        // corrupting local state. Protects against client sending wrong `environment`.
+        const otherEnv: PaddleEnv = env === "sandbox" ? "live" : "sandbox";
+        let existsInOther = false;
+        try {
+          const otherPaddle = getPaddleClient(otherEnv);
+          const otherSub = await otherPaddle.subscriptions.get(sub.paddle_subscription_id);
+          if (otherSub) existsInOther = true;
+        } catch (_) {
+          existsInOther = false;
+        }
+
+        if (existsInOther) {
+          return new Response(
+            JSON.stringify({
+              error: "WRONG_ENVIRONMENT",
+              message:
+                "A tua subscrição existe noutro ambiente de pagamento. Por favor, tenta novamente.",
+            }),
+            { status: 400, headers: corsHeaders },
+          );
+        }
+
         // Sync DB so the user is no longer shown as having an active subscription.
         const admin = createClient(
           Deno.env.get("SUPABASE_URL")!,
