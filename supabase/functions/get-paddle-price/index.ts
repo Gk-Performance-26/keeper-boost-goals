@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { gatewayFetch, type PaddleEnv } from '../_shared/paddle.ts';
 
 const responseHeaders = {
@@ -15,15 +16,40 @@ serve(async (req) => {
   }
 
   try {
+    // Require authentication to prevent unauthenticated probing of Paddle prices.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        ...responseHeaders,
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        ...responseHeaders,
+      });
+    }
+
     const { priceId, environment } = await req.json();
-    if (!priceId) {
+    if (!priceId || typeof priceId !== "string") {
       return new Response(JSON.stringify({ error: "priceId required" }), {
         status: 400,
         ...responseHeaders,
       });
     }
 
-    const env = (environment || 'sandbox') as PaddleEnv;
+    // Strict allowlist for environment values.
+    const env: PaddleEnv = environment === "live" ? "live" : "sandbox";
     const response = await gatewayFetch(env, `/prices?external_id=${encodeURIComponent(priceId)}`);
     const data = await response.json();
 
@@ -37,7 +63,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ paddleId: data.data[0].id }), responseHeaders);
   } catch (e) {
     console.error("get-paddle-price error:", e);
-    return new Response(JSON.stringify({ error: String(e) }), {
+    return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,
       ...responseHeaders,
     });
