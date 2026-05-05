@@ -56,6 +56,22 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Input size limits to prevent AI credit exhaustion abuse.
+    const MAX_TEXTS = 50;
+    const MAX_TEXT_LEN = 500;
+    if (texts.length > MAX_TEXTS) {
+      return new Response(
+        JSON.stringify({ error: `Too many texts (max ${MAX_TEXTS})` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    if (texts.some((t) => typeof t !== "string" || t.length > MAX_TEXT_LEN)) {
+      return new Response(
+        JSON.stringify({ error: `Each text must be a string up to ${MAX_TEXT_LEN} chars` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 

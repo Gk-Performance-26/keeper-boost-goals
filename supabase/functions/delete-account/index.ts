@@ -30,7 +30,11 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const env = ((body.environment as string) || "sandbox") as PaddleEnv;
+    const rawEnv = (body.environment as string) || "sandbox";
+    if (rawEnv !== "sandbox" && rawEnv !== "live") {
+      return new Response(JSON.stringify({ error: "Invalid environment" }), { status: 400, headers: corsHeaders });
+    }
+    const env: PaddleEnv = rawEnv;
 
     // Service-role client to perform privileged deletions
     const admin = createClient(
