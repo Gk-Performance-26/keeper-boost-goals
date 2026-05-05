@@ -98,11 +98,11 @@ export function VideoPlayer({
     drillIndex,
     type,
     fallbackUrl: url,
-    // For drills with an intro, reuse the intro video as the exercise loop
-    enabled: !(isDrill && hasIntro),
+    // For DRILL fields with an intro, reuse the intro video as the exercise loop
+    enabled: !(isDrillField && hasIntro),
   });
-  // For drills with intro: exercise = same intro video (looped 20s)
-  const main = isDrill && hasIntro
+  // For drill fields with intro: exercise = same intro video (looped)
+  const main = isDrillField && hasIntro
     ? {
         data: intro.data,
         isLoading: intro.isLoading,
@@ -110,7 +110,7 @@ export function VideoPlayer({
       }
     : mainSigned;
   const exerciseType: VideoSource =
-    isDrill && hasIntro ? ((introType ?? "upload") as VideoSource) : type;
+    isDrillField && hasIntro ? ((introType ?? "upload") as VideoSource) : type;
 
   // Reset phase when intro changes (e.g. switching trainings)
   useEffect(() => {
