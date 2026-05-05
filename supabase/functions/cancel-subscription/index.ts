@@ -34,7 +34,11 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const env = ((body.environment as string) || "sandbox") as PaddleEnv;
+    const rawEnv = (body.environment as string) || "sandbox";
+    if (rawEnv !== "sandbox" && rawEnv !== "live") {
+      return new Response(JSON.stringify({ error: "Invalid environment" }), { status: 400, headers: corsHeaders });
+    }
+    const env: PaddleEnv = rawEnv;
 
     const { data: sub } = await supabase
       .from("subscriptions")
@@ -55,6 +59,31 @@ Deno.serve(async (req) => {
       const detail: string = paddleErr?.detail || paddleErr?.message || "";
       const isNotFound = code === "not_found" || /not found/i.test(detail);
       if (isNotFound) {
+        // Before marking canceled locally, verify the subscription doesn't exist in the OTHER
+        // Paddle environment either. This prevents a client sending the wrong `environment`
+        // value from corrupting subscription state for a user who actually has an active
+        // subscription in the other env.
+        const otherEnv: PaddleEnv = env === "sandbox" ? "live" : "sandbox";
+        let existsInOther = false;
+        try {
+          const otherPaddle = getPaddleClient(otherEnv);
+          const otherSub = await otherPaddle.subscriptions.get(sub.paddle_subscription_id);
+          if (otherSub) existsInOther = true;
+        } catch (_) {
+          existsInOther = false;
+        }
+
+        if (existsInOther) {
+          return new Response(
+            JSON.stringify({
+              error: "WRONG_ENVIRONMENT",
+              message:
+                "A tua subscrição existe noutro ambiente de pagamento. Por favor, tenta novamente.",
+            }),
+            { status: 400, headers: corsHeaders },
+          );
+        }
+
         // Subscription no longer exists in Paddle — sync our DB to reflect that.
         await admin
           .from("subscriptions")

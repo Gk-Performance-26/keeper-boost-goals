@@ -29,7 +29,11 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const env = ((body.environment as string) || "sandbox") as PaddleEnv;
+    const rawEnv = (body.environment as string) || "sandbox";
+    if (rawEnv !== "sandbox" && rawEnv !== "live") {
+      return new Response(JSON.stringify({ error: "Invalid environment" }), { status: 400, headers: corsHeaders });
+    }
+    const env: PaddleEnv = rawEnv;
     const targetPriceKey = body.priceId as string; // e.g. "premium_monthly" | "premium_yearly"
     if (!targetPriceKey) {
       return new Response(JSON.stringify({ error: "Missing priceId" }), { status: 400, headers: corsHeaders });
@@ -71,6 +75,29 @@ Deno.serve(async (req) => {
         code === "not_found" ||
         /not found/i.test(detail);
       if (isNotFound) {
+        // Verify the subscription doesn't exist in the OTHER Paddle env before
+        // corrupting local state. Protects against client sending wrong `environment`.
+        const otherEnv: PaddleEnv = env === "sandbox" ? "live" : "sandbox";
+        let existsInOther = false;
+        try {
+          const otherPaddle = getPaddleClient(otherEnv);
+          const otherSub = await otherPaddle.subscriptions.get(sub.paddle_subscription_id);
+          if (otherSub) existsInOther = true;
+        } catch (_) {
+          existsInOther = false;
+        }
+
+        if (existsInOther) {
+          return new Response(
+            JSON.stringify({
+              error: "WRONG_ENVIRONMENT",
+              message:
+                "A tua subscrição existe noutro ambiente de pagamento. Por favor, tenta novamente.",
+            }),
+            { status: 400, headers: corsHeaders },
+          );
+        }
+
         // Sync DB so the user is no longer shown as having an active subscription.
         const admin = createClient(
           Deno.env.get("SUPABASE_URL")!,
