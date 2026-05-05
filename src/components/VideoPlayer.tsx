@@ -22,9 +22,11 @@ interface Props {
   onAllEnded?: () => void;
   /** If true, when the intro ends jump straight to the exercise (no countdown). */
   skipCountdown?: boolean;
+  /** Duration of the drill timer in seconds. Defaults to 20s. */
+  exerciseDurationSeconds?: number;
 }
 
-const DRILL_DURATION_SECONDS = 20;
+const DEFAULT_DRILL_DURATION_SECONDS = 20;
 
 function buildAutoplayUrl(url: string, type: VideoSource, loop = false): string {
   if (type === "youtube") {
@@ -58,9 +60,11 @@ export function VideoPlayer({
   introField = "intro",
   onAllEnded,
   skipCountdown = false,
+  exerciseDurationSeconds,
 }: Props) {
   const hasIntro = !!introUrl;
   const isDrill = mainField === "drill_exercise";
+  const DRILL_DURATION_SECONDS = exerciseDurationSeconds ?? DEFAULT_DRILL_DURATION_SECONDS;
   const [phase, setPhase] = useState<"intro" | "countdown" | "exercise">(
     hasIntro ? "intro" : "exercise",
   );
