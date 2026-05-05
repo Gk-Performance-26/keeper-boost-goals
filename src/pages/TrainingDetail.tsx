@@ -158,7 +158,7 @@ const TrainingDetail = () => {
           introLabel={t("training.introVideo")}
           exerciseLabel={t("training.exerciseVideo")}
           skipCountdown
-          mainField="drill_exercise"
+          loopExercise
           exerciseDurationSeconds={(training as any).exercise_duration_seconds ?? 20}
           onAllEnded={() => goToNextDrill(null)}
         />
