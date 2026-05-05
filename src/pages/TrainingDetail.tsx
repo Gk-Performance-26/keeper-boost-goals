@@ -158,6 +158,8 @@ const TrainingDetail = () => {
           introLabel={t("training.introVideo")}
           exerciseLabel={t("training.exerciseVideo")}
           skipCountdown
+          loopExercise
+          exerciseDurationSeconds={(training as any).exercise_duration_seconds ?? 20}
           onAllEnded={() => goToNextDrill(null)}
         />
       )}
@@ -290,6 +292,7 @@ const TrainingDetail = () => {
                           introType={d.intro_video_type}
                           introLabel={t("training.introVideo")}
                           exerciseLabel={t("training.exerciseVideo")}
+                          exerciseDurationSeconds={(training as any).exercise_duration_seconds ?? 20}
                           onAllEnded={() => handleDrillEnded(i)}
                         />
                       </div>

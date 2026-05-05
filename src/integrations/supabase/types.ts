@@ -390,6 +390,7 @@ export type Database = {
           drills: Json
           duration_minutes: number
           equipment: string[] | null
+          exercise_duration_seconds: number
           id: string
           intro_video_type:
             | Database["public"]["Enums"]["video_source_type"]
@@ -415,6 +416,7 @@ export type Database = {
           drills?: Json
           duration_minutes?: number
           equipment?: string[] | null
+          exercise_duration_seconds?: number
           id?: string
           intro_video_type?:
             | Database["public"]["Enums"]["video_source_type"]
@@ -440,6 +442,7 @@ export type Database = {
           drills?: Json
           duration_minutes?: number
           equipment?: string[] | null
+          exercise_duration_seconds?: number
           id?: string
           intro_video_type?:
             | Database["public"]["Enums"]["video_source_type"]

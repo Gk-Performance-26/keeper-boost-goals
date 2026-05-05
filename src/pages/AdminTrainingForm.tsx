@@ -49,6 +49,7 @@ const AdminTrainingForm = () => {
   const [level, setLevel] = useState<string>("beginner");
   const [duration, setDuration] = useState(15);
   const [xpReward, setXpReward] = useState(50);
+  const [exerciseDurationSeconds, setExerciseDurationSeconds] = useState(20);
   const [videoType, setVideoType] = useState<VideoType>("youtube");
   const [videoUrl, setVideoUrl] = useState("");
   const [introVideoType, setIntroVideoType] = useState<VideoType>("upload");
@@ -113,6 +114,7 @@ const AdminTrainingForm = () => {
       setLevel(existing.level ?? "beginner");
       setDuration(existing.duration_minutes ?? 15);
       setXpReward(existing.xp_reward ?? 50);
+      setExerciseDurationSeconds((existing as any).exercise_duration_seconds ?? 20);
       setVideoType((existing.video_type as VideoType) ?? "youtube");
       setVideoUrl(existing.video_url ?? "");
       setIntroVideoType(((existing as any).intro_video_type as VideoType) ?? "upload");
@@ -234,6 +236,7 @@ const AdminTrainingForm = () => {
       level: level as any,
       duration_minutes: duration,
       xp_reward: xpReward,
+      exercise_duration_seconds: exerciseDurationSeconds,
       video_type: videoType as any,
       video_url: videoUrl.trim(),
       intro_video_url: introVideoUrl.trim() || null,
@@ -403,6 +406,19 @@ const AdminTrainingForm = () => {
                 value={xpReward}
                 onChange={(e) => setXpReward(parseInt(e.target.value) || 0)}
               />
+            </div>
+            <div className="col-span-2 space-y-1.5">
+              <Label>Duração do exercício (segundos)</Label>
+              <Input
+                type="number"
+                min={5}
+                max={600}
+                value={exerciseDurationSeconds}
+                onChange={(e) => setExerciseDurationSeconds(parseInt(e.target.value) || 20)}
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Cronómetro mostrado ao utilizador durante cada exercício. O vídeo fica em loop até o tempo terminar.
+              </p>
             </div>
           </div>
         </CardContent>

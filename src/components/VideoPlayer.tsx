@@ -22,9 +22,13 @@ interface Props {
   onAllEnded?: () => void;
   /** If true, when the intro ends jump straight to the exercise (no countdown). */
   skipCountdown?: boolean;
+  /** Duration of the drill timer in seconds. Defaults to 20s. */
+  exerciseDurationSeconds?: number;
+  /** If true, treat the main exercise video as a loopable timed drill (for non-drill players). */
+  loopExercise?: boolean;
 }
 
-const DRILL_DURATION_SECONDS = 20;
+const DEFAULT_DRILL_DURATION_SECONDS = 20;
 
 function buildAutoplayUrl(url: string, type: VideoSource, loop = false): string {
   if (type === "youtube") {
@@ -58,9 +62,14 @@ export function VideoPlayer({
   introField = "intro",
   onAllEnded,
   skipCountdown = false,
+  exerciseDurationSeconds,
+  loopExercise = false,
 }: Props) {
   const hasIntro = !!introUrl;
-  const isDrill = mainField === "drill_exercise";
+  const isDrillField = mainField === "drill_exercise";
+  // Treat as drill (looped + timer) if it's a drill field OR caller asked for loopExercise
+  const isDrill = isDrillField || loopExercise;
+  const DRILL_DURATION_SECONDS = exerciseDurationSeconds ?? DEFAULT_DRILL_DURATION_SECONDS;
   const [phase, setPhase] = useState<"intro" | "countdown" | "exercise">(
     hasIntro ? "intro" : "exercise",
   );
@@ -89,11 +98,11 @@ export function VideoPlayer({
     drillIndex,
     type,
     fallbackUrl: url,
-    // For drills with an intro, reuse the intro video as the exercise loop
-    enabled: !(isDrill && hasIntro),
+    // For DRILL fields with an intro, reuse the intro video as the exercise loop
+    enabled: !(isDrillField && hasIntro),
   });
-  // For drills with intro: exercise = same intro video (looped 20s)
-  const main = isDrill && hasIntro
+  // For drill fields with intro: exercise = same intro video (looped)
+  const main = isDrillField && hasIntro
     ? {
         data: intro.data,
         isLoading: intro.isLoading,
@@ -101,7 +110,7 @@ export function VideoPlayer({
       }
     : mainSigned;
   const exerciseType: VideoSource =
-    isDrill && hasIntro ? ((introType ?? "upload") as VideoSource) : type;
+    isDrillField && hasIntro ? ((introType ?? "upload") as VideoSource) : type;
 
   // Reset phase when intro changes (e.g. switching trainings)
   useEffect(() => {

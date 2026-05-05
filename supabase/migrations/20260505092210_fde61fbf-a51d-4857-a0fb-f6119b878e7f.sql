@@ -1,0 +1,1 @@
+ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS exercise_duration_seconds integer NOT NULL DEFAULT 20;
