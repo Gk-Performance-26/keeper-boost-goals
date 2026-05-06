@@ -44,10 +44,10 @@ const Trainings = () => {
     });
   }, [trainings, categorySlug, level]);
 
-  const groups: { key: "fisico" | "tecnico" | "aquecimento" | "alongamento"; label: string; emoji: string }[] = [
+  const groups: { key: "aquecimento" | "fisico" | "tecnico" | "alongamento"; label: string; emoji: string }[] = [
+    { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥" },
     { key: "fisico", label: t("trainings.group.fisico"), emoji: "💪" },
     { key: "tecnico", label: t("trainings.group.tecnico"), emoji: "⚽" },
-    { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥" },
     { key: "alongamento", label: t("trainings.group.alongamento"), emoji: "🧘" },
   ];
 
