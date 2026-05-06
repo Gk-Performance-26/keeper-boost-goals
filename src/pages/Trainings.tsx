@@ -118,36 +118,51 @@ const Trainings = () => {
             );
           }
 
+          const isOpen = !!openGroups[g.key];
           return (
-            <section key={g.key} className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xl" aria-hidden>
-                  {g.emoji}
-                </span>
-                <h2 className="font-display text-lg">{g.label}</h2>
-              </div>
-              {items.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-border/60 bg-muted/20 py-5 text-center text-xs text-muted-foreground">
-                  {t("trainings.emptyGroup")}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {items.map((tr: any) => (
-                    <TrainingCard
-                      key={tr.id}
-                      id={tr.id}
-                      title={tr.title}
-                      level={tr.level}
-                      duration={tr.duration_minutes}
-                      xp={tr.xp_reward}
-                      categoryName={tr.categories?.name}
-                      categoryIcon={tr.categories?.icon}
-                      categoryColorToken={tr.categories?.color_token}
-                      isPremium={tr.is_premium}
-                      locked={tr.is_premium && !hasSub}
-                    />
-                  ))}
+            <section key={g.key} className="space-y-3">
+              <button
+                type="button"
+                onClick={() => setOpenGroups((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
+                className="group flex w-full items-center justify-between rounded-2xl border border-border/60 bg-gradient-to-br from-primary/10 to-primary/5 px-5 py-4 transition hover:border-primary/40 hover:from-primary/15"
+                aria-expanded={isOpen}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl" aria-hidden>
+                    {g.emoji}
+                  </span>
+                  <h2 className="font-display text-lg">{g.label}</h2>
                 </div>
+                {isOpen ? (
+                  <ChevronDown className="h-5 w-5 text-primary transition" />
+                ) : (
+                  <ChevronRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
+                )}
+              </button>
+              {isOpen && (
+                items.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-border/60 bg-muted/20 py-5 text-center text-xs text-muted-foreground">
+                    {t("trainings.emptyGroup")}
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {items.map((tr: any) => (
+                      <TrainingCard
+                        key={tr.id}
+                        id={tr.id}
+                        title={tr.title}
+                        level={tr.level}
+                        duration={tr.duration_minutes}
+                        xp={tr.xp_reward}
+                        categoryName={tr.categories?.name}
+                        categoryIcon={tr.categories?.icon}
+                        categoryColorToken={tr.categories?.color_token}
+                        isPremium={tr.is_premium}
+                        locked={tr.is_premium && !hasSub}
+                      />
+                    ))}
+                  </div>
+                )
               )}
             </section>
           );
