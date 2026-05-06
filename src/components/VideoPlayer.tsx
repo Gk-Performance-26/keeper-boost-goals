@@ -243,7 +243,7 @@ export function VideoPlayer({
   };
 
   const renderTimerBadge = () => {
-    if (!isDrill || phase !== "exercise") return null;
+    if (!isDrillField || phase !== "exercise") return null;
     const pct = (secondsLeft / DRILL_DURATION_SECONDS) * 100;
     return (
       <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2">
