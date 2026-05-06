@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
-const TRIAL_DAYS = 5;
+const TRIAL_DAYS = 3;
 
 export function useSubscription() {
   const { user } = useAuth();
