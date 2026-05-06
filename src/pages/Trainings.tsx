@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 const Trainings = () => {
   const [categorySlug, setCategorySlug] = useState<string | null>(null);
   const [level, setLevel] = useState<ExperienceLevel | null>(null);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const { isActive: hasSub } = useSubscription();
   const { t } = useLanguage();
 
