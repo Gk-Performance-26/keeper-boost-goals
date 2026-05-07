@@ -651,6 +651,53 @@ const AdminTrainingForm = () => {
                   />
                 </div>
 
+                <div className="grid grid-cols-3 gap-2 rounded-md border border-border/40 bg-background/40 p-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Duração (s)</Label>
+                    <Input
+                      type="number"
+                      min={5}
+                      max={600}
+                      className="h-8 text-xs"
+                      value={d.duration_seconds ?? 20}
+                      onChange={(e) => {
+                        const n = [...drills];
+                        n[i].duration_seconds = parseInt(e.target.value) || 20;
+                        setDrills(n);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Séries</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={20}
+                      className="h-8 text-xs"
+                      value={d.sets ?? 1}
+                      onChange={(e) => {
+                        const n = [...drills];
+                        n[i].sets = parseInt(e.target.value) || 1;
+                        setDrills(n);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Descanso (s)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={600}
+                      className="h-8 text-xs"
+                      value={d.rest_seconds ?? 15}
+                      onChange={(e) => {
+                        const n = [...drills];
+                        n[i].rest_seconds = parseInt(e.target.value) || 0;
+                        setDrills(n);
+                      }}
+                    />
+                  </div>
+                </div>
                 {(["intro_video_url", "exercise_video_url"] as const).map((field) => {
                   const typeField = field === "intro_video_url" ? "intro_video_type" : "exercise_video_type";
                   const url = (d[field] as string) || "";
