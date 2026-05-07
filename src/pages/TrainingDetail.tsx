@@ -23,6 +23,9 @@ interface Drill {
   intro_video_type?: VideoSrc | null;
   exercise_video_url?: string | null;
   exercise_video_type?: VideoSrc | null;
+  duration_seconds?: number;
+  sets?: number;
+  rest_seconds?: number;
 }
 
 const TrainingDetail = () => {
@@ -158,8 +161,6 @@ const TrainingDetail = () => {
           introLabel={t("training.introVideo")}
           exerciseLabel={t("training.exerciseVideo")}
           skipCountdown
-          loopExercise
-          exerciseDurationSeconds={(training as any).exercise_duration_seconds ?? 20}
           onAllEnded={() => goToNextDrill(null)}
         />
       )}
@@ -292,7 +293,9 @@ const TrainingDetail = () => {
                           introType={d.intro_video_type}
                           introLabel={t("training.introVideo")}
                           exerciseLabel={t("training.exerciseVideo")}
-                          exerciseDurationSeconds={(training as any).exercise_duration_seconds ?? 20}
+                          exerciseDurationSeconds={d.duration_seconds ?? 20}
+                          sets={d.sets ?? 1}
+                          restSeconds={d.rest_seconds ?? 15}
                           onAllEnded={() => handleDrillEnded(i)}
                         />
                       </div>

@@ -33,6 +33,9 @@ interface Drill {
   intro_video_type?: VideoType;
   exercise_video_url?: string;
   exercise_video_type?: VideoType;
+  duration_seconds?: number;
+  sets?: number;
+  rest_seconds?: number;
 }
 
 const AdminTrainingForm = () => {
@@ -49,7 +52,7 @@ const AdminTrainingForm = () => {
   const [level, setLevel] = useState<string>("beginner");
   const [duration, setDuration] = useState(15);
   const [xpReward, setXpReward] = useState(50);
-  const [exerciseDurationSeconds, setExerciseDurationSeconds] = useState(20);
+  
   const [videoType, setVideoType] = useState<VideoType>("youtube");
   const [videoUrl, setVideoUrl] = useState("");
   const [introVideoType, setIntroVideoType] = useState<VideoType>("upload");
@@ -114,7 +117,7 @@ const AdminTrainingForm = () => {
       setLevel(existing.level ?? "beginner");
       setDuration(existing.duration_minutes ?? 15);
       setXpReward(existing.xp_reward ?? 50);
-      setExerciseDurationSeconds((existing as any).exercise_duration_seconds ?? 20);
+      
       setVideoType((existing.video_type as VideoType) ?? "youtube");
       setVideoUrl(existing.video_url ?? "");
       setIntroVideoType(((existing as any).intro_video_type as VideoType) ?? "upload");
@@ -131,6 +134,9 @@ const AdminTrainingForm = () => {
               intro_video_type: (x.intro_video_type as VideoType) ?? "upload",
               exercise_video_url: x.exercise_video_url ?? "",
               exercise_video_type: (x.exercise_video_type as VideoType) ?? "upload",
+              duration_seconds: x.duration_seconds ?? 20,
+              sets: x.sets ?? 1,
+              rest_seconds: x.rest_seconds ?? 15,
             }))
           : [{ title: "", reps: "", is_premium: false }],
       );
@@ -236,7 +242,7 @@ const AdminTrainingForm = () => {
       level: level as any,
       duration_minutes: duration,
       xp_reward: xpReward,
-      exercise_duration_seconds: exerciseDurationSeconds,
+      
       video_type: videoType as any,
       video_url: videoUrl.trim(),
       intro_video_url: introVideoUrl.trim() || null,
@@ -255,6 +261,9 @@ const AdminTrainingForm = () => {
           intro_video_type: d.intro_video_url?.trim() ? d.intro_video_type ?? "upload" : null,
           exercise_video_url: d.exercise_video_url?.trim() || null,
           exercise_video_type: d.exercise_video_url?.trim() ? d.exercise_video_type ?? "upload" : null,
+          duration_seconds: d.duration_seconds ?? 20,
+          sets: d.sets ?? 1,
+          rest_seconds: d.rest_seconds ?? 15,
         })) as any,
       is_published: isPublished,
       is_premium: isPremium,
@@ -406,19 +415,6 @@ const AdminTrainingForm = () => {
                 value={xpReward}
                 onChange={(e) => setXpReward(parseInt(e.target.value) || 0)}
               />
-            </div>
-            <div className="col-span-2 space-y-1.5">
-              <Label>Duração do exercício (segundos)</Label>
-              <Input
-                type="number"
-                min={5}
-                max={600}
-                value={exerciseDurationSeconds}
-                onChange={(e) => setExerciseDurationSeconds(parseInt(e.target.value) || 20)}
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Cronómetro mostrado ao utilizador durante cada exercício. O vídeo fica em loop até o tempo terminar.
-              </p>
             </div>
           </div>
         </CardContent>
@@ -655,6 +651,53 @@ const AdminTrainingForm = () => {
                   />
                 </div>
 
+                <div className="grid grid-cols-3 gap-2 rounded-md border border-border/40 bg-background/40 p-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Duração (s)</Label>
+                    <Input
+                      type="number"
+                      min={5}
+                      max={600}
+                      className="h-8 text-xs"
+                      value={d.duration_seconds ?? 20}
+                      onChange={(e) => {
+                        const n = [...drills];
+                        n[i].duration_seconds = parseInt(e.target.value) || 20;
+                        setDrills(n);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Séries</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={20}
+                      className="h-8 text-xs"
+                      value={d.sets ?? 1}
+                      onChange={(e) => {
+                        const n = [...drills];
+                        n[i].sets = parseInt(e.target.value) || 1;
+                        setDrills(n);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Descanso (s)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={600}
+                      className="h-8 text-xs"
+                      value={d.rest_seconds ?? 15}
+                      onChange={(e) => {
+                        const n = [...drills];
+                        n[i].rest_seconds = parseInt(e.target.value) || 0;
+                        setDrills(n);
+                      }}
+                    />
+                  </div>
+                </div>
                 {(["intro_video_url", "exercise_video_url"] as const).map((field) => {
                   const typeField = field === "intro_video_url" ? "intro_video_type" : "exercise_video_type";
                   const url = (d[field] as string) || "";
