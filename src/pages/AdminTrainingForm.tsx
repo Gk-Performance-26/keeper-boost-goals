@@ -416,19 +416,6 @@ const AdminTrainingForm = () => {
                 onChange={(e) => setXpReward(parseInt(e.target.value) || 0)}
               />
             </div>
-            <div className="col-span-2 space-y-1.5">
-              <Label>Duração do exercício (segundos)</Label>
-              <Input
-                type="number"
-                min={5}
-                max={600}
-                value={exerciseDurationSeconds}
-                onChange={(e) => setExerciseDurationSeconds(parseInt(e.target.value) || 20)}
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Cronómetro mostrado ao utilizador durante cada exercício. O vídeo fica em loop até o tempo terminar.
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>
