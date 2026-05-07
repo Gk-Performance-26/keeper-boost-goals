@@ -34,11 +34,11 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const rawEnv = (body.environment as string) || "sandbox";
+    const rawEnv = (body.environment as string) || "live";
     if (rawEnv !== "sandbox" && rawEnv !== "live") {
       return new Response(JSON.stringify({ error: "Invalid environment" }), { status: 400, headers: corsHeaders });
     }
-    const env: PaddleEnv = rawEnv;
+    const preferredEnv: PaddleEnv = rawEnv;
 
     const { data: sub } = await supabase
       .from("subscriptions")
@@ -48,6 +48,24 @@ Deno.serve(async (req) => {
 
     if (!sub?.paddle_subscription_id) {
       return new Response(JSON.stringify({ error: "No subscription found" }), { status: 404, headers: corsHeaders });
+    }
+
+    // Detect actual env of this subscription instead of trusting client.
+    const order: PaddleEnv[] = preferredEnv === "live" ? ["live", "sandbox"] : ["sandbox", "live"];
+    let env: PaddleEnv = preferredEnv;
+    let detected = false;
+    for (const candidate of order) {
+      try {
+        const probe = getPaddleClient(candidate);
+        const found = await probe.subscriptions.get(sub.paddle_subscription_id);
+        if (found) {
+          env = candidate;
+          detected = true;
+          break;
+        }
+      } catch (_) {
+        // try next
+      }
     }
 
     const paddle = getPaddleClient(env);
