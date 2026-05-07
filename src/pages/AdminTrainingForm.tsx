@@ -33,6 +33,9 @@ interface Drill {
   intro_video_type?: VideoType;
   exercise_video_url?: string;
   exercise_video_type?: VideoType;
+  duration_seconds?: number;
+  sets?: number;
+  rest_seconds?: number;
 }
 
 const AdminTrainingForm = () => {
