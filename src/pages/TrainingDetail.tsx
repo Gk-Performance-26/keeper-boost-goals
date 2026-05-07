@@ -23,6 +23,9 @@ interface Drill {
   intro_video_type?: VideoSrc | null;
   exercise_video_url?: string | null;
   exercise_video_type?: VideoSrc | null;
+  duration_seconds?: number;
+  sets?: number;
+  rest_seconds?: number;
 }
 
 const TrainingDetail = () => {
