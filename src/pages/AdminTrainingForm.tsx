@@ -52,7 +52,7 @@ const AdminTrainingForm = () => {
   const [level, setLevel] = useState<string>("beginner");
   const [duration, setDuration] = useState(15);
   const [xpReward, setXpReward] = useState(50);
-  const [exerciseDurationSeconds, setExerciseDurationSeconds] = useState(20);
+  
   const [videoType, setVideoType] = useState<VideoType>("youtube");
   const [videoUrl, setVideoUrl] = useState("");
   const [introVideoType, setIntroVideoType] = useState<VideoType>("upload");
