@@ -117,7 +117,7 @@ const AdminTrainingForm = () => {
       setLevel(existing.level ?? "beginner");
       setDuration(existing.duration_minutes ?? 15);
       setXpReward(existing.xp_reward ?? 50);
-      setExerciseDurationSeconds((existing as any).exercise_duration_seconds ?? 20);
+      
       setVideoType((existing.video_type as VideoType) ?? "youtube");
       setVideoUrl(existing.video_url ?? "");
       setIntroVideoType(((existing as any).intro_video_type as VideoType) ?? "upload");
