@@ -134,6 +134,9 @@ const AdminTrainingForm = () => {
               intro_video_type: (x.intro_video_type as VideoType) ?? "upload",
               exercise_video_url: x.exercise_video_url ?? "",
               exercise_video_type: (x.exercise_video_type as VideoType) ?? "upload",
+              duration_seconds: x.duration_seconds ?? 20,
+              sets: x.sets ?? 1,
+              rest_seconds: x.rest_seconds ?? 15,
             }))
           : [{ title: "", reps: "", is_premium: false }],
       );
