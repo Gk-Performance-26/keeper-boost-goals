@@ -242,7 +242,7 @@ const AdminTrainingForm = () => {
       level: level as any,
       duration_minutes: duration,
       xp_reward: xpReward,
-      exercise_duration_seconds: exerciseDurationSeconds,
+      
       video_type: videoType as any,
       video_url: videoUrl.trim(),
       intro_video_url: introVideoUrl.trim() || null,
