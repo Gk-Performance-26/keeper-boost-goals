@@ -54,16 +54,27 @@ const Home = () => {
   };
 
   const { data: recommended } = useQuery({
-    queryKey: ["recommended", profile?.experience_level],
+    queryKey: ["recommended-v2", profile?.experience_level],
     enabled: !!profile,
     queryFn: async () => {
-      // Always include at least one warm-up
-      const { data: warmups } = await supabase
+      // Always include a warm-up: prefer one matching the user's level, fallback to any
+      let { data: warmups } = await supabase
         .from("trainings")
         .select("*, categories(name, icon, color_token, slug)")
         .eq("training_group", "aquecimento")
         .eq("is_published", true)
+        .eq("level", profile!.experience_level)
         .limit(1);
+
+      if (!warmups || warmups.length === 0) {
+        const res = await supabase
+          .from("trainings")
+          .select("*, categories(name, icon, color_token, slug)")
+          .eq("training_group", "aquecimento")
+          .eq("is_published", true)
+          .limit(1);
+        warmups = res.data ?? [];
+      }
 
       const { data: levelTrainings } = await supabase
         .from("trainings")
@@ -73,11 +84,7 @@ const Home = () => {
         .neq("training_group", "aquecimento")
         .limit(1);
 
-      const combined = [
-        ...(warmups ?? []),
-        ...(levelTrainings ?? []),
-      ];
-      return combined;
+      return [...(warmups ?? []), ...(levelTrainings ?? [])];
     },
   });
 
