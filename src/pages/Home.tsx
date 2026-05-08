@@ -57,12 +57,27 @@ const Home = () => {
     queryKey: ["recommended", profile?.experience_level],
     enabled: !!profile,
     queryFn: async () => {
-      const { data } = await supabase
+      // Always include at least one warm-up
+      const { data: warmups } = await supabase
+        .from("trainings")
+        .select("*, categories(name, icon, color_token, slug)")
+        .eq("training_group", "aquecimento")
+        .eq("is_published", true)
+        .limit(1);
+
+      const { data: levelTrainings } = await supabase
         .from("trainings")
         .select("*, categories(name, icon, color_token, slug)")
         .eq("level", profile!.experience_level)
-        .limit(2);
-      return data ?? [];
+        .eq("is_published", true)
+        .neq("training_group", "aquecimento")
+        .limit(1);
+
+      const combined = [
+        ...(warmups ?? []),
+        ...(levelTrainings ?? []),
+      ];
+      return combined;
     },
   });
 
