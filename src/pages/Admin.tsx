@@ -17,6 +17,7 @@ const Admin = () => {
   const { data: adminCount, isLoading: countLoading } = useAdminCount();
   const qc = useQueryClient();
   const [claiming, setClaiming] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const { t } = useLanguage();
 
   const { data: trainings, refetch } = useQuery({
