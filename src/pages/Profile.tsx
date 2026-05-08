@@ -37,7 +37,7 @@ const Profile = () => {
   if (!profile) return null;
 
   return (
-    <div className="space-y-5 px-5 pt-8 pb-6">
+    <div className="space-y-5 px-5 pt-16 pb-6">
       <header className="flex flex-col items-center gap-3 pt-4 text-center">
         <Avatar className="h-24 w-24 ring-4 ring-primary/30 shadow-glow">
           <AvatarImage src={profile.avatar_url ?? undefined} />

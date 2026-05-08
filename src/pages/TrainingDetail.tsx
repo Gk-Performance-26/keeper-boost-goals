@@ -125,7 +125,7 @@ const TrainingDetail = () => {
   };
 
   return (
-    <div className="space-y-5 px-5 pt-6 pb-6">
+    <div className="space-y-5 px-5 pt-16 pb-6">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"

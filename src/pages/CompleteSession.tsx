@@ -150,7 +150,7 @@ const CompleteSession = () => {
   }
 
   return (
-    <div className="space-y-6 px-5 pt-8 pb-6">
+    <div className="space-y-6 px-5 pt-16 pb-6">
       <header>
         <p className="text-xs uppercase tracking-wider text-muted-foreground">{t("complete.selfAssessment")}</p>
         <h1 className="font-display text-2xl">{t("complete.howWasIt")}</h1>
