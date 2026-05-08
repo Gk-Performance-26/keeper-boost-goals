@@ -58,7 +58,7 @@ const Admin = () => {
       qc.invalidateQueries({ queryKey: ["admin-count"] });
     };
     return (
-      <div className="space-y-5 px-5 pt-8">
+      <div className="space-y-5 px-5 pt-16">
         <header>
           <h1 className="font-display text-3xl">{t("admin.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("admin.noAdminsYet")}</p>
@@ -79,7 +79,7 @@ const Admin = () => {
 
   if (!isAdmin) {
     return (
-      <div className="space-y-4 px-5 pt-8">
+      <div className="space-y-4 px-5 pt-16">
         <h1 className="font-display text-3xl">{t("admin.title")}</h1>
         <p className="text-sm text-muted-foreground">{t("admin.noPermission")}</p>
         <Link to="/">
