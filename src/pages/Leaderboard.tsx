@@ -32,7 +32,7 @@ const Leaderboard = () => {
   });
 
   return (
-    <div className="relative space-y-5 px-5 pt-8 pb-6">
+    <div className="relative space-y-5 px-5 pt-16 pb-6">
       {/* Background image */}
       <div
         aria-hidden

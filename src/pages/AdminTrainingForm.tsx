@@ -286,7 +286,7 @@ const AdminTrainingForm = () => {
   };
 
   return (
-    <div className="space-y-5 px-5 pt-8 pb-10">
+    <div className="space-y-5 px-5 pt-16 pb-10">
       <header className="flex items-center gap-3">
         <Link to="/admin">
           <Button size="icon" variant="ghost">

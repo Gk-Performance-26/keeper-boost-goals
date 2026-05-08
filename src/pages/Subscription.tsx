@@ -151,7 +151,7 @@ const Subscription = () => {
   return (
     <>
       <PaymentTestModeBanner />
-      <div className="space-y-6 px-5 pt-6 pb-10">
+      <div className="space-y-6 px-5 pt-16 pb-10">
         <Link to="/profile" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> {t("common.back")}
         </Link>
