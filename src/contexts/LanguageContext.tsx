@@ -325,7 +325,7 @@ const translations: Record<Lang, Dict> = {
     "pricing.disclosure": "As subscrições renovam-se automaticamente no final do período (10€/mês ou 96€/ano) salvo cancelamento prévio. Pode cancelar a qualquer momento. Pagamentos web processados pela Paddle.com (Comerciante Registado). Garantia de reembolso de 30 dias para compras web.",
 
     // Admin
-    "admin.title": "Admin",
+    "admin.title": "Gerir Treinos",
     "admin.subtitle": "Gerir treinos e vídeos",
     "admin.new": "Novo",
     "admin.empty": "Ainda não existem treinos. Cria o primeiro!",
@@ -699,7 +699,7 @@ const translations: Record<Lang, Dict> = {
     "pricing.disclosureTitle": "Subscription information",
     "pricing.disclosure": "Subscriptions renew automatically at the end of the period (€10/month or €96/year) unless cancelled. Cancel any time. Web payments are processed by Paddle.com (Merchant of Record). 30-day money-back guarantee on web purchases.",
 
-    "admin.title": "Admin",
+    "admin.title": "Manage Trainings",
     "admin.subtitle": "Manage trainings and videos",
     "admin.new": "New",
     "admin.empty": "No trainings yet. Create the first one!",
