@@ -735,6 +735,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_admin_count: { Args: never; Returns: number }
       get_leaderboard: {
         Args: { _limit?: number }
         Returns: {
