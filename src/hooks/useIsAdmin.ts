@@ -24,12 +24,9 @@ export function useAdminCount() {
   return useQuery({
     queryKey: ["admin-count"],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("user_roles")
-        .select("*", { count: "exact", head: true })
-        .eq("role", "admin");
+      const { data, error } = await supabase.rpc("get_admin_count");
       if (error) throw error;
-      return count ?? 0;
+      return (data as number) ?? 0;
     },
   });
 }
