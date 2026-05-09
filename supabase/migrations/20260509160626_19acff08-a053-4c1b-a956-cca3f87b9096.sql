@@ -1,0 +1,1 @@
+UPDATE public.subscriptions SET status='canceled', cancel_at_period_end=false, current_period_end=now(), updated_at=now() WHERE user_id='e7276232-4ae0-4eb1-bcf5-21dcac6dbbe8';
