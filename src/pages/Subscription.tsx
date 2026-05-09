@@ -41,19 +41,18 @@ const Subscription = () => {
   // (this is the entry point used when the iOS app opens the web checkout in Safari).
   useEffect(() => {
     if (Capacitor.isNativePlatform()) return;
+    if (!user) return;
     const params = new URLSearchParams(window.location.search);
     const checkout = params.get("checkout");
-    const uid = params.get("uid");
-    const email = params.get("email");
-    if (!checkout || !uid) return;
+    if (!checkout) return;
     (async () => {
       try {
         await initializePaddle();
         const paddlePriceId = await getPaddlePriceId(checkout);
         window.Paddle.Checkout.open({
           items: [{ priceId: paddlePriceId, quantity: 1 }],
-          customer: email ? { email } : undefined,
-          customData: { userId: uid },
+          customer: user.email ? { email: user.email } : undefined,
+          customData: { userId: user.id },
           settings: {
             displayMode: "overlay",
             successUrl: `${window.location.origin}/subscription?success=1`,
@@ -65,7 +64,7 @@ const Subscription = () => {
         toast.error(e.message);
       }
     })();
-  }, []);
+  }, [user]);
 
   if (!user) return <Navigate to="/auth" replace />;
 
