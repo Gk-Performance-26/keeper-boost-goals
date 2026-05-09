@@ -10,7 +10,7 @@ const Refund = () => {
   const { user } = useAuth();
   return (
     <div className="min-h-screen bg-background">
-      <div className="px-5 pt-6 pb-10 max-w-2xl mx-auto">
+      <div className="px-5 pt-16 pb-10 max-w-2xl mx-auto">
         <Link to={user ? "/profile" : "/auth"}>
           <Button variant="ghost" size="sm" className="mb-4 -ml-2">
             <ArrowLeft className="h-4 w-4" /> {t("common.back")}
