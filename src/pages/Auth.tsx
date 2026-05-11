@@ -17,6 +17,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PrivacyPolicyContent } from "@/components/PrivacyPolicyContent";
 import { TermsContent } from "@/components/TermsContent";
 import { lovable } from "@/integrations/lovable";
+import { isNativePlatform, nativeSignInWithOAuth } from "@/lib/nativeAuth";
 
 const Auth = () => {
   const { user, loading, signOut } = useAuth();
