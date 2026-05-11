@@ -112,8 +112,8 @@ const Auth = () => {
     }
     setSubmitting(true);
     try {
-      // Capacitor (iOS/Android): use direct Supabase OAuth + Browser plugin,
-      // because the web broker would land back on capacitor://localhost (404).
+      // Capacitor (iOS/Android): use Browser + App plugins with a custom URL
+      // scheme so OAuth returns to the native app instead of a web 404 route.
       if (isNativePlatform()) {
         await nativeSignInWithOAuth(provider);
         // The deep-link listener will set the session; AuthContext picks it up

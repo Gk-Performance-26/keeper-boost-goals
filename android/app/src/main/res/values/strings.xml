@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GKPerformanceHub</string>
+    <string name="title_activity_main">GKPerformanceHub</string>
+    <string name="package_name">com.guilherme.gkperformancehub</string>
+    <string name="custom_url_scheme">com.guilherme.gkperformancehub</string>
+</resources>
