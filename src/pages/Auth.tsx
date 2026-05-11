@@ -112,6 +112,16 @@ const Auth = () => {
     }
     setSubmitting(true);
     try {
+      // Capacitor (iOS/Android): use direct Supabase OAuth + Browser plugin,
+      // because the web broker would land back on capacitor://localhost (404).
+      if (isNativePlatform()) {
+        await nativeSignInWithOAuth(provider);
+        // The deep-link listener will set the session; AuthContext picks it up
+        // and the AppShell/route guards take the user home. Keep submitting=true
+        // so the buttons stay disabled while the system browser is open.
+        return;
+      }
+
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: window.location.origin,
       });
