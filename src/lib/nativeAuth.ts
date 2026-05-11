@@ -4,38 +4,48 @@ import { App, type URLOpenListenerEvent } from "@capacitor/app";
 import { supabase } from "@/integrations/supabase/client";
 
 export const NATIVE_REDIRECT_URL =
-  "https://gkperformancehub.com/auth/native-callback.html";
+  "com.guilherme.gkperformancehub://auth/callback";
 export const NATIVE_DEEP_LINK_PREFIX =
   "com.guilherme.gkperformancehub://auth/callback";
+const NATIVE_OAUTH_BROKER_URL = "https://gkperformancehub.com/~oauth/initiate";
+const NATIVE_OAUTH_STATE_KEY = "native-oauth-state";
 
 export const isNativePlatform = () => Capacitor.isNativePlatform();
+
+const generateOAuthState = () => {
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  return `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+};
 
 /**
  * Native (Capacitor iOS/Android) OAuth flow.
  *
  * Flow:
- * 1. Ask Supabase for the OAuth URL with `skipBrowserRedirect:true` and
- *    `redirectTo` pointing at our public bridge page.
- * 2. Open that URL in the system browser (SFSafariViewController on iOS).
- * 3. The provider returns to the bridge page with tokens in the URL hash
- *    (or a `?code=` for PKCE), which immediately deep-links back into the
- *    app via `com.guilherme.gkperformancehub://auth/callback`.
+ * 1. Open Lovable Cloud's OAuth broker from the system browser.
+ * 2. The broker/provider callback redirects directly to our custom URL scheme
+ *    (`com.guilherme.gkperformancehub://auth/callback`) instead of a web page.
  * 4. The deep-link listener registered in `installNativeAuthDeepLinkListener`
  *    parses the URL and finalises the session.
  */
 export async function nativeSignInWithOAuth(provider: "google" | "apple") {
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const state = generateOAuthState();
+  sessionStorage.setItem(NATIVE_OAUTH_STATE_KEY, state);
+
+  const params = new URLSearchParams({
     provider,
-    options: {
-      redirectTo: NATIVE_REDIRECT_URL,
-      skipBrowserRedirect: true,
-    },
+    redirect_uri: NATIVE_REDIRECT_URL,
+    state,
   });
 
-  if (error) throw error;
-  if (!data?.url) throw new Error("Could not start OAuth flow");
-
-  await Browser.open({ url: data.url, presentationStyle: "popover" });
+  await Browser.open({
+    url: `${NATIVE_OAUTH_BROKER_URL}?${params.toString()}`,
+    presentationStyle: "popover",
+  });
 }
 
 let listenerInstalled = false;
@@ -68,6 +78,12 @@ export function installNativeAuthDeepLinkListener() {
       const accessToken = fragParams.get("access_token");
       const refreshToken = fragParams.get("refresh_token");
       const code = queryParams.get("code");
+      const returnedState = queryParams.get("state") ?? fragParams.get("state");
+      const expectedState = sessionStorage.getItem(NATIVE_OAUTH_STATE_KEY);
+
+      if (expectedState && returnedState && returnedState !== expectedState) {
+        throw new Error("Native OAuth state is invalid");
+      }
 
       if (accessToken && refreshToken) {
         await supabase.auth.setSession({
@@ -77,6 +93,7 @@ export function installNativeAuthDeepLinkListener() {
       } else if (code) {
         await supabase.auth.exchangeCodeForSession(code);
       }
+      sessionStorage.removeItem(NATIVE_OAUTH_STATE_KEY);
 
       // Close the in-app browser if it is still up.
       try {
@@ -84,6 +101,8 @@ export function installNativeAuthDeepLinkListener() {
       } catch {
         /* no-op */
       }
+
+      window.location.replace("/");
     } catch (err) {
       // Surface in console; AuthContext will keep waiting otherwise.
       // eslint-disable-next-line no-console
