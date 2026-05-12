@@ -115,10 +115,13 @@ const Auth = () => {
       // Capacitor (iOS/Android): use Browser + App plugins with a custom URL
       // scheme so OAuth returns to the native app instead of a web 404 route.
       if (isNativePlatform()) {
-        await nativeSignInWithOAuth(provider);
-        // The deep-link listener will set the session; AuthContext picks it up
-        // and the AppShell/route guards take the user home. Keep submitting=true
-        // so the buttons stay disabled while the system browser is open.
+        const { cancelled } = await nativeSignInWithOAuth(provider);
+        if (cancelled) {
+          // User closed the in-app browser before completing OAuth.
+          setSubmitting(false);
+        }
+        // On success, the deep-link listener finalises the session and
+        // navigates away. Keep the buttons disabled until then.
         return;
       }
 
