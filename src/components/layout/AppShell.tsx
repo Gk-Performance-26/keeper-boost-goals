@@ -31,7 +31,7 @@ export function AppShell() {
           <LanguageSwitcher />
         </div>
       </div>
-      <main className="flex-1 pb-2">
+      <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         <Outlet />
       </main>
       <BottomNav />
