@@ -4,10 +4,12 @@ import { App, type URLOpenListenerEvent } from "@capacitor/app";
 import { supabase } from "@/integrations/supabase/client";
 
 export const NATIVE_REDIRECT_URL =
-  "com.guilherme.gkperformancehub://auth/callback";
+  "com.gkperformancehub.app://auth/callback";
 export const NATIVE_DEEP_LINK_PREFIX =
-  "com.guilherme.gkperformancehub://auth/callback";
+  "com.gkperformancehub.app://auth/callback";
 const NATIVE_OAUTH_BROKER_URL = "https://gkperformancehub.com/~oauth/initiate";
+const NATIVE_OAUTH_WEB_CALLBACK_URL =
+  "https://gkperformancehub.com/auth/native-callback.html";
 const NATIVE_OAUTH_STATE_KEY = "native-oauth-state";
 
 export const isNativePlatform = () => Capacitor.isNativePlatform();
@@ -27,9 +29,9 @@ const generateOAuthState = () => {
  *
  * Flow:
  * 1. Open Lovable Cloud's OAuth broker from the system browser.
- * 2. The broker/provider callback redirects directly to our custom URL scheme
- *    (`com.guilherme.gkperformancehub://auth/callback`) instead of a web page.
- * 4. The deep-link listener registered in `installNativeAuthDeepLinkListener`
+ * 2. The OAuth redirect goes to a static web callback that immediately opens
+ *    our custom URL scheme (`com.gkperformancehub.app://auth/callback`).
+ * 3. The deep-link listener registered in `installNativeAuthDeepLinkListener`
  *    parses the URL and finalises the session.
  */
 export async function nativeSignInWithOAuth(provider: "google" | "apple") {
@@ -38,7 +40,8 @@ export async function nativeSignInWithOAuth(provider: "google" | "apple") {
 
   const params = new URLSearchParams({
     provider,
-    redirect_uri: NATIVE_REDIRECT_URL,
+    redirect_uri: NATIVE_OAUTH_WEB_CALLBACK_URL,
+    native_redirect_uri: NATIVE_REDIRECT_URL,
     state,
   });
 
