@@ -86,7 +86,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-8">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pt-20 pb-8 sm:pt-12">
       <div className="mb-6 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary">
           <Shield className="h-5 w-5 text-primary-foreground" />
