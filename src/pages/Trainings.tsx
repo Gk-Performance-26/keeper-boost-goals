@@ -27,11 +27,11 @@ const Trainings = () => {
 
   const filtered = useMemo(() => trainings ?? [], [trainings]);
 
-  const groups: { key: "aquecimento" | "fisico" | "tecnico" | "alongamento"; label: string; emoji: string }[] = [
-    { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥" },
-    { key: "fisico", label: t("trainings.group.fisico"), emoji: "💪" },
-    { key: "tecnico", label: t("trainings.group.tecnico"), emoji: "⚽" },
-    { key: "alongamento", label: t("trainings.group.alongamento"), emoji: "🧘" },
+  const groups: { key: "aquecimento" | "fisico" | "tecnico" | "alongamento"; label: string; emoji: string; step: number }[] = [
+    { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥", step: 1 },
+    { key: "fisico", label: t("trainings.group.fisico"), emoji: "💪", step: 2 },
+    { key: "tecnico", label: t("trainings.group.tecnico"), emoji: "⚽", step: 3 },
+    { key: "alongamento", label: t("trainings.group.alongamento"), emoji: "🧘", step: 4 },
   ];
 
   return (
@@ -70,6 +70,9 @@ const Trainings = () => {
                 className="group flex items-center justify-between rounded-2xl border border-border/60 bg-gradient-to-br from-primary/10 to-primary/5 px-5 py-4 transition hover:border-primary/40 hover:from-primary/15"
               >
                 <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 font-display text-sm font-bold text-primary">
+                    {g.step}
+                  </span>
                   <span className="text-2xl" aria-hidden>
                     {g.emoji}
                   </span>
@@ -90,6 +93,9 @@ const Trainings = () => {
                 aria-expanded={isOpen}
               >
                 <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 font-display text-sm font-bold text-primary">
+                    {g.step}
+                  </span>
                   <span className="text-2xl" aria-hidden>
                     {g.emoji}
                   </span>
