@@ -123,7 +123,7 @@ const Auth = () => {
       }
 
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth/callback`,
       });
       if (result.error) {
         const msg = result.error instanceof Error ? result.error.message : t("auth.somethingWrong");
