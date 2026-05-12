@@ -18,6 +18,7 @@ const Checkout = () => {
     const params = new URLSearchParams(window.location.search);
     const priceKey = params.get("price") || params.get("checkout");
     const urlUid = params.get("uid");
+    const urlEmail = params.get("email") || undefined;
 
     if (!priceKey) {
       setError("Parâmetros de checkout em falta.");
@@ -26,18 +27,21 @@ const Checkout = () => {
 
     (async () => {
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const session = sessionData.session;
-        if (!session) {
-          setError("Sessão não encontrada. Inicie sessão para continuar.");
-          return;
-        }
-        const userId = session.user.id;
-        const email = session.user.email ?? undefined;
+        // Resolve identity: prefer URL params (used when the iOS app opens
+        // the web checkout in Safari without a shared session). Fall back to
+        // the current Supabase session for users who land here from the web.
+        let userId = urlUid ?? undefined;
+        let email = urlEmail;
 
-        if (urlUid && urlUid !== userId) {
-          setError("Sessão não corresponde ao link de checkout.");
-          return;
+        if (!userId) {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const session = sessionData.session;
+          if (!session) {
+            setError("Parâmetros de checkout em falta.");
+            return;
+          }
+          userId = session.user.id;
+          email = email ?? session.user.email ?? undefined;
         }
 
         await initializePaddle();
