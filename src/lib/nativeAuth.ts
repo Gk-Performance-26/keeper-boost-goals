@@ -34,9 +34,14 @@ const generateOAuthState = () => {
  * 3. The deep-link listener registered in `installNativeAuthDeepLinkListener`
  *    parses the URL and finalises the session.
  */
-export async function nativeSignInWithOAuth(provider: "google" | "apple") {
+let deepLinkReceived = false;
+
+export async function nativeSignInWithOAuth(
+  provider: "google" | "apple",
+): Promise<{ cancelled: boolean }> {
   const state = generateOAuthState();
   sessionStorage.setItem(NATIVE_OAUTH_STATE_KEY, state);
+  deepLinkReceived = false;
 
   const params = new URLSearchParams({
     provider,
@@ -45,10 +50,27 @@ export async function nativeSignInWithOAuth(provider: "google" | "apple") {
     state,
   });
 
+  // Wait for either a deep-link callback or the user closing the in-app browser.
+  const finishedPromise = new Promise<{ cancelled: boolean }>((resolve) => {
+    const handle = Browser.addListener("browserFinished", async () => {
+      try {
+        await (await handle).remove();
+      } catch {
+        /* no-op */
+      }
+      // Give the deep-link listener a brief chance to fire first.
+      setTimeout(() => {
+        resolve({ cancelled: !deepLinkReceived });
+      }, 400);
+    });
+  });
+
   await Browser.open({
     url: `${NATIVE_OAUTH_BROKER_URL}?${params.toString()}`,
     presentationStyle: "popover",
   });
+
+  return finishedPromise;
 }
 
 let listenerInstalled = false;
