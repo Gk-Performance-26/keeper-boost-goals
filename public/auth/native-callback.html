@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Signing you in…</title>
+    <style>
+      html,body{height:100%;margin:0;background:#0b0b0c;color:#fff;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+      .wrap{display:flex;min-height:100%;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:24px;text-align:center}
+      .spinner{width:32px;height:32px;border-radius:50%;border:3px solid #2a2a2d;border-top-color:#fff;animation:spin 1s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      a{color:#9bb6ff}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>A regressar à app…</p>
+      <p><a id="manual" href="#">Toca aqui se a app não abrir</a></p>
+    </div>
+    <script>
+      (function () {
+        // Forward both hash (implicit-flow tokens) and query (PKCE code) to the native app.
+        var hash = window.location.hash || "";
+        var search = window.location.search || "";
+        var params = new URLSearchParams(search);
+        var nativeRedirect = params.get("native_redirect_uri") || "com.gkperformancehub.app://auth/callback";
+        params.delete("native_redirect_uri");
+        var cleanSearch = params.toString() ? "?" + params.toString() : "";
+        var deepLink = nativeRedirect + cleanSearch + hash;
+        document.getElementById("manual").setAttribute("href", deepLink);
+        // Trigger the deep link
+        window.location.replace(deepLink);
+      })();
+    </script>
+  </body>
+</html>

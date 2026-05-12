@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { installNativeAuthDeepLinkListener } from "@/lib/nativeAuth";
 
 interface AuthContextValue {
   user: User | null;
@@ -26,6 +27,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Bridge Capacitor deep-link OAuth callbacks into the Supabase session.
+    installNativeAuthDeepLinkListener();
+
     // Set listener BEFORE getSession to avoid missed events
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       // Record login moment so we can enforce a 14-day max session

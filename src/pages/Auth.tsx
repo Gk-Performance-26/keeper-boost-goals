@@ -17,6 +17,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { PrivacyPolicyContent } from "@/components/PrivacyPolicyContent";
 import { TermsContent } from "@/components/TermsContent";
 import { lovable } from "@/integrations/lovable";
+import { isNativePlatform, nativeSignInWithOAuth } from "@/lib/nativeAuth";
 
 const Auth = () => {
   const { user, loading, signOut } = useAuth();
@@ -111,8 +112,18 @@ const Auth = () => {
     }
     setSubmitting(true);
     try {
+      // Capacitor (iOS/Android): use Browser + App plugins with a custom URL
+      // scheme so OAuth returns to the native app instead of a web 404 route.
+      if (isNativePlatform()) {
+        await nativeSignInWithOAuth(provider);
+        // The deep-link listener will set the session; AuthContext picks it up
+        // and the AppShell/route guards take the user home. Keep submitting=true
+        // so the buttons stay disabled while the system browser is open.
+        return;
+      }
+
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth/callback`,
       });
       if (result.error) {
         const msg = result.error instanceof Error ? result.error.message : t("auth.somethingWrong");
