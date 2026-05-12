@@ -201,7 +201,7 @@ const Home = () => {
       <header className="flex items-start justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
-            {format(new Date(), "EEEE, d LLL", { locale: lang === "pt" ? pt : enUS })}
+            {format(new Date(), "EEEE, d 'de' LLLL", { locale: lang === "pt" ? pt : enUS })}
           </p>
           <h1 className="font-display text-3xl">
             {t("home.greeting")}, {profile.display_name?.split(" ")[0] || "Keeper"} 🧤
