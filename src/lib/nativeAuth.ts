@@ -87,6 +87,7 @@ export function installNativeAuthDeepLinkListener() {
     try {
       const url = event.url;
       if (!url || !url.startsWith(NATIVE_DEEP_LINK_PREFIX)) return;
+      deepLinkReceived = true;
 
       // Extract both fragment (#access_token=...) and query (?code=...)
       const hashIndex = url.indexOf("#");
