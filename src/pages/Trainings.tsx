@@ -93,6 +93,9 @@ const Trainings = () => {
                 aria-expanded={isOpen}
               >
                 <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 font-display text-sm font-bold text-primary">
+                    {g.step}
+                  </span>
                   <span className="text-2xl" aria-hidden>
                     {g.emoji}
                   </span>
