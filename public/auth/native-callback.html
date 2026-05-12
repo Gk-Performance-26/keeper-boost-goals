@@ -23,7 +23,11 @@
         // Forward both hash (implicit-flow tokens) and query (PKCE code) to the native app.
         var hash = window.location.hash || "";
         var search = window.location.search || "";
-        var deepLink = "com.guilherme.gkperformancehub://auth/callback" + search + hash;
+        var params = new URLSearchParams(search);
+        var nativeRedirect = params.get("native_redirect_uri") || "com.gkperformancehub.app://auth/callback";
+        params.delete("native_redirect_uri");
+        var cleanSearch = params.toString() ? "?" + params.toString() : "";
+        var deepLink = nativeRedirect + cleanSearch + hash;
         document.getElementById("manual").setAttribute("href", deepLink);
         // Trigger the deep link
         window.location.replace(deepLink);
