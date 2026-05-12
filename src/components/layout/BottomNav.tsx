@@ -14,7 +14,14 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="sticky bottom-0 z-40 border-t border-border/50 bg-card/80 backdrop-blur-lg">
+    <nav
+      className="sticky bottom-0 z-40 border-t border-border/50 bg-card/80 backdrop-blur-lg"
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom)",
+        paddingLeft: "env(safe-area-inset-left)",
+        paddingRight: "env(safe-area-inset-right)",
+      }}
+    >
       <ul className="mx-auto flex max-w-md items-stretch justify-around">
         {items.map(({ to, label, icon: Icon }) => (
           <li key={to} className="flex-1">
