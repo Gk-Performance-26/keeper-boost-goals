@@ -27,11 +27,11 @@ const Trainings = () => {
 
   const filtered = useMemo(() => trainings ?? [], [trainings]);
 
-  const groups: { key: "aquecimento" | "fisico" | "tecnico" | "alongamento"; label: string; emoji: string }[] = [
-    { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥" },
-    { key: "fisico", label: t("trainings.group.fisico"), emoji: "💪" },
-    { key: "tecnico", label: t("trainings.group.tecnico"), emoji: "⚽" },
-    { key: "alongamento", label: t("trainings.group.alongamento"), emoji: "🧘" },
+  const groups: { key: "aquecimento" | "fisico" | "tecnico" | "alongamento"; label: string; emoji: string; step: number }[] = [
+    { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥", step: 1 },
+    { key: "fisico", label: t("trainings.group.fisico"), emoji: "💪", step: 2 },
+    { key: "tecnico", label: t("trainings.group.tecnico"), emoji: "⚽", step: 3 },
+    { key: "alongamento", label: t("trainings.group.alongamento"), emoji: "🧘", step: 4 },
   ];
 
   return (
