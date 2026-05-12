@@ -124,9 +124,9 @@ const Home = () => {
   if (!profile) return null;
 
   return (
-    <div className="space-y-6 px-5 pt-16">
+    <div className="space-y-6 px-5 pt-24">
       {/* Brand hero */}
-      <div className="relative -mx-5 -mt-16 overflow-hidden px-5 pt-12 pb-8">
+      <div className="relative -mx-5 -mt-8 overflow-hidden px-5 pt-6 pb-8">
         {/* Glow background */}
         <div
           aria-hidden
