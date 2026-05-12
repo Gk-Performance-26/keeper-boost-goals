@@ -1,4 +1,4 @@
-package com.guilherme.gkperformancehub;
+package com.gkperformancehub.app;
 
 import com.getcapacitor.BridgeActivity;
 
