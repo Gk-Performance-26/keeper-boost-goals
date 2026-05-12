@@ -40,6 +40,7 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/callback" element={<AuthCallback />} />
               {/* Public legal & pricing pages — must remain accessible without authentication for Paddle compliance */}
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
