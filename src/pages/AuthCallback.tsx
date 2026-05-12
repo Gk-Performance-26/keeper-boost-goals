@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 const REDIRECT_AFTER_LOGIN = "/";
 
@@ -22,9 +23,15 @@ const collectCallbackParams = () => {
 const AuthCallback = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [stuck, setStuck] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+
+    // Safety net: if nothing finishes within 15s, surface a manual exit.
+    const stuckTimer = setTimeout(() => {
+      if (!cancelled) setStuck(true);
+    }, 15000);
 
     const finishOAuthLogin = async () => {
       const params = collectCallbackParams();
@@ -57,7 +64,6 @@ const AuthCallback = () => {
         if (!cancelled) {
           const message = err instanceof Error ? err.message : "Não foi possível concluir o login.";
           setErrorMessage(message);
-          setTimeout(() => navigate("/auth", { replace: true }), 1800);
         }
       }
     };
@@ -66,18 +72,37 @@ const AuthCallback = () => {
 
     return () => {
       cancelled = true;
+      clearTimeout(stuckTimer);
     };
   }, [navigate]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="flex max-w-sm flex-col items-center gap-4 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
-        <h1 className="font-display text-2xl">A concluir login…</h1>
         {errorMessage ? (
-          <p className="text-sm text-destructive">{errorMessage}</p>
+          <>
+            <AlertCircle className="h-10 w-10 text-destructive" aria-hidden="true" />
+            <h1 className="font-display text-2xl">Falha no login</h1>
+            <p className="text-sm text-destructive">{errorMessage}</p>
+            <Button onClick={() => navigate("/auth", { replace: true })} className="mt-2">
+              Voltar ao login
+            </Button>
+          </>
         ) : (
-          <p className="text-sm text-muted-foreground">Só mais um instante.</p>
+          <>
+            <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+            <h1 className="font-display text-2xl">A concluir login…</h1>
+            <p className="text-sm text-muted-foreground">Só mais um instante.</p>
+            {stuck && (
+              <Button
+                variant="outline"
+                onClick={() => navigate("/auth", { replace: true })}
+                className="mt-4"
+              >
+                Cancelar e voltar
+              </Button>
+            )}
+          </>
         )}
       </div>
     </main>
