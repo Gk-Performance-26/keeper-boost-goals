@@ -12,6 +12,7 @@ import Onboarding from "./pages/Onboarding";
 import Home from "./pages/Home";
 import Trainings from "./pages/Trainings";
 import TrainingGroupPage from "./pages/TrainingGroupPage";
+import TrainingLevelPage from "./pages/TrainingLevelPage";
 import TrainingDetail from "./pages/TrainingDetail";
 import CompleteSession from "./pages/CompleteSession";
 import Progress from "./pages/Progress";
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/trainings" element={<Trainings />} />
                 <Route path="/trainings/group/:group" element={<TrainingGroupPage />} />
+                <Route path="/trainings/level/:level" element={<TrainingLevelPage />} />
                 <Route path="/trainings/:id" element={<TrainingDetail />} />
                 <Route path="/trainings/:id/complete" element={<CompleteSession />} />
                 <Route path="/progress" element={<Progress />} />

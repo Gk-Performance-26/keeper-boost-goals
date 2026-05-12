@@ -4,27 +4,15 @@ import { ChevronRight, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TrainingCard } from "@/components/TrainingCard";
-import { CategoryIcon } from "@/components/CategoryIcon";
-import { EXPERIENCE_LEVELS, ExperienceLevel } from "@/lib/gamification";
+import { EXPERIENCE_LEVELS } from "@/lib/gamification";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useTranslatedTexts } from "@/hooks/useTranslatedTexts";
 import { cn } from "@/lib/utils";
 
 const Trainings = () => {
-  const [categorySlug, setCategorySlug] = useState<string | null>(null);
-  const [level, setLevel] = useState<ExperienceLevel | null>(null);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const { isActive: hasSub } = useSubscription();
   const { t } = useLanguage();
-
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data } = await supabase.from("categories").select("*").order("sort_order");
-      return data ?? [];
-    },
-  });
 
   const { data: trainings } = useQuery({
     queryKey: ["trainings"],
@@ -37,13 +25,7 @@ const Trainings = () => {
     },
   });
 
-  const filtered = useMemo(() => {
-    return (trainings ?? []).filter((tr: any) => {
-      if (categorySlug && tr.categories?.slug !== categorySlug) return false;
-      if (level && tr.level !== level) return false;
-      return true;
-    });
-  }, [trainings, categorySlug, level]);
+  const filtered = useMemo(() => trainings ?? [], [trainings]);
 
   const groups: { key: "aquecimento" | "fisico" | "tecnico" | "alongamento"; label: string; emoji: string }[] = [
     { key: "aquecimento", label: t("trainings.group.aquecimento"), emoji: "🔥" },
@@ -52,8 +34,6 @@ const Trainings = () => {
     { key: "alongamento", label: t("trainings.group.alongamento"), emoji: "🧘" },
   ];
 
-  const translatedCategoryNames = useTranslatedTexts((categories ?? []).map((c) => c.name));
-
   return (
     <div className="space-y-5 px-5 pt-16 pb-10">
       <header className="pt-4">
@@ -61,36 +41,19 @@ const Trainings = () => {
         <p className="text-sm text-muted-foreground">{t("trainings.subtitle")}</p>
       </header>
 
-      {/* Categories */}
-      <div className="-mx-5 overflow-x-auto">
-        <div className="flex gap-2 px-5 pb-1">
-          <FilterChip active={!categorySlug} onClick={() => setCategorySlug(null)}>
-            {t("common.all")}
-          </FilterChip>
-          {(categories ?? []).map((c, idx) => (
-            <FilterChip
-              key={c.id}
-              active={categorySlug === c.slug}
-              onClick={() => setCategorySlug(categorySlug === c.slug ? null : c.slug)}
-              colorToken={c.color_token}
-            >
-              <CategoryIcon name={c.icon} className="h-3.5 w-3.5" />
-              {translatedCategoryNames[idx] || c.name}
-            </FilterChip>
-          ))}
-        </div>
-      </div>
-
-      {/* Levels */}
+      {/* Levels — navigate to dedicated level page */}
       <div className="flex flex-wrap gap-2">
         {EXPERIENCE_LEVELS.map((l) => (
-          <FilterChip
+          <Link
             key={l.value}
-            active={level === l.value}
-            onClick={() => setLevel(level === l.value ? null : l.value)}
+            to={`/trainings/level/${l.value}`}
+            className={cn(
+              "flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-semibold transition",
+              "border-border bg-muted/40 text-muted-foreground hover:border-primary/60 hover:bg-primary/10 hover:text-primary",
+            )}
           >
             {t(`level.${l.value}`)}
-          </FilterChip>
+          </Link>
         ))}
       </div>
 
@@ -99,7 +62,6 @@ const Trainings = () => {
         {groups.map((g) => {
           const items = filtered.filter((tr: any) => tr.training_group === g.key);
 
-          // Aquecimento and Alongamentos: clickable card to dedicated sub-group page
           if (g.key === "aquecimento" || g.key === "alongamento") {
             return (
               <Link
@@ -171,40 +133,5 @@ const Trainings = () => {
     </div>
   );
 };
-
-function FilterChip({
-  children,
-  active,
-  onClick,
-  colorToken,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-  onClick: () => void;
-  colorToken?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-semibold transition",
-        active
-          ? "border-primary bg-primary/15 text-primary"
-          : "border-border bg-muted/40 text-muted-foreground hover:bg-muted",
-      )}
-      style={
-        active && colorToken
-          ? {
-              borderColor: `hsl(var(--${colorToken}))`,
-              backgroundColor: `hsl(var(--${colorToken}) / 0.18)`,
-              color: `hsl(var(--${colorToken}))`,
-            }
-          : undefined
-      }
-    >
-      {children}
-    </button>
-  );
-}
 
 export default Trainings;
