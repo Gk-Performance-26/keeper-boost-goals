@@ -52,16 +52,16 @@ export async function nativeSignInWithOAuth(
 
   // Wait for either a deep-link callback or the user closing the in-app browser.
   const finishedPromise = new Promise<{ cancelled: boolean }>((resolve) => {
-    const handle = Browser.addListener("browserFinished", async () => {
-      try {
-        await (await handle).remove();
-      } catch {
-        /* no-op */
-      }
+    const handlePromise = Browser.addListener("browserFinished", () => {
+      handlePromise
+        .then((h) => h.remove())
+        .catch(() => {
+          /* no-op */
+        });
       // Give the deep-link listener a brief chance to fire first.
       setTimeout(() => {
         resolve({ cancelled: !deepLinkReceived });
-      }, 400);
+      }, 500);
     });
   });
 
