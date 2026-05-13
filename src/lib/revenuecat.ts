@@ -25,8 +25,8 @@ export const ENTITLEMENT_ID = "GKPerformanceHub Pro";
 // Product identifiers configured in App Store Connect / Google Play Console.
 export const PRODUCT_IDS = {
   ios: {
-    monthly: "premium_monthly",
-    yearly: "premium_yearly",
+    monthly: "premium_monthly_v2",
+    yearly: "premium_yearly_v2",
   },
   android: {
     // TODO: preencher quando as subscrições Android forem criadas no Google Play Console
@@ -199,7 +199,7 @@ async function fetchStoreProductPrices(platform: "ios" | "android"): Promise<Pla
 
 function getStoreConfigurationMessage(platform: "ios" | "android"): string {
   if (platform === "ios") {
-    return "As compras da App Store ainda não estão disponíveis neste build. Confirma no RevenueCat e no App Store Connect que os produtos premium_monthly e premium_yearly existem exatamente com estes IDs, estão ligados ao bundle ID do TestFlight e fazem parte da Offering atual.";
+    return "As compras da App Store ainda não estão disponíveis neste build. Confirma no RevenueCat e no App Store Connect que os produtos premium_monthly_v2 e premium_yearly_v2 existem exatamente com estes IDs, estão ligados ao bundle ID do TestFlight e fazem parte da Offering atual.";
   }
   return "As compras da Google Play ainda não estão disponíveis neste build. Confirma a configuração dos produtos no RevenueCat e na Google Play Console.";
 }
