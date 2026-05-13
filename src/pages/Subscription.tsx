@@ -43,6 +43,20 @@ const Subscription = () => {
   const { t, lang } = useLanguage();
 
   const isYearly = subscription?.price_id === "premium_yearly";
+  // Subscriptions paid through Apple/Google must be managed in the respective store.
+  const isStoreManaged = subscription?.provider === "revenuecat";
+  const isIOS = Capacitor.getPlatform() === "ios";
+
+  const openStoreManagement = () => {
+    const url = isIOS
+      ? "https://apps.apple.com/account/subscriptions"
+      : "https://play.google.com/store/account/subscriptions";
+    if (Capacitor.isNativePlatform()) {
+      window.open(url, "_system");
+    } else {
+      window.open(url, "_blank");
+    }
+  };
 
   // On the web, if we receive ?checkout=premium_yearly&uid=...&email=..., auto-open Paddle
   // (this is the entry point used when the iOS app opens the web checkout in Safari).
