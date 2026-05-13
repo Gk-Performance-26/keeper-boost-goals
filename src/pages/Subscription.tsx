@@ -252,69 +252,85 @@ const Subscription = () => {
               </CardContent>
             </Card>
 
-            {!subscription?.cancel_at_period_end && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    <ArrowRightLeft className="h-4 w-4" />{" "}
-                    {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {isYearly ? t("sub.switchConfirmMonthly") : t("sub.switchConfirmYearly")}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleSwitchPlan} disabled={switching}>
-                      {switching ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.switching")}
-                        </>
-                      ) : (
-                        t("sub.confirm")
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            {isStoreManaged ? (
+              <>
+                <Button variant="outline" className="w-full" onClick={openStoreManagement}>
+                  <ArrowRightLeft className="h-4 w-4" />{" "}
+                  {isIOS ? "Gerir na App Store" : "Gerir no Google Play"}
+                </Button>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  {isIOS
+                    ? "Para mudar de plano ou cancelar, usa as Definições da App Store."
+                    : "Para mudar de plano ou cancelar, usa as Subscrições do Google Play."}
+                </p>
+              </>
+            ) : (
+              <>
+                {!subscription?.cancel_at_period_end && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        <ArrowRightLeft className="h-4 w-4" />{" "}
+                        {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {isYearly ? t("sub.switchConfirmMonthly") : t("sub.switchConfirmYearly")}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleSwitchPlan} disabled={switching}>
+                          {switching ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.switching")}
+                            </>
+                          ) : (
+                            t("sub.confirm")
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
 
-            {!subscription?.cancel_at_period_end && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="w-full text-destructive hover:text-destructive">
-                    <X className="h-4 w-4" /> {t("sub.cancelSub")}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t("sub.cancelSub")}</AlertDialogTitle>
-                    <AlertDialogDescription>{t("sub.cancelConfirm")}</AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleCancel}
-                      disabled={cancelling}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {cancelling ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.canceling")}
-                        </>
-                      ) : (
-                        t("sub.cancelSub")
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                {!subscription?.cancel_at_period_end && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full text-destructive hover:text-destructive">
+                        <X className="h-4 w-4" /> {t("sub.cancelSub")}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t("sub.cancelSub")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("sub.cancelConfirm")}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleCancel}
+                          disabled={cancelling}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {cancelling ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.canceling")}
+                            </>
+                          ) : (
+                            t("sub.cancelSub")
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </>
             )}
           </>
         ) : (
