@@ -217,11 +217,10 @@ const AdminTrainingForm = () => {
       setDrillUploading((s) => ({ ...s, [key]: false }));
       return;
     }
-    const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
     const n = [...drills];
     n[drillIdx] = {
       ...n[drillIdx],
-      [field]: pub.publicUrl,
+      [field]: path,
       [field === "intro_video_url" ? "intro_video_type" : "exercise_video_type"]: "upload",
     };
     setDrills(n);
