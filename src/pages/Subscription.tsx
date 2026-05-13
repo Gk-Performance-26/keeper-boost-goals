@@ -109,7 +109,10 @@ const Subscription = () => {
   useEffect(() => {
     if (!user) return;
     if (!Capacitor.isNativePlatform()) return;
-    initRevenueCat(user.id).catch((e) => console.warn("[RevenueCat] init failed", e));
+    initRevenueCat(user.id)
+      .then(() => fetchOfferingsPrices())
+      .then((prices) => setNativePrices(prices))
+      .catch((e) => console.warn("[RevenueCat] init/prices failed", e));
   }, [user]);
 
   const openCheckout = async () => {
