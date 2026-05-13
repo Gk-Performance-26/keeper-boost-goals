@@ -43,11 +43,16 @@ const Subscription = () => {
   const [switching, setSwitching] = useState(false);
   const [plan, setPlan] = useState<Plan>("yearly");
   const { t, lang } = useLanguage();
+  const [nativePrices, setNativePrices] = useState<PlanPrices | null>(null);
 
   const isYearly = subscription?.price_id === "premium_yearly";
   // Subscriptions paid through Apple/Google must be managed in the respective store.
   const isStoreManaged = subscription?.provider === "revenuecat";
   const isIOS = Capacitor.getPlatform() === "ios";
+
+  const monthlyPrice = nativePrices?.monthly ?? "9,99€";
+  const yearlyPrice = nativePrices?.yearly ?? "95,99€";
+  const btnPrice = plan === "yearly" ? yearlyPrice : monthlyPrice;
 
   const openStoreManagement = () => {
     const url = isIOS
