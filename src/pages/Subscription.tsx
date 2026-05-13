@@ -403,6 +403,11 @@ const Subscription = () => {
                     </>
                   )}
                 </Button>
+                {Capacitor.isNativePlatform() && isNativePurchasesSupported() && (
+                  <Button variant="ghost" size="sm" className="w-full" onClick={handleRestore}>
+                    Restaurar compras
+                  </Button>
+                )}
                 <p className="text-center text-[11px] text-muted-foreground">{t("sub.cancelAnytime")}</p>
 
                 {/* Apple App Store required subscription disclosure */}
