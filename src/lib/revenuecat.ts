@@ -101,15 +101,19 @@ export async function purchasePlan(plan: "monthly" | "yearly"): Promise<Customer
   // Fetch current offerings and find the package matching this product id.
   const offerings = await Purchases.getOfferings();
   const current = offerings.current;
-  if (!current) {
-    throw new Error("Nenhuma oferta disponível na loja. Verifica a configuração no RevenueCat.");
+  if (!current || current.availablePackages.length === 0) {
+    throw new Error(
+      "As subscrições ainda não estão disponíveis. A configuração da loja está a ser finalizada — tenta novamente dentro de alguns minutos.",
+    );
   }
 
   const pkg: PurchasesPackage | undefined = current.availablePackages.find(
     (p) => p.product.identifier === productId,
   );
   if (!pkg) {
-    throw new Error(`Produto ${productId} não encontrado na oferta atual.`);
+    throw new Error(
+      "Plano indisponível neste momento. Tenta novamente mais tarde ou contacta o suporte.",
+    );
   }
 
   const result = await Purchases.purchasePackage({ aPackage: pkg });
