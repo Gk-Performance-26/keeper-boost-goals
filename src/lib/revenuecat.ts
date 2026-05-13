@@ -1,21 +1,18 @@
 import { Capacitor } from "@capacitor/core";
 import { Purchases, LOG_LEVEL, type CustomerInfo, type PurchasesPackage } from "@revenuecat/purchases-capacitor";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * RevenueCat integration for native iOS/Android in-app purchases.
  *
- * iOS: uses StoreKit (Apple Pay / App Store).
- * Android: uses Google Play Billing.
+ * The public SDK keys (appl_/goog_) are stored as Lovable Cloud backend secrets
+ * (REVENUECAT_IOS_API_KEY / REVENUECAT_ANDROID_API_KEY) and fetched at runtime
+ * via the `get-revenuecat-config` edge function. We do this because Lovable
+ * Cloud does not allow setting VITE_ build-time secrets, and these keys are
+ * public (safe to ship to the client).
  *
  * The web build keeps using Paddle (this module never initializes on web).
- *
- * The iOS / Android API keys are RevenueCat **public SDK keys** (start with
- * `appl_` / `goog_`) — safe to ship in the client. They must be exposed as
- * Vite build env vars: VITE_REVENUECAT_IOS_API_KEY / VITE_REVENUECAT_ANDROID_API_KEY.
  */
-
-const IOS_API_KEY = import.meta.env.VITE_REVENUECAT_IOS_API_KEY as string | undefined;
-const ANDROID_API_KEY = import.meta.env.VITE_REVENUECAT_ANDROID_API_KEY as string | undefined;
 
 export const ENTITLEMENT_ID = "GKPerformanceHub Pro";
 
@@ -33,12 +30,40 @@ export const PRODUCT_IDS = {
 } as const;
 
 let initialized = false;
+let configCache: { ios: string | null; android: string | null } | null = null;
+let configPromise: Promise<{ ios: string | null; android: string | null }> | null = null;
 
+async function loadConfig() {
+  if (configCache) return configCache;
+  if (!configPromise) {
+    configPromise = (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("get-revenuecat-config");
+        if (error) throw error;
+        configCache = {
+          ios: (data?.ios as string | null) ?? null,
+          android: (data?.android as string | null) ?? null,
+        };
+      } catch (e) {
+        console.warn("[RevenueCat] failed to load config", e);
+        configCache = { ios: null, android: null };
+      }
+      return configCache;
+    })();
+  }
+  return configPromise;
+}
+
+/**
+ * Synchronous capability check for UI gating. On native iOS/Android this
+ * assumes the SDK key has been (or will be) provisioned server-side; the
+ * actual key presence is verified inside `initRevenueCat` / `purchasePlan`.
+ */
 export function isNativePurchasesSupported(): boolean {
   if (!Capacitor.isNativePlatform()) return false;
   const platform = Capacitor.getPlatform();
-  if (platform === "ios") return !!IOS_API_KEY;
-  if (platform === "android") return !!ANDROID_API_KEY && !!PRODUCT_IDS.android.monthly;
+  if (platform === "ios") return true;
+  if (platform === "android") return !!PRODUCT_IDS.android.monthly;
   return false;
 }
 
@@ -50,7 +75,8 @@ export async function initRevenueCat(appUserId: string): Promise<void> {
   }
 
   const platform = Capacitor.getPlatform();
-  const apiKey = platform === "ios" ? IOS_API_KEY : ANDROID_API_KEY;
+  const config = await loadConfig();
+  const apiKey = platform === "ios" ? config.ios : config.android;
   if (!apiKey) {
     console.warn(`[RevenueCat] No API key for platform ${platform}`);
     return;
@@ -66,6 +92,10 @@ export async function purchasePlan(plan: "monthly" | "yearly"): Promise<Customer
   const productId = PRODUCT_IDS[platform][plan];
   if (!productId) {
     throw new Error(`Plano ${plan} não está configurado para ${platform}.`);
+  }
+
+  if (!initialized) {
+    throw new Error("RevenueCat não foi inicializado. Tenta novamente.");
   }
 
   // Fetch current offerings and find the package matching this product id.
