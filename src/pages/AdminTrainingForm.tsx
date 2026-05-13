@@ -184,7 +184,7 @@ const AdminTrainingForm = () => {
       setVideoType(asImage ? "image" : "upload");
       setUploading(false);
     } else {
-      setIntroVideoUrl(pub.publicUrl);
+      setIntroVideoUrl(path);
       setIntroVideoType("upload");
       setUploadingIntro(false);
     }
