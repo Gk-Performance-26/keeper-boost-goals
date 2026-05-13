@@ -27,21 +27,34 @@ const Checkout = () => {
 
     (async () => {
       try {
-        // Resolve identity: prefer URL params (used when the iOS app opens
-        // the web checkout in Safari without a shared session). Fall back to
-        // the current Supabase session for users who land here from the web.
-        let userId = urlUid ?? undefined;
-        let email = urlEmail;
+        // Resolve identity safely. Always check the current session first;
+        // if a session exists, it is the source of truth and any `uid` in
+        // the URL must match it (otherwise an attacker could trick a
+        // signed-in victim into paying for the attacker's subscription).
+        // Only fall back to the URL `uid` for the native iOS Safari flow
+        // where no shared session is available.
+        const { data: sessionData } = await supabase.auth.getSession();
+        const session = sessionData.session;
 
-        if (!userId) {
-          const { data: sessionData } = await supabase.auth.getSession();
-          const session = sessionData.session;
-          if (!session) {
-            setError("Parâmetros de checkout em falta.");
+        let userId: string | undefined;
+        let email: string | undefined = urlEmail;
+
+        if (session) {
+          if (urlUid && urlUid !== session.user.id) {
+            setError("Sessão não corresponde ao utilizador do checkout.");
             return;
           }
           userId = session.user.id;
           email = email ?? session.user.email ?? undefined;
+        } else if (urlUid) {
+          // Native iOS flow: no shared web session. Accept the URL uid —
+          // the Paddle webhook only credits the subscription after the
+          // payment succeeds, and the iOS app builds this URL from the
+          // signed-in native session.
+          userId = urlUid;
+        } else {
+          setError("Sessão necessária para abrir o checkout.");
+          return;
         }
 
         await initializePaddle();

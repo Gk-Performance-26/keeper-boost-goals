@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { gatewayFetch, type PaddleEnv } from '../_shared/paddle.ts';
 
 const ALLOWED_PRICE_IDS = new Set(["premium_monthly", "premium_yearly"]);
@@ -17,6 +18,28 @@ serve(async (req) => {
   }
 
   try {
+    // Require an authenticated user to prevent abuse of the Paddle gateway.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.toLowerCase().startsWith("bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        ...responseHeaders,
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const token = authHeader.replace(/^[Bb]earer\s+/, "");
+    const { data: userData, error: userErr } = await supabase.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        ...responseHeaders,
+      });
+    }
+
     const { priceId, environment } = await req.json();
     if (!priceId || typeof priceId !== "string" || !ALLOWED_PRICE_IDS.has(priceId)) {
       return new Response(JSON.stringify({ error: "priceId required" }), {
