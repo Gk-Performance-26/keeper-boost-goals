@@ -178,13 +178,13 @@ const AdminTrainingForm = () => {
       else setUploadingIntro(false);
       return;
     }
-    const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
+    // Store the bare storage path. The private bucket is served via signed URLs only.
     if (target === "main") {
-      setVideoUrl(pub.publicUrl);
+      setVideoUrl(path);
       setVideoType(asImage ? "image" : "upload");
       setUploading(false);
     } else {
-      setIntroVideoUrl(pub.publicUrl);
+      setIntroVideoUrl(path);
       setIntroVideoType("upload");
       setUploadingIntro(false);
     }
@@ -217,11 +217,10 @@ const AdminTrainingForm = () => {
       setDrillUploading((s) => ({ ...s, [key]: false }));
       return;
     }
-    const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
     const n = [...drills];
     n[drillIdx] = {
       ...n[drillIdx],
-      [field]: pub.publicUrl,
+      [field]: path,
       [field === "intro_video_url" ? "intro_video_type" : "exercise_video_type"]: "upload",
     };
     setDrills(n);
