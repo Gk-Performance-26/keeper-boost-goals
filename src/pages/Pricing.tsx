@@ -45,7 +45,7 @@ const Pricing = () => {
                 {t("sub.monthlyPlan")}
               </p>
               <p className="font-display text-3xl">
-                10€<span className="text-sm text-muted-foreground">{t("sub.month")}</span>
+                9,99€<span className="text-sm text-muted-foreground">{t("sub.month")}</span>
               </p>
               <p className="text-xs text-muted-foreground">{t("pricing.monthlyDesc")}</p>
             </CardContent>
@@ -60,7 +60,7 @@ const Pricing = () => {
                 {t("sub.yearlyPlan")}
               </p>
               <p className="font-display text-3xl">
-                96€<span className="text-sm text-muted-foreground">{t("sub.year")}</span>
+                95,99€<span className="text-sm text-muted-foreground">{t("sub.year")}</span>
               </p>
               <p className="text-xs text-primary">{t("sub.perMonthEquivalent")}</p>
             </CardContent>
