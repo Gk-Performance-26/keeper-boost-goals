@@ -124,8 +124,12 @@ const Subscription = () => {
         return;
       }
 
-      // Android nativo sem RevenueCat configurado → fallback para checkout web (Paddle)
+      // Android nativo sem RevenueCat configurado → fallback para checkout web (Paddle).
+      // iOS nunca cai aqui — Apple exige in-app purchases via StoreKit/RevenueCat.
       if (Capacitor.isNativePlatform()) {
+        if (isIOS) {
+          throw new Error("Compras na App Store estão temporariamente indisponíveis. Tenta novamente em instantes.");
+        }
         const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
         const url = `https://gkperformancehub.com/checkout?price=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
         window.open(url, "_system");
