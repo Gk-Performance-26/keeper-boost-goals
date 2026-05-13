@@ -23,6 +23,8 @@ import {
   purchasePlan,
   restorePurchases,
   hasEntitlement,
+  fetchOfferingsPrices,
+  type PlanPrices,
 } from "@/lib/revenuecat";
 import { Capacitor } from "@capacitor/core";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -41,11 +43,16 @@ const Subscription = () => {
   const [switching, setSwitching] = useState(false);
   const [plan, setPlan] = useState<Plan>("yearly");
   const { t, lang } = useLanguage();
+  const [nativePrices, setNativePrices] = useState<PlanPrices | null>(null);
 
   const isYearly = subscription?.price_id === "premium_yearly";
   // Subscriptions paid through Apple/Google must be managed in the respective store.
   const isStoreManaged = subscription?.provider === "revenuecat";
   const isIOS = Capacitor.getPlatform() === "ios";
+
+  const monthlyPrice = nativePrices?.monthly ?? "9,99€";
+  const yearlyPrice = nativePrices?.yearly ?? "95,99€";
+  const btnPrice = plan === "yearly" ? yearlyPrice : monthlyPrice;
 
   const openStoreManagement = () => {
     const url = isIOS
@@ -102,7 +109,10 @@ const Subscription = () => {
   useEffect(() => {
     if (!user) return;
     if (!Capacitor.isNativePlatform()) return;
-    initRevenueCat(user.id).catch((e) => console.warn("[RevenueCat] init failed", e));
+    initRevenueCat(user.id)
+      .then(() => fetchOfferingsPrices())
+      .then((prices) => setNativePrices(prices))
+      .catch((e) => console.warn("[RevenueCat] init/prices failed", e));
   }, [user]);
 
   const openCheckout = async () => {
@@ -383,7 +393,7 @@ const Subscription = () => {
                     {t("sub.monthlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    9,99€<span className="text-xs text-muted-foreground">{t("sub.month")}</span>
+                    {monthlyPrice}<span className="text-xs text-muted-foreground">{t("sub.month")}</span>
                   </p>
                 </button>
                 <button
@@ -402,7 +412,7 @@ const Subscription = () => {
                     {t("sub.yearlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    95,99€<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
+                    {yearlyPrice}<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
                   </p>
                   <p className="text-[10px] text-primary">{t("sub.perMonthEquivalent")}</p>
                 </button>
@@ -433,7 +443,7 @@ const Subscription = () => {
                   ) : (
                     <>
                       <Lock className="h-4 w-4" />{" "}
-                      {t("sub.subscribeBtn")} {plan === "yearly" ? "95,99€/ano" : "9,99€/mês"}
+                      {t("sub.subscribeBtn")} {plan === "yearly" ? `${btnPrice}/${t("sub.year")}` : `${btnPrice}/${t("sub.month")}`}
                     </>
                   )}
                 </Button>

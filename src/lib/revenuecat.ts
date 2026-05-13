@@ -125,3 +125,31 @@ export function hasEntitlement(customerInfo: CustomerInfo | null | undefined): b
   if (!customerInfo) return false;
   return !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 }
+
+export type PlanPrices = {
+  monthly: string | null;
+  yearly: string | null;
+};
+
+export async function fetchOfferingsPrices(): Promise<PlanPrices> {
+  if (!initialized) {
+    throw new Error("RevenueCat não foi inicializado.");
+  }
+  const offerings = await Purchases.getOfferings();
+  const current = offerings.current;
+  if (!current) return { monthly: null, yearly: null };
+
+  const platform = Capacitor.getPlatform() as "ios" | "android";
+
+  const monthlyPkg = current.availablePackages.find(
+    (p) => p.product.identifier === PRODUCT_IDS[platform].monthly,
+  );
+  const yearlyPkg = current.availablePackages.find(
+    (p) => p.product.identifier === PRODUCT_IDS[platform].yearly,
+  );
+
+  return {
+    monthly: monthlyPkg?.product.priceString ?? null,
+    yearly: yearlyPkg?.product.priceString ?? null,
+  };
+}
