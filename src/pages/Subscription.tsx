@@ -17,6 +17,13 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
+import {
+  initRevenueCat,
+  isNativePurchasesSupported,
+  purchasePlan,
+  restorePurchases,
+  hasEntitlement,
+} from "@/lib/revenuecat";
 import { Capacitor } from "@capacitor/core";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
