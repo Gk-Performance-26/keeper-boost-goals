@@ -349,10 +349,15 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           id: string
+          original_transaction_id: string | null
           paddle_customer_id: string | null
           paddle_subscription_id: string | null
           price_id: string | null
+          product_identifier: string | null
+          provider: string
+          rc_app_user_id: string | null
           status: string
+          store: string | null
           updated_at: string
           user_id: string
         }
@@ -361,10 +366,15 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          original_transaction_id?: string | null
           paddle_customer_id?: string | null
           paddle_subscription_id?: string | null
           price_id?: string | null
+          product_identifier?: string | null
+          provider?: string
+          rc_app_user_id?: string | null
           status?: string
+          store?: string | null
           updated_at?: string
           user_id: string
         }
@@ -373,10 +383,15 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          original_transaction_id?: string | null
           paddle_customer_id?: string | null
           paddle_subscription_id?: string | null
           price_id?: string | null
+          product_identifier?: string | null
+          provider?: string
+          rc_app_user_id?: string | null
           status?: string
+          store?: string | null
           updated_at?: string
           user_id?: string
         }

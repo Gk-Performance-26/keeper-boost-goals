@@ -17,6 +17,13 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { initializePaddle, getPaddlePriceId, isTestMode } from "@/lib/paddle";
+import {
+  initRevenueCat,
+  isNativePurchasesSupported,
+  purchasePlan,
+  restorePurchases,
+  hasEntitlement,
+} from "@/lib/revenuecat";
 import { Capacitor } from "@capacitor/core";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -77,11 +84,33 @@ const Subscription = () => {
     t("sub.benefit6"),
   ];
 
+  // Initialize RevenueCat once we have a logged-in user on a native platform.
+  useEffect(() => {
+    if (!user) return;
+    if (!Capacitor.isNativePlatform()) return;
+    initRevenueCat(user.id).catch((e) => console.warn("[RevenueCat] init failed", e));
+  }, [user]);
+
   const openCheckout = async () => {
     setOpening(true);
     try {
-      // On native apps (iOS/Android), Paddle.js cannot run inside the
-      // capacitor:// WebView — open the hosted web checkout in the system browser.
+      // iOS / Android nativo com RevenueCat configurado → fluxo nativo (Apple Pay / Google Pay)
+      if (isNativePurchasesSupported()) {
+        try {
+          const info = await purchasePlan(plan);
+          if (hasEntitlement(info)) {
+            toast.success(t("sub.activeTitle"));
+            // dar tempo ao webhook para escrever na DB; refetch faz o restante
+            setTimeout(() => refetch(), 2000);
+          }
+        } catch (e: any) {
+          if (e?.userCancelled || e?.code === "1" /* PURCHASE_CANCELLED */) return;
+          throw e;
+        }
+        return;
+      }
+
+      // Android nativo sem RevenueCat configurado → fallback para checkout web (Paddle)
       if (Capacitor.isNativePlatform()) {
         const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
         const url = `https://gkperformancehub.com/checkout?price=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
@@ -89,6 +118,7 @@ const Subscription = () => {
         return;
       }
 
+      // Web → Paddle
       await initializePaddle();
       const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
       const paddlePriceId = await getPaddlePriceId(priceKey);
@@ -104,9 +134,23 @@ const Subscription = () => {
         },
       });
     } catch (e: any) {
-      toast.error(t("sub.checkoutError") + e.message);
+      toast.error(t("sub.checkoutError") + (e.message ?? ""));
     } finally {
       setOpening(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      const info = await restorePurchases();
+      if (hasEntitlement(info)) {
+        toast.success(t("sub.activeTitle"));
+        setTimeout(() => refetch(), 2000);
+      } else {
+        toast.info("Nenhuma compra anterior encontrada.");
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Erro ao restaurar compras.");
     }
   };
 
@@ -359,6 +403,11 @@ const Subscription = () => {
                     </>
                   )}
                 </Button>
+                {Capacitor.isNativePlatform() && isNativePurchasesSupported() && (
+                  <Button variant="ghost" size="sm" className="w-full" onClick={handleRestore}>
+                    Restaurar compras
+                  </Button>
+                )}
                 <p className="text-center text-[11px] text-muted-foreground">{t("sub.cancelAnytime")}</p>
 
                 {/* Apple App Store required subscription disclosure */}
