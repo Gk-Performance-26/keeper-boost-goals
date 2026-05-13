@@ -134,7 +134,7 @@ export function TermsContent() {
           <strong>O nosso processo de encomenda é conduzido pelo nosso revendedor online Paddle.com. A Paddle.com é o Comerciante Registado (Merchant of Record) para todas as nossas encomendas. A Paddle gere todas as questões de apoio ao cliente relativas a pagamentos e processa os reembolsos.</strong>
         </p>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Planos Premium: <strong>10€/mês</strong> ou <strong>96€/ano</strong>.</li>
+          <li>Planos Premium: <strong>9,99€/mês</strong> ou <strong>95,99€/ano</strong>.</li>
           <li>As subscrições <strong>renovam-se automaticamente</strong> no final de cada período, salvo cancelamento antes da renovação.</li>
           <li>Pode cancelar a qualquer momento nas definições da conta.</li>
           <li>Os termos de pagamento, faturação, impostos e reembolsos para compras web são regidos pelos <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">Termos de Comprador da Paddle</a> e pela <a href="https://www.paddle.com/legal/refund-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Política de Reembolso da Paddle</a>.</li>

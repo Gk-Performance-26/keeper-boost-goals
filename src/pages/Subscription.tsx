@@ -305,7 +305,7 @@ const Subscription = () => {
                     {t("sub.monthlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    10€<span className="text-xs text-muted-foreground">{t("sub.month")}</span>
+                    9,99€<span className="text-xs text-muted-foreground">{t("sub.month")}</span>
                   </p>
                 </button>
                 <button
@@ -324,7 +324,7 @@ const Subscription = () => {
                     {t("sub.yearlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    96€<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
+                    95,99€<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
                   </p>
                   <p className="text-[10px] text-primary">{t("sub.perMonthEquivalent")}</p>
                 </button>
@@ -355,7 +355,7 @@ const Subscription = () => {
                   ) : (
                     <>
                       <Lock className="h-4 w-4" />{" "}
-                      {t("sub.subscribeBtn")} {plan === "yearly" ? "96€/ano" : "10€/mês"}
+                      {t("sub.subscribeBtn")} {plan === "yearly" ? "95,99€/ano" : "9,99€/mês"}
                     </>
                   )}
                 </Button>
