@@ -178,9 +178,9 @@ const AdminTrainingForm = () => {
       else setUploadingIntro(false);
       return;
     }
-    const { data: pub } = supabase.storage.from("training-videos").getPublicUrl(path);
+    // Store the bare storage path. The private bucket is served via signed URLs only.
     if (target === "main") {
-      setVideoUrl(pub.publicUrl);
+      setVideoUrl(path);
       setVideoType(asImage ? "image" : "upload");
       setUploading(false);
     } else {
