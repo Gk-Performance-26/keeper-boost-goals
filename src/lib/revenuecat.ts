@@ -1,5 +1,11 @@
 import { Capacitor } from "@capacitor/core";
-import { Purchases, LOG_LEVEL, type CustomerInfo, type PurchasesPackage } from "@revenuecat/purchases-capacitor";
+import {
+  Purchases,
+  LOG_LEVEL,
+  type CustomerInfo,
+  type PurchasesPackage,
+  type PurchasesStoreProduct,
+} from "@revenuecat/purchases-capacitor";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -98,25 +104,10 @@ export async function purchasePlan(plan: "monthly" | "yearly"): Promise<Customer
     throw new Error("RevenueCat não foi inicializado. Tenta novamente.");
   }
 
-  // Fetch current offerings and find the package matching this product id.
-  const offerings = await Purchases.getOfferings();
-  const current = offerings.current;
-  if (!current || current.availablePackages.length === 0) {
-    throw new Error(
-      "As subscrições ainda não estão disponíveis. A configuração da loja está a ser finalizada — tenta novamente dentro de alguns minutos.",
-    );
-  }
-
-  const pkg: PurchasesPackage | undefined = current.availablePackages.find(
-    (p) => p.product.identifier === productId,
-  );
-  if (!pkg) {
-    throw new Error(
-      "Plano indisponível neste momento. Tenta novamente mais tarde ou contacta o suporte.",
-    );
-  }
-
-  const result = await Purchases.purchasePackage({ aPackage: pkg });
+  const item = await findPurchasableItem(platform, productId);
+  const result = item.kind === "package"
+    ? await Purchases.purchasePackage({ aPackage: item.value })
+    : await Purchases.purchaseStoreProduct({ product: item.value });
   return result.customerInfo;
 }
 
@@ -139,21 +130,76 @@ export async function fetchOfferingsPrices(): Promise<PlanPrices> {
   if (!initialized) {
     throw new Error("RevenueCat não foi inicializado.");
   }
-  const offerings = await Purchases.getOfferings();
-  const current = offerings.current;
-  if (!current) return { monthly: null, yearly: null };
-
   const platform = Capacitor.getPlatform() as "ios" | "android";
+  const monthlyId = PRODUCT_IDS[platform].monthly;
+  const yearlyId = PRODUCT_IDS[platform].yearly;
 
-  const monthlyPkg = current.availablePackages.find(
-    (p) => p.product.identifier === PRODUCT_IDS[platform].monthly,
-  );
-  const yearlyPkg = current.availablePackages.find(
-    (p) => p.product.identifier === PRODUCT_IDS[platform].yearly,
-  );
+  try {
+    const offerings = await Purchases.getOfferings();
+    const current = offerings.current;
+    if (current) {
+      const monthlyPkg = current.availablePackages.find((p) => p.product.identifier === monthlyId);
+      const yearlyPkg = current.availablePackages.find((p) => p.product.identifier === yearlyId);
+      if (monthlyPkg || yearlyPkg) {
+        return {
+          monthly: monthlyPkg?.product.priceString ?? null,
+          yearly: yearlyPkg?.product.priceString ?? null,
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("[RevenueCat] offerings unavailable, trying products directly", e);
+  }
 
-  return {
-    monthly: monthlyPkg?.product.priceString ?? null,
-    yearly: yearlyPkg?.product.priceString ?? null,
-  };
+  return fetchStoreProductPrices(platform);
+}
+
+type PurchasableItem =
+  | { kind: "package"; value: PurchasesPackage }
+  | { kind: "product"; value: PurchasesStoreProduct };
+
+async function findPurchasableItem(platform: "ios" | "android", productId: string): Promise<PurchasableItem> {
+  try {
+    const offerings = await Purchases.getOfferings();
+    const pkg = offerings.current?.availablePackages.find((p) => p.product.identifier === productId);
+    if (pkg) return { kind: "package", value: pkg };
+  } catch (e) {
+    console.warn("[RevenueCat] offerings unavailable, trying product directly", e);
+  }
+
+  try {
+    const { products } = await Purchases.getProducts({ productIdentifiers: [productId] });
+    const product = products.find((p) => p.identifier === productId);
+    if (product) return { kind: "product", value: product };
+  } catch (e) {
+    console.warn("[RevenueCat] product fetch failed", e);
+  }
+
+  throw new Error(getStoreConfigurationMessage(platform));
+}
+
+async function fetchStoreProductPrices(platform: "ios" | "android"): Promise<PlanPrices> {
+  const productIds = [PRODUCT_IDS[platform].monthly, PRODUCT_IDS[platform].yearly].filter(Boolean);
+  if (productIds.length === 0) return { monthly: null, yearly: null };
+
+  try {
+    const { products } = await Purchases.getProducts({ productIdentifiers: productIds });
+    const monthlyProduct = products.find((p) => p.identifier === PRODUCT_IDS[platform].monthly);
+    const yearlyProduct = products.find((p) => p.identifier === PRODUCT_IDS[platform].yearly);
+
+    return {
+      monthly: monthlyProduct?.priceString ?? null,
+      yearly: yearlyProduct?.priceString ?? null,
+    };
+  } catch (e) {
+    console.warn("[RevenueCat] product prices unavailable", e);
+    return { monthly: null, yearly: null };
+  }
+}
+
+function getStoreConfigurationMessage(platform: "ios" | "android"): string {
+  if (platform === "ios") {
+    return "As compras da App Store ainda não estão disponíveis neste build. Confirma no RevenueCat e no App Store Connect que os produtos premium_monthly e premium_yearly existem exatamente com estes IDs, estão ligados ao bundle ID do TestFlight e fazem parte da Offering atual.";
+  }
+  return "As compras da Google Play ainda não estão disponíveis neste build. Confirma a configuração dos produtos no RevenueCat e na Google Play Console.";
 }
