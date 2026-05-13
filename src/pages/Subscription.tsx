@@ -43,6 +43,20 @@ const Subscription = () => {
   const { t, lang } = useLanguage();
 
   const isYearly = subscription?.price_id === "premium_yearly";
+  // Subscriptions paid through Apple/Google must be managed in the respective store.
+  const isStoreManaged = subscription?.provider === "revenuecat";
+  const isIOS = Capacitor.getPlatform() === "ios";
+
+  const openStoreManagement = () => {
+    const url = isIOS
+      ? "https://apps.apple.com/account/subscriptions"
+      : "https://play.google.com/store/account/subscriptions";
+    if (Capacitor.isNativePlatform()) {
+      window.open(url, "_system");
+    } else {
+      window.open(url, "_blank");
+    }
+  };
 
   // On the web, if we receive ?checkout=premium_yearly&uid=...&email=..., auto-open Paddle
   // (this is the entry point used when the iOS app opens the web checkout in Safari).
@@ -110,8 +124,12 @@ const Subscription = () => {
         return;
       }
 
-      // Android nativo sem RevenueCat configurado → fallback para checkout web (Paddle)
+      // Android nativo sem RevenueCat configurado → fallback para checkout web (Paddle).
+      // iOS nunca cai aqui — Apple exige in-app purchases via StoreKit/RevenueCat.
       if (Capacitor.isNativePlatform()) {
+        if (isIOS) {
+          throw new Error("Compras na App Store estão temporariamente indisponíveis. Tenta novamente em instantes.");
+        }
         const priceKey = plan === "yearly" ? "premium_yearly" : "premium_monthly";
         const url = `https://gkperformancehub.com/checkout?price=${priceKey}&uid=${encodeURIComponent(user.id)}&email=${encodeURIComponent(user.email ?? "")}`;
         window.open(url, "_system");
@@ -234,69 +252,85 @@ const Subscription = () => {
               </CardContent>
             </Card>
 
-            {!subscription?.cancel_at_period_end && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    <ArrowRightLeft className="h-4 w-4" />{" "}
-                    {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {isYearly ? t("sub.switchConfirmMonthly") : t("sub.switchConfirmYearly")}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleSwitchPlan} disabled={switching}>
-                      {switching ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.switching")}
-                        </>
-                      ) : (
-                        t("sub.confirm")
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            {isStoreManaged ? (
+              <>
+                <Button variant="outline" className="w-full" onClick={openStoreManagement}>
+                  <ArrowRightLeft className="h-4 w-4" />{" "}
+                  {isIOS ? "Gerir na App Store" : "Gerir no Google Play"}
+                </Button>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  {isIOS
+                    ? "Para mudar de plano ou cancelar, usa as Definições da App Store."
+                    : "Para mudar de plano ou cancelar, usa as Subscrições do Google Play."}
+                </p>
+              </>
+            ) : (
+              <>
+                {!subscription?.cancel_at_period_end && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        <ArrowRightLeft className="h-4 w-4" />{" "}
+                        {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {isYearly ? t("sub.switchToMonthly") : t("sub.switchToYearly")}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {isYearly ? t("sub.switchConfirmMonthly") : t("sub.switchConfirmYearly")}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleSwitchPlan} disabled={switching}>
+                          {switching ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.switching")}
+                            </>
+                          ) : (
+                            t("sub.confirm")
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
 
-            {!subscription?.cancel_at_period_end && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="w-full text-destructive hover:text-destructive">
-                    <X className="h-4 w-4" /> {t("sub.cancelSub")}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t("sub.cancelSub")}</AlertDialogTitle>
-                    <AlertDialogDescription>{t("sub.cancelConfirm")}</AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleCancel}
-                      disabled={cancelling}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {cancelling ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.canceling")}
-                        </>
-                      ) : (
-                        t("sub.cancelSub")
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                {!subscription?.cancel_at_period_end && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" className="w-full text-destructive hover:text-destructive">
+                        <X className="h-4 w-4" /> {t("sub.cancelSub")}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t("sub.cancelSub")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("sub.cancelConfirm")}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleCancel}
+                          disabled={cancelling}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {cancelling ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" /> {t("sub.canceling")}
+                            </>
+                          ) : (
+                            t("sub.cancelSub")
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </>
             )}
           </>
         ) : (
