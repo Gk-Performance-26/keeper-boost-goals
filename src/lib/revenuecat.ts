@@ -78,14 +78,54 @@ export async function initRevenueCat(appUserId: string): Promise<void> {
     return;
   }
 
-  await Purchases.setLogLevel({ level: LOG_LEVEL.WARN });
+  await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+  console.log("[RevenueCat] configuring", {
+    platform,
+    appUserID: appUserId,
+    apiKeyPreview: `${apiKey.slice(0, 8)}…${apiKey.slice(-4)}`,
+    apiKeyLength: apiKey.length,
+  });
   await Purchases.configure({ apiKey, appUserID: appUserId });
   initialized = true;
+  console.log("[RevenueCat] configured OK");
 }
 
 async function getCurrentOffering(): Promise<PurchasesOffering | null> {
-  const offerings = await Purchases.getOfferings();
-  return offerings.current ?? offerings.all?.["default"] ?? null;
+  try {
+    const offerings = await Purchases.getOfferings();
+    const allKeys = Object.keys(offerings.all ?? {});
+    const current = offerings.current ?? offerings.all?.["default"] ?? null;
+    console.log("[RevenueCat] getOfferings result", {
+      hasCurrent: !!offerings.current,
+      currentIdentifier: offerings.current?.identifier ?? null,
+      allOfferingKeys: allKeys,
+      pickedOffering: current?.identifier ?? null,
+      availablePackages:
+        current?.availablePackages?.map((p) => ({
+          identifier: p.identifier,
+          packageType: p.packageType,
+          productIdentifier: p.product?.identifier,
+          priceString: p.product?.priceString,
+        })) ?? [],
+    });
+    if (!current) {
+      console.error("[RevenueCat] offerings empty — no current offering and no 'default' offering returned");
+    } else if ((current.availablePackages ?? []).length === 0) {
+      console.error(
+        "[RevenueCat] offering has no packages — likely product not found in App Store Connect, bundle ID mismatch, or product not approved/ready",
+      );
+    }
+    return current;
+  } catch (err: any) {
+    console.error("[RevenueCat] getOfferings FAILED", {
+      message: err?.message,
+      code: err?.code,
+      underlyingErrorMessage: err?.underlyingErrorMessage,
+      readableErrorCode: err?.readableErrorCode,
+      raw: err,
+    });
+    throw err;
+  }
 }
 
 function pickPackage(offering: PurchasesOffering, plan: "monthly" | "yearly"): PurchasesPackage | null {
