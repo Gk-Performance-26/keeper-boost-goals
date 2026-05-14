@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Check, Crown } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -93,7 +94,15 @@ const Pricing = () => {
 
           <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5 text-left">
             <p className="font-semibold text-foreground">{t("pricing.disclosureTitle")}</p>
-            <p>{t("pricing.disclosure")}</p>
+            <p>
+              {Capacitor.getPlatform() === "ios"
+                ? t("pricing.disclosure")
+                    .replace(/Pagamentos web processados pela Paddle\.com \(Comerciante Registado\)\.\s?/g, "Pagamentos processados pela App Store. ")
+                    .replace(/Web payments are processed by Paddle\.com \(Merchant of Record\)\.\s?/g, "Payments are processed by the App Store. ")
+                    .replace(/Garantia de reembolso de 30 dias para compras web\./g, "Reembolsos geridos pela App Store conforme as políticas da Apple.")
+                    .replace(/30-day money-back guarantee on web purchases\./g, "Refunds are handled by the App Store under Apple's policies.")
+                : t("pricing.disclosure")}
+            </p>
             <p className="pt-1">
               <Link to="/terms" className="underline hover:text-foreground">
                 {t("profile.terms")}

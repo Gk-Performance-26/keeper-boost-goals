@@ -448,7 +448,11 @@ const Subscription = () => {
                     Restaurar compras
                   </Button>
                 )}
-                <p className="text-center text-[11px] text-muted-foreground">{t("sub.cancelAnytime")}</p>
+                <p className="text-center text-[11px] text-muted-foreground">
+                  {Capacitor.getPlatform() === "ios"
+                    ? t("sub.cancelAnytime").replace(/Paddle\.com|Paddle/g, "App Store")
+                    : t("sub.cancelAnytime")}
+                </p>
 
                 {/* Apple App Store required subscription disclosure */}
                 <div className="rounded-lg border border-border/60 bg-muted/30 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5">
