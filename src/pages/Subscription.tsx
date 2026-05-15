@@ -50,8 +50,11 @@ const Subscription = () => {
   const isStoreManaged = subscription?.provider === "revenuecat";
   const isIOS = Capacitor.getPlatform() === "ios";
 
-  const monthlyPrice = nativePrices?.monthly ?? "9,99€";
-  const yearlyPrice = nativePrices?.yearly ?? "95,99€";
+  const isNative = isNativePurchasesSupported();
+  // On native: only show prices coming from RevenueCat/App Store. No hardcoded fallback.
+  // On web (Paddle): keep static labels as last resort since RC isn't available.
+  const monthlyPrice = nativePrices?.monthly ?? (isNative ? null : "9,99€");
+  const yearlyPrice = nativePrices?.yearly ?? (isNative ? null : "95,99€");
   const btnPrice = plan === "yearly" ? yearlyPrice : monthlyPrice;
 
   const openStoreManagement = () => {
@@ -389,7 +392,8 @@ const Subscription = () => {
                     {t("sub.monthlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    {monthlyPrice}<span className="text-xs text-muted-foreground">{t("sub.month")}</span>
+                    {monthlyPrice ?? <Loader2 className="inline h-4 w-4 animate-spin" />}
+                    {monthlyPrice && <span className="text-xs text-muted-foreground">{t("sub.month")}</span>}
                   </p>
                 </button>
                 <button
@@ -408,7 +412,8 @@ const Subscription = () => {
                     {t("sub.yearlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    {yearlyPrice}<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
+                    {yearlyPrice ?? <Loader2 className="inline h-4 w-4 animate-spin" />}
+                    {yearlyPrice && <span className="text-xs text-muted-foreground">{t("sub.year")}</span>}
                   </p>
                   <p className="text-[10px] text-primary">{t("sub.perMonthEquivalent")}</p>
                 </button>
@@ -439,7 +444,8 @@ const Subscription = () => {
                   ) : (
                     <>
                       <Lock className="h-4 w-4" />{" "}
-                      {t("sub.subscribeBtn")} {plan === "yearly" ? `${btnPrice}/${t("sub.year")}` : `${btnPrice}/${t("sub.month")}`}
+                      {t("sub.subscribeBtn")}
+                      {btnPrice ? ` ${btnPrice}/${plan === "yearly" ? t("sub.year") : t("sub.month")}` : ""}
                     </>
                   )}
                 </Button>
