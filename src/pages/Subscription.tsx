@@ -121,8 +121,8 @@ const Subscription = () => {
     if (!user) return;
     if (!Capacitor.isNativePlatform()) return;
     initRevenueCat(user.id)
-      .then(() => fetchOfferingsPrices())
-      .then((prices) => setNativePrices(prices))
+      .then(() => fetchOfferingsPackages())
+      .then((pkgs) => setNativePackages(pkgs))
       .catch((e) => console.warn("[RevenueCat] init/prices failed", e));
   }, [user]);
 
