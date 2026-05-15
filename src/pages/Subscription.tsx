@@ -444,7 +444,8 @@ const Subscription = () => {
                   ) : (
                     <>
                       <Lock className="h-4 w-4" />{" "}
-                      {t("sub.subscribeBtn")} {plan === "yearly" ? `${btnPrice}/${t("sub.year")}` : `${btnPrice}/${t("sub.month")}`}
+                      {t("sub.subscribeBtn")}
+                      {btnPrice ? ` ${btnPrice}/${plan === "yearly" ? t("sub.year") : t("sub.month")}` : ""}
                     </>
                   )}
                 </Button>
