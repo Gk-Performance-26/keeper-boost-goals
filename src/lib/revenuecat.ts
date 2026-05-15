@@ -161,6 +161,15 @@ export async function purchasePlan(plan: "monthly" | "yearly"): Promise<Customer
     throw new Error(`Plano ${plan === "monthly" ? "mensal" : "anual"} não está disponível.`);
   }
 
+  console.log("[RevenueCat] purchasing", {
+    plan,
+    offeringIdentifier: offering.identifier,
+    packageIdentifier: pkg.identifier,
+    packageType: pkg.packageType,
+    productIdentifier: pkg.product?.identifier,
+    priceString: pkg.product?.priceString,
+  });
+
   const result = await Purchases.purchasePackage({ aPackage: pkg });
   return result.customerInfo;
 }
