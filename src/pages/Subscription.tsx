@@ -50,8 +50,8 @@ const Subscription = () => {
   const isStoreManaged = subscription?.provider === "revenuecat";
   const isIOS = Capacitor.getPlatform() === "ios";
 
-  const monthlyPrice = nativePrices?.monthly ?? "9,99€";
-  const yearlyPrice = nativePrices?.yearly ?? "95,99€";
+  const monthlyPrice = nativePrices?.monthly ?? null;
+  const yearlyPrice = nativePrices?.yearly ?? null;
   const btnPrice = plan === "yearly" ? yearlyPrice : monthlyPrice;
 
   const openStoreManagement = () => {
