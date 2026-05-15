@@ -50,8 +50,11 @@ const Subscription = () => {
   const isStoreManaged = subscription?.provider === "revenuecat";
   const isIOS = Capacitor.getPlatform() === "ios";
 
-  const monthlyPrice = nativePrices?.monthly ?? null;
-  const yearlyPrice = nativePrices?.yearly ?? null;
+  const isNative = isNativePurchasesSupported();
+  // On native: only show prices coming from RevenueCat/App Store. No hardcoded fallback.
+  // On web (Paddle): keep static labels as last resort since RC isn't available.
+  const monthlyPrice = nativePrices?.monthly ?? (isNative ? null : "9,99€");
+  const yearlyPrice = nativePrices?.yearly ?? (isNative ? null : "95,99€");
   const btnPrice = plan === "yearly" ? yearlyPrice : monthlyPrice;
 
   const openStoreManagement = () => {
