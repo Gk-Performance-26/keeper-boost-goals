@@ -184,12 +184,12 @@ export function hasEntitlement(customerInfo: CustomerInfo | null | undefined): b
   return !!customerInfo.entitlements.active[ENTITLEMENT_ID];
 }
 
-export type PlanPrices = {
-  monthly: string | null;
-  yearly: string | null;
+export type PlanPackages = {
+  monthly: PurchasesPackage | null;
+  yearly: PurchasesPackage | null;
 };
 
-export async function fetchOfferingsPrices(): Promise<PlanPrices> {
+export async function fetchOfferingsPackages(): Promise<PlanPackages> {
   if (!initialized) {
     throw new Error("RevenueCat não foi inicializado.");
   }
@@ -198,12 +198,9 @@ export async function fetchOfferingsPrices(): Promise<PlanPrices> {
     const offering = await getCurrentOffering();
     if (!offering) return { monthly: null, yearly: null };
 
-    const monthlyPkg = pickPackage(offering, "monthly");
-    const yearlyPkg = pickPackage(offering, "yearly");
-
     return {
-      monthly: monthlyPkg?.product.priceString ?? null,
-      yearly: yearlyPkg?.product.priceString ?? null,
+      monthly: pickPackage(offering, "monthly"),
+      yearly: pickPackage(offering, "yearly"),
     };
   } catch (e) {
     console.warn("[RevenueCat] offerings unavailable", e);
