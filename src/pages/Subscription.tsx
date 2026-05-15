@@ -23,8 +23,8 @@ import {
   purchasePlan,
   restorePurchases,
   hasEntitlement,
-  fetchOfferingsPrices,
-  type PlanPrices,
+  fetchOfferingsPackages,
+  type PlanPackages,
 } from "@/lib/revenuecat";
 import { Capacitor } from "@capacitor/core";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -43,7 +43,7 @@ const Subscription = () => {
   const [switching, setSwitching] = useState(false);
   const [plan, setPlan] = useState<Plan>("yearly");
   const { t, lang } = useLanguage();
-  const [nativePrices, setNativePrices] = useState<PlanPrices | null>(null);
+  const [nativePackages, setNativePackages] = useState<PlanPackages | null>(null);
 
   const isYearly = subscription?.price_id === "premium_yearly";
   // Subscriptions paid through Apple/Google must be managed in the respective store.
@@ -51,11 +51,19 @@ const Subscription = () => {
   const isIOS = Capacitor.getPlatform() === "ios";
 
   const isNative = isNativePurchasesSupported();
-  // On native: only show prices coming from RevenueCat/App Store. No hardcoded fallback.
-  // On web (Paddle): keep static labels as last resort since RC isn't available.
-  const monthlyPrice = nativePrices?.monthly ?? (isNative ? null : "9,99€");
-  const yearlyPrice = nativePrices?.yearly ?? (isNative ? null : "95,99€");
-  const btnPrice = plan === "yearly" ? yearlyPrice : monthlyPrice;
+  const monthlyPackage = nativePackages?.monthly ?? null;
+  const annualPackage = nativePackages?.yearly ?? null;
+  const selectedPackage = plan === "yearly" ? annualPackage : monthlyPackage;
+
+  // Price always comes from the package's product.priceString (App Store / Play).
+  // On web (Paddle) we keep static labels as last resort since RC isn't available.
+  const monthlyPrice = monthlyPackage?.product?.priceString ?? (isNative ? null : "9,99€");
+  const yearlyPrice = annualPackage?.product?.priceString ?? (isNative ? null : "95,99€");
+  const btnPrice = selectedPackage?.product?.priceString ?? (isNative ? null : (plan === "yearly" ? "95,99€" : "9,99€"));
+
+  console.log("[Paywall] monthly price", monthlyPackage?.product?.priceString);
+  console.log("[Paywall] annual price", annualPackage?.product?.priceString);
+  console.log("[Paywall] selected price", selectedPackage?.product?.priceString);
 
   const openStoreManagement = () => {
     const url = isIOS
@@ -113,8 +121,8 @@ const Subscription = () => {
     if (!user) return;
     if (!Capacitor.isNativePlatform()) return;
     initRevenueCat(user.id)
-      .then(() => fetchOfferingsPrices())
-      .then((prices) => setNativePrices(prices))
+      .then(() => fetchOfferingsPackages())
+      .then((pkgs) => setNativePackages(pkgs))
       .catch((e) => console.warn("[RevenueCat] init/prices failed", e));
   }, [user]);
 
@@ -392,7 +400,7 @@ const Subscription = () => {
                     {t("sub.monthlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    {monthlyPrice ?? <Loader2 className="inline h-4 w-4 animate-spin" />}
+                    {monthlyPrice ?? <span className="text-sm text-muted-foreground">A carregar...</span>}
                     {monthlyPrice && <span className="text-xs text-muted-foreground">{t("sub.month")}</span>}
                   </p>
                 </button>
@@ -412,7 +420,7 @@ const Subscription = () => {
                     {t("sub.yearlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    {yearlyPrice ?? <Loader2 className="inline h-4 w-4 animate-spin" />}
+                    {yearlyPrice ?? <span className="text-sm text-muted-foreground">A carregar...</span>}
                     {yearlyPrice && <span className="text-xs text-muted-foreground">{t("sub.year")}</span>}
                   </p>
                   <p className="text-[10px] text-primary">{t("sub.perMonthEquivalent")}</p>
