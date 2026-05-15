@@ -23,8 +23,8 @@ import {
   purchasePlan,
   restorePurchases,
   hasEntitlement,
-  fetchOfferingsPrices,
-  type PlanPrices,
+  fetchOfferingsPackages,
+  type PlanPackages,
 } from "@/lib/revenuecat";
 import { Capacitor } from "@capacitor/core";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
