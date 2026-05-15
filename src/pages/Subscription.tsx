@@ -400,7 +400,7 @@ const Subscription = () => {
                     {t("sub.monthlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    {monthlyPrice ?? <Loader2 className="inline h-4 w-4 animate-spin" />}
+                    {monthlyPrice ?? <span className="text-sm text-muted-foreground">A carregar...</span>}
                     {monthlyPrice && <span className="text-xs text-muted-foreground">{t("sub.month")}</span>}
                   </p>
                 </button>
