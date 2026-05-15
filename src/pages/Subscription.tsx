@@ -412,7 +412,8 @@ const Subscription = () => {
                     {t("sub.yearlyPlan")}
                   </p>
                   <p className="mt-0.5 font-display text-lg">
-                    {yearlyPrice}<span className="text-xs text-muted-foreground">{t("sub.year")}</span>
+                    {yearlyPrice ?? <Loader2 className="inline h-4 w-4 animate-spin" />}
+                    {yearlyPrice && <span className="text-xs text-muted-foreground">{t("sub.year")}</span>}
                   </p>
                   <p className="text-[10px] text-primary">{t("sub.perMonthEquivalent")}</p>
                 </button>
