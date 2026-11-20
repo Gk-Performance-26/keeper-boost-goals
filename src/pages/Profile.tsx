@@ -13,6 +13,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
+import { ProfileDetailsDialog } from "@/components/ProfileDetailsDialog";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -21,6 +22,7 @@ const Profile = () => {
   const { isActive: hasSub, hasPaidSub, refetch: refetchSub } = useSubscription();
   const { t } = useLanguage();
   const [restoring, setRestoring] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const handleRestorePurchases = async () => {
     setRestoring(true);
@@ -40,7 +42,7 @@ const Profile = () => {
     <div className="space-y-5 px-5 pt-16 pb-6">
       <header className="flex flex-col items-center gap-3 pt-4 text-center">
         <Avatar className="h-24 w-24 ring-4 ring-primary/30 shadow-glow">
-          <AvatarImage src={profile.avatar_url ?? undefined} />
+          <AvatarImage src={profile.avatar_url ?? undefined} className="object-cover" />
           <AvatarFallback className="text-3xl">
             {(profile.display_name ?? user?.email ?? "?").slice(0, 1).toUpperCase()}
           </AvatarFallback>
@@ -50,6 +52,10 @@ const Profile = () => {
           <p className="text-sm text-muted-foreground capitalize">
             {t(`level.${profile.experience_level}`)} · {profile.age_group ?? "—"}
           </p>
+          {profile.bio && <p className="max-w-full whitespace-pre-wrap break-words text-sm text-muted-foreground [overflow-wrap:anywhere]">{profile.bio}</p>}
+          <Button variant="outline" size="sm" onClick={() => setDetailsOpen(true)}>
+            <Settings className="h-4 w-4" />{t("profile.photoBio")}
+          </Button>
           {hasSub ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
               <Crown className="h-3 w-3" /> {t("trainings.premium")}
@@ -67,6 +73,9 @@ const Profile = () => {
           )}
         </div>
       </header>
+      <ProfileDetailsDialog open={detailsOpen} onOpenChange={setDetailsOpen}
+        avatarUrl={profile.avatar_url} bio={profile.bio}
+        initial={(profile.display_name ?? user?.email ?? "?").slice(0, 1).toUpperCase()} />
 
       <Card className="gradient-card border-border/60">
         <CardContent className="space-y-3 p-4">

@@ -206,6 +206,7 @@ export type Database = {
         Row: {
           age_group: string | null
           avatar_url: string | null
+          bio: string
           created_at: string
           current_level: number
           current_streak: number
@@ -227,6 +228,7 @@ export type Database = {
         Insert: {
           age_group?: string | null
           avatar_url?: string | null
+          bio?: string
           created_at?: string
           current_level?: number
           current_streak?: number
@@ -248,6 +250,7 @@ export type Database = {
         Update: {
           age_group?: string | null
           avatar_url?: string | null
+          bio?: string
           created_at?: string
           current_level?: number
           current_streak?: number
