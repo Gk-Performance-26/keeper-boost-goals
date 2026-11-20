@@ -118,8 +118,6 @@ const Progress = () => {
       {/* Goals (admin can create, users can activate) */}
       <GoalsSection
         sessions={sessions ?? []}
-        totalXp={profile.total_xp}
-        currentStreak={profile.current_streak}
       />
 
       {/* Stats grid */}

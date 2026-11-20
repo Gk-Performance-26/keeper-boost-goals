@@ -99,9 +99,9 @@ const translations: Record<Lang, Dict> = {
 
     // Goals
     "goals.title": "Os meus objetivos",
-    "goals.empty": "Ainda não tens objetivos. Adiciona um abaixo!",
+    "goals.empty": "Ainda não tens objetivos ativos.",
     "goals.adminEmpty": "Ainda não há objetivos disponíveis. Cria o primeiro!",
-    "goals.add": "Adicionar objetivo",
+    "goals.add": "Ativar objetivos",
     "goals.create": "Criar objetivo",
     "goals.new": "Novo objetivo",
     "goals.titleField": "Título",
@@ -121,7 +121,7 @@ const translations: Record<Lang, Dict> = {
     "goals.period.all_time": "Sempre",
     "goals.xpReward": "Recompensa XP",
     "goals.activate": "Ativar",
-    "goals.activated": "Objetivo adicionado!",
+    "goals.activated": "Objetivo ativado!",
     "goals.removed": "Objetivo removido",
     "goals.created": "Objetivo criado!",
     "goals.deleted": "Modelo apagado",
@@ -482,9 +482,9 @@ const translations: Record<Lang, Dict> = {
 
     // Goals
     "goals.title": "My goals",
-    "goals.empty": "You don't have any goals yet. Add one below!",
+    "goals.empty": "You don't have any active goals yet.",
     "goals.adminEmpty": "No goals available yet. Create the first one!",
-    "goals.add": "Add goal",
+    "goals.add": "Activate goals",
     "goals.create": "Create goal",
     "goals.new": "New goal",
     "goals.titleField": "Title",
@@ -504,7 +504,7 @@ const translations: Record<Lang, Dict> = {
     "goals.period.all_time": "All time",
     "goals.xpReward": "XP reward",
     "goals.activate": "Activate",
-    "goals.activated": "Goal added!",
+    "goals.activated": "Goal activated!",
     "goals.removed": "Goal removed",
     "goals.created": "Goal created!",
     "goals.deleted": "Template deleted",

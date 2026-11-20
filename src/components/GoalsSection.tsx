@@ -29,58 +29,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress as ProgressBar } from "@/components/ui/progress";
 import { CheckCircle2, Plus, Target, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
-import { subDays, startOfDay, isAfter } from "date-fns";
-
-type Session = { completed_at: string; xp_earned: number; duration_minutes: number };
+import { computeGoalProgress, type GoalSession } from "@/lib/goalProgress";
 
 type Props = {
-  sessions: Session[];
-  totalXp: number;
-  currentStreak: number;
+  sessions: GoalSession[];
 };
 
-function periodCutoff(period: string): Date | null {
-  const now = new Date();
-  switch (period) {
-    case "daily":
-      return startOfDay(now);
-    case "weekly":
-      return subDays(now, 7);
-    case "monthly":
-      return subDays(now, 30);
-    default:
-      return null;
-  }
-}
-
-function computeProgress(
-  template: GoalTemplate,
-  sessions: Session[],
-  totalXp: number,
-  currentStreak: number,
-): number {
-  const cutoff = periodCutoff(template.period);
-  const filtered = cutoff
-    ? sessions.filter((s) => isAfter(new Date(s.completed_at), cutoff))
-    : sessions;
-
-  switch (template.metric_type) {
-    case "sessions":
-      return filtered.length;
-    case "xp":
-      return cutoff
-        ? filtered.reduce((sum, s) => sum + (s.xp_earned || 0), 0)
-        : totalXp;
-    case "minutes":
-      return filtered.reduce((sum, s) => sum + (s.duration_minutes || 0), 0);
-    case "streak":
-      return currentStreak;
-    default:
-      return 0;
-  }
-}
-
-export function GoalsSection({ sessions, totalXp, currentStreak }: Props) {
+export function GoalsSection({ sessions }: Props) {
   const { user } = useAuth();
   const { data: isAdmin } = useIsAdmin();
   const { t } = useLanguage();
@@ -169,7 +124,7 @@ export function GoalsSection({ sessions, totalXp, currentStreak }: Props) {
         )}
         {(userGoals ?? []).map((g) => {
           if (!g.template) return null;
-          const current = computeProgress(g.template, sessions, totalXp, currentStreak);
+          const current = computeGoalProgress(g.template, sessions, g.started_at);
           const target = g.template.target_value;
           const pct = Math.min(100, Math.round((current / target) * 100));
           const done = current >= target;
@@ -204,7 +159,7 @@ export function GoalsSection({ sessions, totalXp, currentStreak }: Props) {
                   </Button>
                 </div>
                 <div className="space-y-1">
-                  <ProgressBar value={pct} className="h-2" />
+                  <ProgressBar value={pct} className="h-2 bg-muted" />
                   <div className="flex justify-between text-[11px] text-muted-foreground">
                     <span>
                       {current} / {target} {t(`goals.metric.${g.template.metric_type}`).toLowerCase()}
